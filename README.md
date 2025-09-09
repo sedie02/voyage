@@ -1,2 +1,2 @@
-# Wearhouse
-Een app die je kledingkast digitaliseert, zodat je makkelijk kleding terugvindt en outfits kiest.
+# Voyage
+Een app die je helpt reizen plannen.
