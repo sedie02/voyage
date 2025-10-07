@@ -1,7 +1,7 @@
 # 🧪 Voyage Test Status
 
-**Datum**: 30 September 2025  
-**Tijd**: Net nu  
+**Datum**: 30 September 2025
+**Tijd**: Net nu
 **Status**: ✅ **WERKT!**
 
 ---
@@ -94,9 +94,9 @@ npm run dev
 error TS2688: Cannot find type definition file for 'minimatch'.
 ```
 
-**Status**: ⚠️ Known issue, niet kritiek  
-**Impact**: Geen - Next.js build werkt gewoon  
-**Reden**: Deprecated `@types/minimatch` dependency conflict  
+**Status**: ⚠️ Known issue, niet kritiek
+**Impact**: Geen - Next.js build werkt gewoon
+**Reden**: Deprecated `@types/minimatch` dependency conflict
 **Fix**: Negeren of later updaten met Next.js 15
 
 ---
