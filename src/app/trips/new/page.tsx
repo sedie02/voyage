@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 // import DatePicker from 'react-datepicker';
 // import Autocomplete from 'react-google-autocomplete';
 
@@ -10,13 +10,13 @@ import { useState, useTransition } from 'react';
 
 type TripType = 'adventure' | 'beach' | 'culture' | 'nature' | 'mixed' | null;
 
-const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyBRCqv9EXAMPLE';
+// const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyBRCqv9EXAMPLE';
 
 export default function NewTripPage() {
-  const [isPending, startTransition] = useTransition();
+  // const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
-  const [guestMode, setGuestMode] = useState(false);
+  // const [guestMode, setGuestMode] = useState(false);
 
   const [formData, setFormData] = useState({
     tripType: null as TripType,
@@ -354,10 +354,10 @@ export default function NewTripPage() {
             ) : (
               <button
                 type="submit"
-                disabled={!canContinue() || isPending}
+                disabled={!canContinue()}
                 className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 sm:px-6 sm:py-4 sm:text-base"
               >
-                {isPending ? (
+                {/* {isPending ? (
                   <>
                     <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
                       <circle
@@ -379,17 +379,17 @@ export default function NewTripPage() {
                   </>
                 ) : (
                   'Trip Aanmaken'
-                )}
+                )} */}
+                Trip Aanmaken
               </button>
             )}
           </div>
 
           {/* Guest Mode Option */}
-          {step === 3 && !isPending && (
+          {step === 3 && (
             <div className="border-t border-border pt-4 sm:pt-6">
               <button
                 type="button"
-                onClick={() => setGuestMode(true)}
                 className="flex w-full items-center justify-center gap-2 text-sm font-semibold text-text-muted transition-colors hover:text-text sm:text-base"
               >
                 <svg
