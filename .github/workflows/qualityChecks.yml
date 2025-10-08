@@ -1,0 +1,52 @@
+name: Voyage Quality Checks
+
+on:
+  push:
+    branches: ['**'] # elke branch
+  pull_request:
+    branches: ['**'] # ook bij PR’s
+
+jobs:
+  quality:
+    name: Quality Assurance
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Repo ophalen
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Node.js installeren
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 # gebruik dezelfde versie als lokaal
+          cache: 'npm'
+
+      # 3️⃣ Dependencies installeren
+      - name: Install dependencies
+        run: npm ci
+
+      # 4️⃣ ESLint
+      - name: Run ESLint
+        run: npm run lint
+
+      # 5️⃣ TypeScript type check
+      - name: Type Check
+        run: npm run type-check --if-present
+
+      # 6️⃣ Prettier format check
+      - name: Format Check
+        run: npm run format:check --if-present
+
+      # 7️⃣ Build check
+      - name: Build project
+        run: npm run build
+
+      # 8️⃣ Unit & Integration tests
+      - name: Run tests
+        run: npm run test -- --ci --passWithNoTests
+
+      # 9️⃣ E2E tests (optioneel)
+      - name: Run E2E tests
+        run: npm run test:e2e --if-present

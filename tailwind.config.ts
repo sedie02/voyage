@@ -122,17 +122,17 @@ const config: Config = {
           '0%': { transform: 'rotate(0deg)' },
           '100%': { transform: 'rotate(360deg)' },
         },
-        'blob': {
+        blob: {
           '0%': { transform: 'translate(0px, 0px) scale(1)' },
           '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
           '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
           '100%': { transform: 'translate(0px, 0px) scale(1)' },
         },
-        'float': {
+        float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-20px)' },
         },
-        'shimmer': {
+        shimmer: {
           '0%': { backgroundPosition: '-1000px 0' },
           '100%': { backgroundPosition: '1000px 0' },
         },
@@ -143,9 +143,9 @@ const config: Config = {
         'slide-in-down': 'slide-in-down 0.3s ease-out',
         'scale-in': 'scale-in 0.2s ease-out',
         'spin-slow': 'spin-slow 3s linear infinite',
-        'blob': 'blob 7s infinite',
-        'float': 'float 6s ease-in-out infinite',
-        'shimmer': 'shimmer 2s linear infinite',
+        blob: 'blob 7s infinite',
+        float: 'float 6s ease-in-out infinite',
+        shimmer: 'shimmer 2s linear infinite',
       },
 
       // Screens voor responsive design

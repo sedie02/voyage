@@ -39,12 +39,14 @@ WHERE table_name = 'trips' AND column_name = 'guest_session_id';
 ## Hoe het werkt
 
 ### Voor Gasten (niet ingelogd):
+
 1. Bij eerste bezoek wordt een unieke `guest_session_id` aangemaakt
 2. Deze wordt opgeslagen in een cookie (30 dagen geldig)
 3. Alle trips die de gast aanmaakt krijgen deze `guest_session_id`
 4. De gast ziet alleen trips met zijn eigen `guest_session_id`
 
 ### Voor Ingelogde Users:
+
 1. Trips worden gekoppeld aan hun `created_by` user ID
 2. `guest_session_id` blijft `NULL`
 3. Gebruiker ziet alleen trips waar `created_by = user.id`
