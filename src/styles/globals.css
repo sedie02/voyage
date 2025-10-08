@@ -51,7 +51,7 @@
   }
 
   .btn-secondary {
-    @apply btn bg-secondary-500 text-white hover:bg-secondary-600;
+    @apply btn bg-secondary-500 hover:bg-secondary-600 text-white;
     @apply focus-visible:ring-secondary-500;
   }
 
@@ -66,11 +66,11 @@
 
   /* Card styles */
   .card {
-    @apply rounded-xl bg-white p-6 shadow-card;
+    @apply shadow-card rounded-xl bg-white p-6;
   }
 
   .card-hover {
-    @apply card cursor-pointer transition-shadow hover:shadow-card-hover;
+    @apply card hover:shadow-card-hover cursor-pointer transition-shadow;
   }
 
   /* Input styles */
@@ -126,7 +126,7 @@
 
   /* Gradient text */
   .gradient-text {
-    @apply bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent;
+    @apply to-secondary-500 bg-gradient-to-r from-primary-600 bg-clip-text text-transparent;
   }
 
   /* Backdrop blur for modals */
