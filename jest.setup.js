@@ -1,3 +1,5 @@
+/* eslint-env jest */
+
 // Jest setup file - runs before each test file
 import '@testing-library/jest-dom';
 
