@@ -37,6 +37,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.44.0",
+    "@swc/core": "^1.13.5",
+    "@swc/jest": "^0.2.39",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.19",
