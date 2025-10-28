@@ -1,30 +1,38 @@
 'use client';
 
+import BottomNav from '@/components/BottomNav';
 import Link from 'next/link';
-import { useState } from 'react';
-// import DatePicker from 'react-datepicker';
-// import Autocomplete from 'react-google-autocomplete';
+import { useEffect, useRef, useState, useTransition } from 'react';
+import DatePicker from 'react-datepicker';
+import Autocomplete from 'react-google-autocomplete';
+import { createTrip } from '../actions';
 
 // Import DatePicker CSS
-// import 'react-datepicker/dist/react-datepicker.css';
+import 'react-datepicker/dist/react-datepicker.css';
 
-type TripType = 'adventure' | 'beach' | 'culture' | 'nature' | 'mixed' | null;
+type TripType = 'adventure' | 'beach' | 'culture' | 'nature' | 'mixed';
 
-// const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyBRCqv9EXAMPLE';
+const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyBRCqv9EXAMPLE';
 
 export default function NewTripPage() {
-  // const [isPending, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
-  // const [guestMode, setGuestMode] = useState(false);
+  const [typeWarning, setTypeWarning] = useState<string | null>(null);
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [step]);
 
   const [formData, setFormData] = useState({
-    tripType: null as TripType,
+    tripTypes: [] as TripType[],
     destination: '',
     city: '',
     country: '',
     startDate: null as Date | null,
     endDate: null as Date | null,
+    activitiesBudget: '' as string,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,28 +42,38 @@ export default function NewTripPage() {
       setError('Selecteer alsjeblieft beide datums');
       return;
     }
+    const budgetNum = Number(formData.activitiesBudget);
+    if (!budgetNum || isNaN(budgetNum) || budgetNum <= 0) {
+      setError('Vul een geldig activiteitenbudget in (meer dan 0)');
+      return;
+    }
 
-    // startTransition(async () => {
-    //   try {
-    //     setError(null);
-    //     await createTrip({
-    //       title: formData.destination,
-    //       destination: formData.destination,
-    //       startDate: formData.startDate.toISOString().split('T')[0],
-    //       endDate: formData.endDate.toISOString().split('T')[0],
-    //       tripType: formData.tripType || undefined,
-    //     });
-    //   } catch (error) {
-    //     console.error('Error creating trip:', error);
-    //     setError(error instanceof Error ? error.message : 'Er ging iets mis. Probeer opnieuw.');
-    //   }
-    // });
+    startTransition(async () => {
+      try {
+        setError(null);
+        await createTrip({
+          title: formData.destination,
+          destination: formData.destination,
+          startDate: formData.startDate.toISOString().split('T')[0],
+          endDate: formData.endDate.toISOString().split('T')[0],
+          tripType: formData.tripTypes[0] || 'mixed',
+          activitiesBudget: budgetNum,
+        });
+      } catch (error) {
+        console.error('Error creating trip:', error);
+        setError(error instanceof Error ? error.message : 'Er ging iets mis. Probeer opnieuw.');
+      }
+    });
   };
 
   const canContinue = () => {
-    if (step === 1) return formData.tripType !== null;
+    if (step === 1) return formData.tripTypes.length > 0 && formData.tripTypes.length <= 2;
     if (step === 2) return formData.destination.length > 0;
     if (step === 3) return formData.startDate !== null && formData.endDate !== null;
+    if (step === 4) {
+      const b = Number(formData.activitiesBudget);
+      return !!b && !isNaN(b) && b > 0;
+    }
     return false;
   };
 
@@ -66,8 +84,21 @@ export default function NewTripPage() {
         )
       : 0;
 
+  const toggleType = (t: TripType) => {
+    setFormData((prev) => {
+      const exists = prev.tripTypes.includes(t);
+      if (exists) return { ...prev, tripTypes: prev.tripTypes.filter((x) => x !== t) };
+      if (prev.tripTypes.length >= 2) {
+        setTypeWarning('Maximaal 2 reis soorten selecteren');
+        return prev;
+      }
+      setTypeWarning(null);
+      return { ...prev, tripTypes: [...prev.tripTypes, t] };
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-bg pb-24">
+    <div className="min-h-screen bg-bg pb-24" ref={containerRef}>
       {/* Header */}
       <nav className="sticky top-0 z-50 border-b border-border bg-surface">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
@@ -78,7 +109,7 @@ export default function NewTripPage() {
             >
               Annuleren
             </Link>
-            <p className="text-sm font-bold text-text sm:text-base">Stap {step} van 3</p>
+            <p className="text-sm font-bold text-text sm:text-base">Stap {step} van 4</p>
             <div className="w-16 sm:w-20"></div>
           </div>
         </div>
@@ -90,7 +121,7 @@ export default function NewTripPage() {
           <div className="h-1 bg-gray-100">
             <div
               className="h-full bg-primary transition-all duration-300"
-              style={{ width: `${(step / 3) * 100}%` }}
+              style={{ width: `${(step / 4) * 100}%` }}
             />
           </div>
         </div>
@@ -105,16 +136,14 @@ export default function NewTripPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-          {/* Step 1: Trip Type */}
+          {/* Step 1: Trip Types (max 2) */}
           {step === 1 && (
             <div className="animate-fade-in space-y-6">
               <div>
                 <h1 className="mb-2 text-2xl font-bold text-text sm:mb-3 sm:text-3xl md:text-4xl">
                   Wat voor soort reis?
                 </h1>
-                <p className="text-base text-text-muted sm:text-lg">
-                  Kies het type dat het beste past
-                </p>
+                <p className="text-base text-text-muted sm:text-lg">Kies maximaal 2</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
@@ -128,9 +157,9 @@ export default function NewTripPage() {
                   <button
                     key={option.type}
                     type="button"
-                    onClick={() => setFormData({ ...formData, tripType: option.type as TripType })}
+                    onClick={() => toggleType(option.type as TripType)}
                     className={`rounded-2xl border-2 p-4 text-left transition-all duration-200 sm:p-6 ${
-                      formData.tripType === option.type
+                      formData.tripTypes.includes(option.type as TripType)
                         ? 'scale-[1.02] border-primary bg-primary-50 shadow-md'
                         : 'border-border hover:border-primary/30 hover:bg-gray-50 active:scale-95'
                     }`}
@@ -141,6 +170,11 @@ export default function NewTripPage() {
                   </button>
                 ))}
               </div>
+              {typeWarning && (
+                <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
+                  {typeWarning}
+                </div>
+              )}
             </div>
           )}
 
@@ -156,50 +190,25 @@ export default function NewTripPage() {
                 </p>
               </div>
 
-              {/* Temporary text input in same style */}
-              <input
-                type="text"
-                value={formData.destination}
-                onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                placeholder="bijv. Barcelona, Spanje"
-                className="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm font-medium text-text transition-all placeholder:text-text-muted focus:border-primary focus:ring-4 focus:ring-primary/20 sm:px-5 sm:py-4 sm:text-base"
-              />
-
-              {formData.destination && (
-                <div className="mt-3 rounded-xl border border-primary/20 bg-primary-50 p-3 sm:p-4">
-                  <div className="flex items-center gap-2">
-                    <svg
-                      className="h-4 w-4 shrink-0 text-primary sm:h-5 sm:w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <p className="text-sm font-semibold text-text sm:text-base">
-                      {formData.destination}
-                    </p>
-                  </div>
-                </div>
-              )}
               <div>
                 <label className="mb-2 block text-sm font-bold text-text">
                   Bestemming <span className="text-primary">*</span>
                 </label>
-                {/* <Autocomplete
+                <Autocomplete
                   apiKey={GOOGLE_MAPS_API_KEY}
                   onPlaceSelected={(place) => {
                     if (place && place.formatted_address) {
                       setFormData({
                         ...formData,
                         destination: place.formatted_address,
-                        city: place.address_components?.find((c: any) => c.types.includes('locality'))?.long_name || '',
-                        country: place.address_components?.find((c: any) => c.types.includes('country'))?.long_name || '',
+                        city:
+                          (place as any).address_components?.find((c: any) =>
+                            c.types.includes('locality')
+                          )?.long_name || '',
+                        country:
+                          (place as any).address_components?.find((c: any) =>
+                            c.types.includes('country')
+                          )?.long_name || '',
                       });
                     }
                   }}
@@ -208,14 +217,36 @@ export default function NewTripPage() {
                     fields: ['formatted_address', 'address_components', 'geometry'],
                   }}
                   placeholder="bijv. Barcelona, Spanje"
-                  className="w-full px-4 sm:px-5 py-3 sm:py-4 border-2 border-border rounded-2xl focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all font-medium bg-surface text-text text-sm sm:text-base"
+                  className="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm font-medium text-text transition-all focus:border-primary focus:ring-4 focus:ring-primary/20 sm:px-5 sm:py-4 sm:text-base"
                   style={{ width: '100%' }}
-                /> */}
+                />
+                {formData.destination && (
+                  <div className="mt-3 rounded-xl border border-primary/20 bg-primary-50 p-3 sm:p-4">
+                    <div className="flex items-center gap-2">
+                      <svg
+                        className="h-4 w-4 shrink-0 text-primary sm:h-5 sm:w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <p className="text-sm font-semibold text-text sm:text-base">
+                        {formData.destination}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
 
-          {/* Step 3: Dates with DatePicker */}
+          {/* Step 3: Dates */}
           {step === 3 && (
             <div className="animate-fade-in space-y-6">
               <div>
@@ -230,95 +261,44 @@ export default function NewTripPage() {
                   <label className="mb-2 block text-sm font-bold text-text">
                     Van <span className="text-primary">*</span>
                   </label>
-                  {/* <DatePicker
+                  <DatePicker
                     selected={formData.startDate}
-                    onChange={(date) => setFormData({ ...formData, startDate: date, endDate: formData.endDate && date && date > formData.endDate ? null : formData.endDate })}
-                    minDate={new Date()}
-                    dateFormat="dd MMM yyyy"
-                    placeholderText="Selecteer startdatum"
-                    className="w-full px-4 sm:px-5 py-3 sm:py-4 border-2 border-border rounded-2xl focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all font-medium bg-surface text-text text-sm sm:text-base"
-                    wrapperClassName="w-full"
-                    calendarClassName="!font-sans"
-                  /> */}
-                  {/* Start Date */}
-                  <input
-                    type="date"
-                    value={formData.startDate ? formData.startDate.toISOString().split('T')[0] : ''}
-                    onChange={(e) =>
+                    onChange={(date) =>
                       setFormData({
                         ...formData,
-                        startDate: e.target.value ? new Date(e.target.value) : null,
-                        // als start later is dan end, reset end
+                        startDate: date,
                         endDate:
-                          formData.endDate &&
-                          e.target.value &&
-                          new Date(e.target.value) > formData.endDate
+                          formData.endDate && date && date > formData.endDate
                             ? null
                             : formData.endDate,
                       })
                     }
-                    min={new Date().toISOString().split('T')[0]}
+                    minDate={new Date()}
+                    dateFormat="EEE dd MMM yyyy"
+                    placeholderText="Selecteer startdatum"
                     className="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm font-medium text-text transition-all focus:border-primary focus:ring-4 focus:ring-primary/20 sm:px-5 sm:py-4 sm:text-base"
+                    wrapperClassName="w-full"
+                    calendarClassName="!font-sans"
                   />
+                </div>
 
-                  <div>
-                    <label className="mb-2 block text-sm font-bold text-text">
-                      Tot <span className="text-primary">*</span>
-                    </label>
-                    {/* <DatePicker
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-text">
+                    Tot <span className="text-primary">*</span>
+                  </label>
+                  <DatePicker
                     selected={formData.endDate}
                     onChange={(date) => setFormData({ ...formData, endDate: date })}
                     minDate={formData.startDate || new Date()}
-                    dateFormat="dd MMM yyyy"
+                    dateFormat="EEE dd MMM yyyy"
                     placeholderText="Selecteer einddatum"
                     disabled={!formData.startDate}
-                    className="w-full px-4 sm:px-5 py-3 sm:py-4 border-2 border-border rounded-2xl focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all font-medium bg-surface text-text text-sm sm:text-base disabled:bg-gray-50 disabled:cursor-not-allowed"
+                    className="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm font-medium text-text transition-all focus:border-primary focus:ring-4 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-gray-50 sm:px-5 sm:py-4 sm:text-base"
                     wrapperClassName="w-full"
                     calendarClassName="!font-sans"
-                  /> */}
-
-                    {/* End Date */}
-                    <input
-                      type="date"
-                      value={formData.endDate ? formData.endDate.toISOString().split('T')[0] : ''}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          endDate: e.target.value ? new Date(e.target.value) : null,
-                        })
-                      }
-                      min={
-                        formData.startDate
-                          ? formData.startDate.toISOString().split('T')[0]
-                          : new Date().toISOString().split('T')[0]
-                      }
-                      disabled={!formData.startDate}
-                      className="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm font-medium text-text transition-all focus:border-primary focus:ring-4 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-gray-50 sm:px-5 sm:py-4 sm:text-base"
-                    />
-                  </div>
+                  />
                 </div>
               </div>
-
-              {/* hidden labels for unittest pass */}
-              <label className="mb-2 block text-sm font-bold text-text">
-                Van <span className="text-primary">*</span>
-              </label>
-              <input
-                type="text"
-                aria-label="start-date"
-                placeholder="Selecteer startdatum"
-                className="hidden"
-              />
-
-              <label className="mb-2 block text-sm font-bold text-text">
-                Tot <span className="text-primary">*</span>
-              </label>
-              <input
-                type="text"
-                aria-label="end-date"
-                placeholder="Selecteer einddatum"
-                className="hidden"
-              />
 
               {tripDuration > 0 && (
                 <div className="rounded-2xl border border-primary/20 bg-primary-50 p-4 sm:p-6">
@@ -352,6 +332,40 @@ export default function NewTripPage() {
             </div>
           )}
 
+          {/* Step 4: Activities budget */}
+          {step === 4 && (
+            <div className="animate-fade-in space-y-6">
+              <div>
+                <h1 className="mb-2 text-2xl font-bold text-text sm:mb-3 sm:text-3xl md:text-4xl">
+                  Budget voor activiteiten
+                </h1>
+                <p className="text-base text-text-muted sm:text-lg">
+                  Wat wil je ongeveer uitgeven in deze periode?
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-text">
+                    Totale budget (EUR)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="bijv. 300"
+                    value={formData.activitiesBudget}
+                    onChange={(e) => setFormData({ ...formData, activitiesBudget: e.target.value })}
+                    className="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm font-medium text-text transition-all focus:border-primary focus:ring-4 focus:ring-primary/20 sm:px-5 sm:py-4 sm:text-base"
+                  />
+                  <p className="mt-2 text-xs text-text-muted">
+                    We gebruiken dit straks om je planning aan te passen.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Navigation Buttons */}
           <div className="flex items-center gap-3 pt-4 sm:pt-6">
             {step > 1 && (
@@ -363,7 +377,7 @@ export default function NewTripPage() {
                 Terug
               </button>
             )}
-            {step < 3 ? (
+            {step < 4 ? (
               <button
                 type="button"
                 onClick={() => setStep(step + 1)}
@@ -375,10 +389,10 @@ export default function NewTripPage() {
             ) : (
               <button
                 type="submit"
-                disabled={!canContinue()}
+                disabled={!canContinue() || isPending}
                 className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 sm:px-6 sm:py-4 sm:text-base"
               >
-                {/* {isPending ? (
+                {isPending ? (
                   <>
                     <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
                       <circle
@@ -400,38 +414,14 @@ export default function NewTripPage() {
                   </>
                 ) : (
                   'Trip Aanmaken'
-                )} */}
-                Trip Aanmaken
+                )}
               </button>
             )}
           </div>
-
-          {/* Guest Mode Option */}
-          {step === 3 && (
-            <div className="border-t border-border pt-4 sm:pt-6">
-              <button
-                type="button"
-                className="flex w-full items-center justify-center gap-2 text-sm font-semibold text-text-muted transition-colors hover:text-text sm:text-base"
-              >
-                <svg
-                  className="h-4 w-4 sm:h-5 sm:w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-                <span>Ga door als gast</span>
-              </button>
-            </div>
-          )}
         </form>
       </main>
+
+      <BottomNav />
     </div>
   );
 }

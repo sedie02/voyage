@@ -1,9 +1,74 @@
+import BottomNav from '@/components/BottomNav';
+import { getCityPhotoUrl } from '@/lib/external/places';
+import { getGuestSessionId } from '@/lib/session';
+import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 
 export default async function TripsPage() {
-  const trips: any[] = [];
+  const supabase = await createClient();
 
-  const activeTrip = trips?.[0] as any;
+  // Get current user
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  let trips: any[] = [];
+
+  // If user is logged in, fetch their trips
+  if (user && !userError) {
+    const { data, error } = await supabase
+      .from('trips')
+      .select(
+        `
+        *,
+        trip_participants(count)
+      `
+      )
+      .eq('is_archived', false)
+      .eq('owner_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching trips:', error);
+    } else {
+      trips = data || [];
+    }
+  } else {
+    // Guest mode - fetch trips for this guest session only
+    const guestSessionId = await getGuestSessionId();
+
+    if (guestSessionId) {
+      const { data, error } = await supabase
+        .from('trips')
+        .select(
+          `
+          *,
+          trip_participants(count)
+        `
+        )
+        .eq('is_archived', false)
+        .eq('guest_session_id', guestSessionId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching trips (guest):', error);
+      } else {
+        trips = data || [];
+      }
+    }
+  }
+
+  // Use cached city photo URLs or fetch as fallback
+  const tripsWithPhotos = await Promise.all(
+    (trips || []).map(async (trip) => ({
+      ...trip,
+      cityPhotoUrl: trip.city_photo_url || (await getCityPhotoUrl(trip.destination)),
+    }))
+  );
+
+  // Get first trip as active
+  const activeTrip = tripsWithPhotos?.[0] as any;
 
   return (
     <div className="min-h-screen bg-bg pb-24">
@@ -23,11 +88,25 @@ export default async function TripsPage() {
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-12">
           {/* Trip Card */}
           <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-md sm:rounded-3xl">
-            {/* Map Section */}
-            <div className="relative h-64 bg-gradient-to-br from-sky-50 via-sky-light/30 to-sky-100 sm:h-96">
-              {/* Header */}
-              <div className="absolute left-4 right-4 top-4 z-10 flex items-start justify-between gap-2 sm:left-6 sm:right-6 sm:top-6">
-                <div className="min-w-0 flex-1 rounded-full border border-border bg-surface/95 px-4 py-2.5 shadow-sm backdrop-blur-sm sm:px-5 sm:py-3">
+            {/* Hero Image Section */}
+            <div className="relative h-64 sm:h-96">
+              {activeTrip.cityPhotoUrl ? (
+                <img
+                  src={activeTrip.cityPhotoUrl}
+                  alt={activeTrip.destination}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-sky-200 via-sky-light/40 to-sky-100" />
+              )}
+              <div className="absolute inset-0 bg-black/25" />
+
+              {/* Unified clickable pill header */}
+              <Link
+                href={`/trips/${activeTrip.id}`}
+                className="absolute left-4 right-4 top-4 z-10 flex items-center justify-between gap-3 rounded-full border border-border bg-white/90 px-4 py-2.5 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 sm:left-6 sm:right-6 sm:top-6 sm:px-5 sm:py-3"
+              >
+                <div className="min-w-0">
                   <p className="flex items-center gap-2 truncate text-sm font-bold text-text sm:text-base">
                     <span className="truncate">{activeTrip.title}</span>
                     <span className="shrink-0 text-base sm:text-lg">🌍</span>
@@ -37,88 +116,32 @@ export default async function TripsPage() {
                       day: 'numeric',
                       month: 'short',
                     })}{' '}
-                    -{' '}
+                    –{' '}
                     {new Date(activeTrip.end_date).toLocaleDateString('nl-NL', {
                       day: 'numeric',
                       month: 'short',
                     })}
                   </p>
                 </div>
-
-                <Link
-                  href={`/trips/${activeTrip.id}`}
-                  className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover sm:px-6 sm:py-3"
+                <svg
+                  className="h-5 w-5 text-text-muted sm:h-6 sm:w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                  <span className="hidden sm:inline">View</span>
-                </Link>
-              </div>
-
-              {/* Map visualization */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-30">
-                <svg className="h-full w-full" viewBox="0 0 400 320">
-                  {/* Routes */}
                   <path
-                    d="M100 120 Q150 80 220 140"
-                    stroke="#13C892"
-                    strokeWidth="3"
-                    fill="none"
-                    strokeDasharray="5,5"
-                    opacity="0.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 5l7 7-7 7"
                   />
-                  <path
-                    d="M220 140 L200 220"
-                    stroke="#13C892"
-                    strokeWidth="3"
-                    fill="none"
-                    opacity="0.6"
-                  />
-
-                  {/* Pins */}
-                  <circle cx="100" cy="120" r="20" fill="#13C892" />
-                  <text
-                    x="100"
-                    y="127"
-                    textAnchor="middle"
-                    fill="white"
-                    fontSize="16"
-                    fontWeight="bold"
-                  >
-                    1
-                  </text>
-
-                  <circle cx="220" cy="140" r="20" fill="#13C892" />
-                  <text
-                    x="220"
-                    y="147"
-                    textAnchor="middle"
-                    fill="white"
-                    fontSize="16"
-                    fontWeight="bold"
-                  >
-                    2
-                  </text>
-
-                  <circle cx="200" cy="220" r="20" fill="#13C892" />
-                  <text
-                    x="200"
-                    y="227"
-                    textAnchor="middle"
-                    fill="white"
-                    fontSize="16"
-                    fontWeight="bold"
-                  >
-                    3
-                  </text>
                 </svg>
-              </div>
+              </Link>
 
-              {/* Country Label */}
-              <div className="absolute bottom-4 right-4 sm:bottom-8 sm:right-8">
-                <p className="text-lg font-bold text-text-secondary sm:text-2xl">
-                  {activeTrip.destination.split(',')[1]?.trim() || activeTrip.destination}
+              {/* Destination Label */}
+              <div className="absolute bottom-4 right-4 z-10 sm:bottom-8 sm:right-8">
+                <p className="text-lg font-bold text-white drop-shadow sm:text-2xl">
+                  {activeTrip.destination}
                 </p>
               </div>
             </div>
@@ -201,131 +224,108 @@ export default async function TripsPage() {
               </div>
             </div>
 
-            {/* Destinations List */}
+            {/* Destinations List (single logical step) */}
             <div className="space-y-1 px-4 py-4 sm:px-8 sm:py-6">
-              {/* Demo destinations */}
-              {[
-                { name: activeTrip.destination.split(',')[0], nights: 2, transport: '2h 27m' },
-                { name: 'Next Stop', nights: 3, transport: '2h 13m' },
-                { name: 'Final Stop', nights: 2, transport: null },
-              ].map((dest, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between gap-3 border-b border-border py-4 last:border-0 sm:py-5"
-                >
-                  <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-5">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold text-primary sm:h-10 sm:w-10 sm:text-base">
-                      {idx + 1}
+              {(() => {
+                const nights = Math.max(
+                  0,
+                  Math.ceil(
+                    (new Date(activeTrip.end_date).getTime() -
+                      new Date(activeTrip.start_date).getTime()) /
+                      (1000 * 60 * 60 * 24)
+                  )
+                );
+                const cityName = String(activeTrip.destination || '').split(',')[0];
+                return (
+                  <div className="flex items-center justify-between gap-3 border-b border-border py-4 last:border-0 sm:py-5">
+                    <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-5">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold text-primary sm:h-10 sm:w-10 sm:text-base">
+                        1
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="mb-1 truncate text-base font-bold text-text sm:text-lg">
+                          {cityName}
+                        </p>
+                        <p className="text-xs text-text-muted sm:text-sm">
+                          {new Date(activeTrip.start_date).toLocaleDateString('nl-NL', {
+                            day: 'numeric',
+                            month: 'short',
+                          })}
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="mb-1 truncate text-base font-bold text-text sm:text-lg">
-                        {dest.name}
-                      </p>
-                      <p className="text-xs text-text-muted sm:text-sm">
-                        {new Date(activeTrip.start_date).toLocaleDateString('nl-NL', {
-                          day: 'numeric',
-                          month: 'short',
-                        })}
-                      </p>
-                      {dest.transport && (
-                        <div className="mt-1 flex items-center gap-1.5 text-xs text-text-muted sm:text-sm">
-                          <svg
-                            className="h-3 w-3 sm:h-4 sm:w-4"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                          </svg>
-                          <span className="hidden sm:inline">{dest.transport}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
 
-                  <div className="flex shrink-0 items-center gap-1 sm:gap-4">
-                    <button className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-gray-50 hover:text-text sm:h-10 sm:w-10">
-                      <svg
-                        className="h-4 w-4 sm:h-5 sm:w-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M20 12H4"
-                        />
-                      </svg>
-                    </button>
                     <div className="min-w-[3rem] text-center sm:min-w-[4rem]">
-                      <p className="text-xl font-bold text-text sm:text-3xl">{dest.nights}</p>
+                      <p className="text-xl font-bold text-text sm:text-3xl">{nights}</p>
                       <p className="text-[10px] font-medium text-text-muted sm:text-xs">nachten</p>
                     </div>
-                    <button className="flex h-8 w-8 items-center justify-center rounded-full text-primary transition-colors hover:bg-primary-50 sm:h-10 sm:w-10">
-                      <svg
-                        className="h-4 w-4 sm:h-5 sm:w-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2.5"
-                          d="M12 4v16m8-8H4"
-                        />
-                      </svg>
-                    </button>
                   </div>
-                </div>
-              ))}
+                );
+              })()}
             </div>
           </div>
 
           {/* All Trips */}
-          {trips && trips.length > 1 && (
+          {tripsWithPhotos && tripsWithPhotos.length > 0 && (
             <div className="mt-16">
               <h2 className="mb-6 text-2xl font-bold text-text">All Trips</h2>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {trips.slice(1).map((trip: any) => (
+                {tripsWithPhotos.map((trip: any) => (
                   <Link
                     key={trip.id}
                     href={`/trips/${trip.id}`}
-                    className="group rounded-2xl border border-border bg-surface p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                    className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
                   >
-                    <div className="mb-4 flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="mb-1 line-clamp-1 text-lg font-bold text-text">
-                          {trip.title}
-                        </h3>
-                        <p className="line-clamp-1 text-sm text-text-muted">{trip.destination}</p>
-                      </div>
-                      <svg
-                        className="h-5 w-5 text-text-muted transition-colors group-hover:text-text"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
+                    <div className="relative h-36 w-full">
+                      <img
+                        src={
+                          trip.cityPhotoUrl ||
+                          `https://source.unsplash.com/featured/1600x900/?${encodeURIComponent((trip.destination || 'travel city') + ' skyline')}`
+                        }
+                        alt={trip.destination}
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/15" />
                     </div>
-                    <div className="text-sm text-text-muted">
-                      {new Date(trip.start_date).toLocaleDateString('nl-NL', {
-                        day: 'numeric',
-                        month: 'short',
-                      })}{' '}
-                      -{' '}
-                      {new Date(trip.end_date).toLocaleDateString('nl-NL', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
+                    <div className="p-6">
+                      <div className="mb-4 flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="mb-1 line-clamp-1 text-lg font-bold text-text">
+                            {trip.title}
+                          </h3>
+                          <p className="line-clamp-1 text-sm text-text-muted">{trip.destination}</p>
+                          {typeof trip.activities_budget === 'number' && (
+                            <p className="mt-1 text-xs font-semibold text-text">
+                              Budget: € {trip.activities_budget}
+                            </p>
+                          )}
+                        </div>
+                        <svg
+                          className="h-5 w-5 text-text-muted transition-colors group-hover:text-text"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </div>
+                      <div className="text-sm text-text-muted">
+                        {new Date(trip.start_date).toLocaleDateString('nl-NL', {
+                          day: 'numeric',
+                          month: 'short',
+                        })}{' '}
+                        -{' '}
+                        {new Date(trip.end_date).toLocaleDateString('nl-NL', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </div>
                     </div>
                   </Link>
                 ))}
@@ -379,6 +379,8 @@ export default async function TripsPage() {
           </div>
         </div>
       )}
+
+      <BottomNav />
     </div>
   );
 }
