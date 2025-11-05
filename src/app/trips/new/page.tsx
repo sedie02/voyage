@@ -1,7 +1,9 @@
 'use client';
 
 import BottomNav from '@/components/BottomNav';
+import { useToast } from '@/contexts/ToastContext';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition } from 'react';
 import DatePicker from 'react-datepicker';
 import Autocomplete from 'react-google-autocomplete';
@@ -19,6 +21,8 @@ export default function NewTripPage() {
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
   const [typeWarning, setTypeWarning] = useState<string | null>(null);
+  const { showToast } = useToast();
+  const router = useRouter();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -51,17 +55,33 @@ export default function NewTripPage() {
     startTransition(async () => {
       try {
         setError(null);
-        await createTrip({
+        const result = await createTrip({
           title: formData.destination,
           destination: formData.destination,
-          startDate: formData.startDate.toISOString().split('T')[0],
-          endDate: formData.endDate.toISOString().split('T')[0],
+          startDate: formData.startDate!.toISOString().split('T')[0],
+          endDate: formData.endDate!.toISOString().split('T')[0],
           tripType: formData.tripTypes[0] || 'mixed',
           activitiesBudget: budgetNum,
         });
+
+        if (result.success && result.trip) {
+          // Toon success toast
+          showToast('Trip succesvol aangemaakt!', 'success');
+
+          // Redirect naar trips page na korte delay zodat toast zichtbaar is
+          setTimeout(() => {
+            router.push('/trips');
+          }, 1500);
+        } else {
+          throw new Error(result.error || 'Er ging iets mis bij het aanmaken van de trip');
+        }
       } catch (error) {
         console.error('Error creating trip:', error);
-        setError(error instanceof Error ? error.message : 'Er ging iets mis. Probeer opnieuw.');
+        const errorMessage =
+          error instanceof Error ? error.message : 'Er ging iets mis. Probeer opnieuw.';
+        setError(errorMessage);
+        // Toon error toast
+        showToast(errorMessage, 'error');
       }
     });
   };

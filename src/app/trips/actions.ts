@@ -83,14 +83,26 @@ export async function createTrip(formData: {
 
     if (error) {
       console.error('Error creating trip:', error);
-      throw new Error(`Failed to create trip: ${error.message}`);
+      return {
+        success: false,
+        error: `Failed to create trip: ${error.message}`,
+      };
     }
 
     revalidatePath('/trips');
-    redirect(`/trips/${trip.id}`);
+
+    // Return trip data ipv redirect
+    return {
+      success: true,
+      trip,
+      message: 'Trip succesvol aangemaakt',
+    };
   } catch (error) {
     console.error('Error in createTrip:', error);
-    throw error;
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
   }
 }
 
