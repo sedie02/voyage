@@ -1,6 +1,9 @@
 'use client';
 
 import BottomNav from '@/components/BottomNav';
+import ItineraryTab from '@/components/ItineraryTab';
+import ParticipantList from '@/components/ParticipantList';
+import ShareTripModal from '@/components/ShareTripModal';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -24,10 +27,31 @@ const getDestinationGradient = (destination: string) => {
 interface TripDetailClientProps {
   trip: any;
   daysUntil: number;
+  isOwner?: boolean;
+  currentUserId?: string;
+  days?: any[];
 }
 
-export default function TripDetailClient({ trip, daysUntil }: TripDetailClientProps) {
+export default function TripDetailClient({
+  trip,
+  daysUntil,
+  isOwner = false,
+  currentUserId,
+  days = [],
+}: TripDetailClientProps) {
   const [activeTab, setActiveTab] = useState('overview');
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  // Debug logging
+  console.log('📅 TripDetailClient received days:', {
+    daysCount: days.length,
+    days: days.map((day: any) => ({
+      id: day.id,
+      day_number: day.day_number,
+      date: day.date,
+      activitiesCount: day.activities?.length || 0,
+    })),
+  });
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -39,7 +63,21 @@ export default function TripDetailClient({ trip, daysUntil }: TripDetailClientPr
     });
   };
 
-  const participantCount = trip.trip_participants?.[0]?.count || 0;
+  // Get actual participant count from participants array
+  const participants = trip.trip_participants || [];
+  // Count all participants (including owner if not already counted)
+  const participantCount = Array.isArray(participants)
+    ? participants.length
+    : participants?.[0]?.count || 0;
+
+  // Ensure owner is counted if they're not in the participants list
+  const hasOwnerAsParticipant =
+    Array.isArray(participants) &&
+    participants.some((p: any) => p.user_id === trip.owner_id || p.role === 'owner');
+
+  // If owner exists but not in participants, add 1 to count
+  const finalParticipantCount =
+    trip.owner_id && !hasOwnerAsParticipant ? participantCount + 1 : participantCount;
   const tripDuration = Math.ceil(
     (new Date(trip.end_date).getTime() - new Date(trip.start_date).getTime()) /
       (1000 * 60 * 60 * 24)
@@ -48,28 +86,42 @@ export default function TripDetailClient({ trip, daysUntil }: TripDetailClientPr
   const activitiesBudget =
     typeof trip.activities_budget === 'number' ? trip.activities_budget : null;
 
+  // Debug: check if cityPhotoUrl exists
+  const cityPhotoUrl = (trip as any).cityPhotoUrl || trip.city_photo_url || null;
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Trip photo URL:', {
+      cityPhotoUrl,
+      city_photo_url: trip.city_photo_url,
+      destination: trip.destination,
+    });
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-24">
       {/* Hero Section */}
       <div className="relative h-96 overflow-hidden">
         {/* City photo with better fallback */}
-        <div className="absolute inset-0">
-          {/* Fallback gradient */}
-          <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`}></div>
-          {/* City photo */}
-          {(trip as any).cityPhotoUrl && (
-            <img
-              src={(trip as any).cityPhotoUrl}
-              alt={trip.destination}
-              className="absolute inset-0 h-full w-full object-cover"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = 'none';
-              }}
-            />
-          )}
-          {/* Overlay gradient for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-        </div>
+        {/* Fallback gradient - achtergrond */}
+        <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`}></div>
+        {/* City photo */}
+        {cityPhotoUrl && (
+          <img
+            src={cityPhotoUrl}
+            alt={trip.destination}
+            className="absolute inset-0 h-full w-full object-cover"
+            onError={(e) => {
+              console.error('Image failed to load:', cityPhotoUrl);
+              (e.currentTarget as HTMLImageElement).style.display = 'none';
+            }}
+            onLoad={() => {
+              if (process.env.NODE_ENV === 'development') {
+                console.log('Image loaded successfully:', cityPhotoUrl);
+              }
+            }}
+          />
+        )}
+        {/* Overlay gradient for better text readability - minder transparent */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20"></div>
 
         {/* Navigation controls */}
         <div className="absolute left-4 right-4 top-4 z-20 flex items-center justify-between sm:left-6 sm:right-6">
@@ -113,10 +165,12 @@ export default function TripDetailClient({ trip, daysUntil }: TripDetailClientPr
           </Link>
         </div>
         {/* Trip info overlay */}
-        <div className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
+        <div className="absolute inset-x-0 bottom-0 z-30 mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
           <div className="text-white">
-            <h1 className="mb-4 text-5xl font-bold drop-shadow-lg md:text-6xl">{trip.title}</h1>
-            <div className="flex flex-wrap items-center gap-6 text-white/95">
+            <h1 className="mb-4 text-5xl font-bold text-white drop-shadow-2xl md:text-6xl">
+              {trip.title}
+            </h1>
+            <div className="flex flex-wrap items-center gap-6 text-white">
               <div className="flex items-center gap-3 rounded-full bg-white/20 px-4 py-2 backdrop-blur-sm">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -158,7 +212,7 @@ export default function TripDetailClient({ trip, daysUntil }: TripDetailClientPr
                   <span className="text-lg font-bold">€ {activitiesBudget}</span>
                 </div>
               )}
-              {participantCount > 0 && (
+              {finalParticipantCount > 0 && (
                 <div className="flex items-center gap-3 rounded-full bg-white/20 px-4 py-2 backdrop-blur-sm">
                   <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -169,7 +223,8 @@ export default function TripDetailClient({ trip, daysUntil }: TripDetailClientPr
                     />
                   </svg>
                   <span className="text-lg font-semibold">
-                    {participantCount} {participantCount === 1 ? 'deelnemer' : 'deelnemers'}
+                    {finalParticipantCount}{' '}
+                    {finalParticipantCount === 1 ? 'deelnemer' : 'deelnemers'}
                   </span>
                 </div>
               )}
@@ -251,32 +306,30 @@ export default function TripDetailClient({ trip, daysUntil }: TripDetailClientPr
                         <p className="font-semibold text-gray-900">{formatDate(trip.end_date)}</p>
                       </div>
                     </div>
+
+                    {/* Participants Section */}
+                    <div className="border-t border-gray-200 pt-6">
+                      <div className="mb-4 flex items-center justify-between">
+                        <h3 className="text-lg font-bold text-gray-900">Deelnemers</h3>
+                        {finalParticipantCount > 0 && (
+                          <span className="text-sm text-gray-500">
+                            {finalParticipantCount}{' '}
+                            {finalParticipantCount === 1 ? 'deelnemer' : 'deelnemers'}
+                          </span>
+                        )}
+                      </div>
+                      <ParticipantList
+                        participants={Array.isArray(participants) ? participants : []}
+                        tripId={trip.id}
+                        isOwner={isOwner}
+                        currentUserId={currentUserId}
+                      />
+                    </div>
                   </div>
                 )}
 
                 {activeTab === 'itinerary' && (
-                  <div className="py-12 text-center">
-                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                      <svg
-                        className="h-8 w-8 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="mb-2 text-lg font-semibold text-gray-900">Nog geen planning</h3>
-                    <p className="mb-4 text-gray-600">Begin met het toevoegen van activiteiten</p>
-                    <button className="rounded-lg bg-sky-600 px-6 py-2.5 font-semibold text-white transition-colors hover:bg-sky-700">
-                      Voeg Activiteit Toe
-                    </button>
-                  </div>
+                  <ItineraryTab tripId={trip.id} days={days} isOwner={isOwner} />
                 )}
 
                 {activeTab === 'budget' && (
@@ -397,7 +450,9 @@ export default function TripDetailClient({ trip, daysUntil }: TripDetailClientPr
                     </div>
                     <span className="font-medium text-gray-700">Deelnemers</span>
                   </div>
-                  <span className="text-lg font-bold text-gray-900">{participantCount || 1}</span>
+                  <span className="text-lg font-bold text-gray-900">
+                    {finalParticipantCount || 1}
+                  </span>
                 </div>
                 {activitiesBudget !== null && (
                   <div className="flex items-center justify-between rounded-lg bg-emerald-50 p-4">
@@ -443,7 +498,10 @@ export default function TripDetailClient({ trip, daysUntil }: TripDetailClientPr
                   </svg>
                   Beheer Budget
                 </Link>
-                <button className="flex w-full items-center justify-center gap-3 rounded-xl bg-gray-100 px-4 py-3 font-semibold text-gray-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-200">
+                <button
+                  onClick={() => setIsShareModalOpen(true)}
+                  className="flex w-full items-center justify-center gap-3 rounded-xl bg-gray-100 px-4 py-3 font-semibold text-gray-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-200"
+                >
                   <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
@@ -461,6 +519,13 @@ export default function TripDetailClient({ trip, daysUntil }: TripDetailClientPr
       </div>
 
       <BottomNav />
+
+      {/* Share Trip Modal */}
+      <ShareTripModal
+        tripId={trip.id}
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+      />
     </div>
   );
 }
