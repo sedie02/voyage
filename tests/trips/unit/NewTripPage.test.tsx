@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 // mock next/link
 jest.mock('next/link', () => {
-  // eslint-disable-next-line react/display-name
+  // eslint-disable-next-line react/display-name s
   return ({ href, children }: any) => <a href={href}>{children}</a>;
 });
 
