@@ -3,9 +3,9 @@
  * Voor gebruik in Server Components en API Routes
  */
 
+import type { Database } from '@/types/database.types';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import type { Database } from '@/types/database.types';
 
 /**
  * Maak Supabase client voor Server Components
