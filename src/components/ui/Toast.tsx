@@ -22,6 +22,8 @@ export default function Toast({
       const timer = setTimeout(onClose, duration);
       return () => clearTimeout(timer);
     }
+    // Explicitly return undefined when no cleanup is required (satisfy TS)
+    return undefined;
   }, [isVisible, duration, onClose]);
 
   if (!isVisible) return null;

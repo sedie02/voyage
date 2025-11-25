@@ -47,7 +47,6 @@ export async function createInviteLink(
     }
 
     // Try to use invite_links table if it exists
-    let inviteLink: any = null;
     let error: any = null;
 
     try {
@@ -63,7 +62,6 @@ export async function createInviteLink(
         })
         .select()
         .single();
-      inviteLink = result.data;
       error = result.error;
     } catch (err) {
       error = err;

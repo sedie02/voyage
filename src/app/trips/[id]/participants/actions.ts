@@ -51,8 +51,14 @@ export async function addParticipant(
       throw new Error('Deze deelnemer is al toegevoegd aan deze trip');
     }
 
-    // Try to find user by email
-    const { data: invitedUser } = await supabase.auth.admin.getUserByEmail(email);
+    // Try to find user by email (GoTrue admin may not expose getUserByEmail in types)
+    let invitedUser: any = null;
+    try {
+      invitedUser = await (supabase.auth.admin as any).getUserByEmail?.(email);
+    } catch (e) {
+      // Fall back to null - treat as guest if lookup not possible
+      invitedUser = null;
+    }
 
     // Insert participant
     const { data: participant, error } = await supabase

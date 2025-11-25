@@ -25,7 +25,7 @@ describe('US47 - updateTrip server action', () => {
   });
 
   it('werkt trip correct bij in de database', async () => {
-    await updateTrip('trip987', { title: 'Nieuwe titel' });
+    await updateTrip('trip987', { title: 'Nieuwe titel', destination: 'Berlin, Germany', startDate: '2025-01-01', endDate: '2025-01-05' });
     expect(mockUpdate).toHaveBeenCalled();
     expect(mockEq).toHaveBeenCalledWith('id', 'trip987');
   });
@@ -40,6 +40,6 @@ describe('US47 - updateTrip server action', () => {
       }),
     });
 
-    await expect(updateTrip('trip987', { title: 'X' })).rejects.toThrow('DB error');
+    await expect(updateTrip('trip987', { title: 'X', destination: 'Nowhere', startDate: '2025-01-01', endDate: '2025-01-02' })).rejects.toThrow('DB error');
   });
 });

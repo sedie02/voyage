@@ -22,9 +22,6 @@ describe('EditTripPage', () => {
   };
 
   it('roept supabase aan en rendert EditTripClient met data', async () => {
-    const mockFrom = jest.fn().mockReturnThis();
-    const mockSelect = jest.fn().mockReturnThis();
-    const mockEq = jest.fn().mockReturnThis();
     const mockSingle = jest.fn().mockResolvedValue({ data: mockTrip });
 
     (supabaseServer.createClient as jest.Mock).mockResolvedValue({

@@ -203,7 +203,7 @@ describe('Trip Creation Endpoint - Integration Tests', () => {
 
       let insertedData: any;
 
-      mockSupabase.insert.mockImplementation((data) => {
+      mockSupabase.insert.mockImplementation((data: any) => {
         insertedData = data;
         return {
           select: jest.fn().mockReturnValue({
@@ -240,7 +240,7 @@ describe('Trip Creation Endpoint - Integration Tests', () => {
 
       let insertedData: any;
 
-      mockSupabase.insert.mockImplementation((data) => {
+      mockSupabase.insert.mockImplementation((data: any) => {
         insertedData = data;
         return {
           select: jest.fn().mockReturnValue({

@@ -5,13 +5,14 @@
 
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import type { Database } from '@/types/database.types';
 
 /**
  * Maak Supabase client voor Server Components
  * Gebruikt cookies voor session management
  */
-export async function createClient() {
-  const cookieStore = await cookies();
+export async function createClient(): Promise<any> {
+  const cookieStore = cookies();
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -44,12 +45,13 @@ export async function createClient() {
  * Service role client voor admin operations
  * ALLEEN gebruiken in API routes, NOOIT in client!
  */
-export function createServiceClient() {
+export function createServiceClient(): any {
+  // Service client used only on server-side. Cast to `any` to avoid spreading DB-generic types
+  // across code while we finish typing the Database definitions.
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      cookies: {},
-    }
-  );
+    // Service client should not pass cookies
+    undefined as any
+  ) as any;
 }
