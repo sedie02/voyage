@@ -8,7 +8,12 @@ import { updateTrip } from '@/app/trips/actions';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 
-jest.mock('next/navigation', () => ({ useRouter: jest.fn() }));
+jest.mock('next/navigation', () => ({
+  __esModule: true,
+  useRouter: jest.fn(),
+  usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
+}));
 jest.mock('@/app/trips/actions', () => ({
   updateTrip: jest.fn(),
 }));
@@ -47,18 +52,21 @@ describe('US47 - Opslaan van wijzigingen', () => {
 
   it('toont succesmelding en redirect', async () => {
     (updateTrip as jest.Mock).mockResolvedValueOnce({});
+    jest.useFakeTimers();
     render(<EditTripClient trip={trip} />);
 
     fireEvent.click(screen.getByRole('button', { name: /Wijzigingen Opslaan/i }));
 
-    await waitFor(() =>
-      expect(screen.getByText(/Reis succesvol bijgewerkt!/i)).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText(/Reis succesvol bijgewerkt!/i)).toBeInTheDocument());
+
+    // Fast-forward the redirect timeout
+    jest.runAllTimers();
     await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/trips/trip987'));
+    jest.useRealTimers();
   });
 
   it('behoudt invoer bij foutmelding', async () => {
-    (updateTrip as jest.Mock).mockRejectedValueOnce(new Error('Server error'));
+    (updateTrip as jest.Mock).mockRejectedValueOnce(new Error('Failed to update trip'));
     render(<EditTripClient trip={trip} />);
 
     const input = screen.getByLabelText(/Titel/i);

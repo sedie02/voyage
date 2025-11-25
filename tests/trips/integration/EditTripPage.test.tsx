@@ -5,12 +5,14 @@
 
 import EditTripPage from '@/app/trips/[id]/edit/page';
 import * as supabaseServer from '@/lib/supabase/server';
+import * as nav from 'next/navigation';
 import { render, screen } from '@testing-library/react';
 
 jest.mock('@/lib/supabase/server');
-jest.mock('@/app/trips/[id]/edit/EditTripClient', () =>
-  jest.fn(() => <div>MockEditTripClient</div>)
-);
+jest.mock('@/app/trips/[id]/edit/EditTripClient', () => ({
+  __esModule: true,
+  default: () => <div>MockEditTripClient</div>,
+}));
 
 describe('EditTripPage', () => {
   const mockTrip = {
@@ -38,7 +40,7 @@ describe('EditTripPage', () => {
     render(Page);
 
     expect(mockSingle).toHaveBeenCalled();
-    expect(screen.getByText('MockEditTripClient')).toBeInTheDocument();
+    await screen.findByText('MockEditTripClient');
   });
 
   it('roept notFound aan als trip niet bestaat', async () => {
@@ -53,10 +55,8 @@ describe('EditTripPage', () => {
       }),
     });
 
-    const notFound = jest
-      .spyOn(require('next/navigation'), 'notFound')
-      .mockImplementation(() => {});
+    (nav as any).notFound = jest.fn();
     await EditTripPage({ params: { id: 'invalid' } });
-    expect(notFound).toHaveBeenCalled();
+    expect(nav.notFound).toHaveBeenCalled();
   });
 });

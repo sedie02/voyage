@@ -16,8 +16,15 @@ describe('US47 - updateTrip server action', () => {
   beforeEach(() => {
     (createClient as jest.Mock).mockResolvedValue({
       from: () => ({
-        update: mockUpdate,
-        eq: mockEq,
+        update: (...args: unknown[]) => {
+          mockUpdate(...args);
+          return {
+            eq: (...eqArgs: unknown[]) => {
+              mockEq(...eqArgs);
+              return Promise.resolve({ error: null });
+            },
+          };
+        },
         select: () => mockSelect(),
       }),
     });

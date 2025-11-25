@@ -9,9 +9,12 @@ jest.mock('@/app/trips/actions', () => ({
 }));
 
 jest.mock('next/navigation', () => ({
+  __esModule: true,
   useRouter: () => ({
     push: jest.fn(),
   }),
+  usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 jest.mock('@/contexts/ToastContext', () => ({
@@ -48,7 +51,11 @@ describe('NewTripForm Flow - Integration Tests', () => {
     await user.click(screen.getByRole('button', { name: /volgende/i }));
 
     // Step 3: Select dates (simplified for test)
-    // In a real test, you'd mock the date picker
+    // Click start and end date inputs (our datepicker is mocked in setup)
+    const startDateInput = screen.getByPlaceholderText(/selecteer startdatum/i);
+    await user.click(startDateInput);
+    const endDateInput = screen.getByPlaceholderText(/selecteer einddatum/i);
+    await user.click(endDateInput);
     await user.click(screen.getByRole('button', { name: /volgende/i }));
 
     // Step 4: Enter budget and submit
@@ -87,6 +94,12 @@ describe('NewTripForm Flow - Integration Tests', () => {
     const destinationInput = screen.getByPlaceholderText(/bijv. barcelona, spanje/i);
     await user.type(destinationInput, 'Amsterdam');
     await user.click(screen.getByRole('button', { name: /volgende/i }));
+
+    // Step 3: set dates
+    const startDateInput = screen.getByPlaceholderText(/selecteer startdatum/i);
+    await user.click(startDateInput);
+    const endDateInput = screen.getByPlaceholderText(/selecteer einddatum/i);
+    await user.click(endDateInput);
 
     await user.click(screen.getByRole('button', { name: /volgende/i }));
 

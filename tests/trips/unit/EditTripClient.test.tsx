@@ -10,7 +10,10 @@ import { useRouter } from 'next/navigation';
 
 // Mock dependencies
 jest.mock('next/navigation', () => ({
+  __esModule: true,
   useRouter: jest.fn(),
+  usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
 }));
 jest.mock('@/app/trips/actions', () => ({
   updateTrip: jest.fn(),
@@ -64,7 +67,7 @@ describe('EditTripClient', () => {
   });
 
   it('toont foutmelding bij mislukte update', async () => {
-    (updateTrip as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+    (updateTrip as jest.Mock).mockRejectedValueOnce(new Error('Failed to update trip'));
     render(<EditTripClient trip={trip} />);
 
     const saveButton = screen.getByRole('button', { name: /Wijzigingen Opslaan/i });

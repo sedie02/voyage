@@ -4,9 +4,12 @@ import userEvent from '@testing-library/user-event';
 
 // Mock de hooks en dependencies
 jest.mock('next/navigation', () => ({
+  __esModule: true,
   useRouter: () => ({
     push: jest.fn(),
   }),
+  usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 jest.mock('@/contexts/ToastContext', () => ({
@@ -87,6 +90,8 @@ describe('NewTripForm Validation - Unit Tests', () => {
       // Mock destination input
       const destinationInput = screen.getByPlaceholderText(/bijv. barcelona, spanje/i);
       await _user.type(destinationInput, 'Amsterdam, Netherlands');
+      // Ensure the autocomplete mock fires onBlur so the page receives the final value
+      await _user.tab();
 
       const nextButton = screen.getByRole('button', { name: /volgende/i });
       expect(nextButton).toBeEnabled();
@@ -105,6 +110,7 @@ describe('NewTripForm Validation - Unit Tests', () => {
 
       const destinationInput = screen.getByPlaceholderText(/bijv. barcelona, spanje/i);
       await _user.type(destinationInput, 'Amsterdam');
+      await _user.tab();
       await _user.click(screen.getByRole('button', { name: /volgende/i }));
 
       const nextButton = screen.getByRole('button', { name: /volgende/i });
@@ -122,6 +128,7 @@ describe('NewTripForm Validation - Unit Tests', () => {
 
       const destinationInput = screen.getByPlaceholderText(/bijv. barcelona, spanje/i);
       await _user.type(destinationInput, 'Amsterdam');
+      await _user.tab();
       await _user.click(screen.getByRole('button', { name: /volgende/i }));
 
       const endDateInput = screen.getByPlaceholderText(/selecteer einddatum/i);
@@ -138,10 +145,26 @@ describe('NewTripForm Validation - Unit Tests', () => {
 
   describe('Step 4: Budget Validation', () => {
     it('should disable submit button when budget is invalid', async () => {
+      const _user = userEvent.setup();
       render(<NewTripPage />);
 
       // Navigate to step 4 with invalid budget
-      // ... implementation
+      const adventureButton = screen.getByText('🏔️').closest('button');
+      await _user.click(adventureButton!);
+      await _user.click(screen.getByRole('button', { name: /volgende/i }));
+
+      const destinationInput = screen.getByPlaceholderText(/bijv. barcelona, spanje/i);
+      await _user.type(destinationInput, 'Amsterdam');
+      await _user.tab();
+      await _user.click(screen.getByRole('button', { name: /volgende/i }));
+
+      // Set start and end dates (mocked datepicker will call onChange on click)
+      const startDateInput = screen.getByPlaceholderText(/selecteer startdatum/i);
+      await _user.click(startDateInput);
+      const endDateInput = screen.getByPlaceholderText(/selecteer einddatum/i);
+      await _user.click(endDateInput);
+
+      await _user.click(screen.getByRole('button', { name: /volgende/i }));
 
       const submitButton = screen.getByRole('button', { name: /trip aanmaken/i });
       expect(submitButton).toBeDisabled();
@@ -163,7 +186,8 @@ describe('NewTripForm Validation - Unit Tests', () => {
       // Set valid dates
       const startDateInput = screen.getByPlaceholderText(/selecteer startdatum/i);
       await _user.click(startDateInput);
-      // ... date selection logic
+      const endDateInput = screen.getByPlaceholderText(/selecteer einddatum/i);
+      await _user.click(endDateInput);
 
       await _user.click(screen.getByRole('button', { name: /volgende/i }));
 
@@ -186,10 +210,14 @@ describe('NewTripForm Validation - Unit Tests', () => {
 
       const destinationInput = screen.getByPlaceholderText(/bijv. barcelona, spanje/i);
       await _user.type(destinationInput, 'Amsterdam, Netherlands');
+      await _user.tab();
       await _user.click(screen.getByRole('button', { name: /volgende/i }));
 
       // Set valid dates
-      // ... date selection implementation
+      const startDateInput = screen.getByPlaceholderText(/selecteer startdatum/i);
+      await _user.click(startDateInput);
+      const endDateInput = screen.getByPlaceholderText(/selecteer einddatum/i);
+      await _user.click(endDateInput);
 
       await _user.click(screen.getByRole('button', { name: /volgende/i }));
 
