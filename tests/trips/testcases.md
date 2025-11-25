@@ -1,3 +1,5 @@
+Sprint 2--------------------------
+
 US40: Trip Success Melding
 User Story: Als reiziger wil ik een duidelijke melding zien ("Trip succesvol aangemaakt"), zodat ik weet dat mijn invoer bewaard is.
 
@@ -139,3 +141,84 @@ Test Coverage
 ✅ Cache management
 
 ---
+
+Sprint 3 -----------------------------------------------
+
+us48
+✅ Scenario 1: Formulier toont bestaande gegevens
+
+Given de gebruiker is eigenaar van een bestaande trip
+When de gebruiker de pagina /trips/[id]/edit opent
+Then worden de velden titel, bestemming, startdatum en einddatum automatisch ingevuld met de huidige tripgegevens
+
+✅ Scenario 2: Velden kunnen worden gewijzigd
+
+Given de gebruiker bevindt zich op het bewerkformulier
+When de gebruiker waarden aanpast in één of meer velden
+Then worden deze wijzigingen direct weergegeven in de invoervelden zonder fouten
+
+✅ Scenario 3: Wijzigingen succesvol opslaan
+
+Given een geldige bewerking is uitgevoerd
+When de gebruiker op “Wijzigingen Opslaan” klikt
+Then wordt updateTrip() aangeroepen met de aangepaste waarden
+And verschijnt een succesmelding “Reis succesvol bijgewerkt!”
+And na 1.5 seconde wordt de gebruiker doorgestuurd naar /trips/[id]
+
+⚠️ Scenario 4: Opslaan mislukt (foutafhandeling)
+
+Given de updateTrip()-actie gooit een fout (bijv. netwerkfout)
+When de gebruiker probeert op te slaan
+Then verschijnt een foutmelding “Failed to update trip”
+And blijft de gebruiker op de huidige pagina
+
+🚫 Scenario 5: Annuleren via navigatie
+
+Given de gebruiker is in het bewerkformulier
+When de gebruiker op “Terug” klikt
+Then wordt de gebruiker omgeleid naar de tripdetailpagina /trips/[id]
+And worden gemaakte wijzigingen niet opgeslagen
+
+Test files
+unit: EditTripClient.test.tsx - Test component rendering, form prefill, input state en validatie
+integration: EditTripPage.test.tsx - Test interactie tussen server fetch (supabase.from('trips')) en clientcomponent
+e2e: trips-edit.spec.ts - Test volledige gebruikersflow: open bewerkpagina, wijzig velden, sla op, valideer navigatie en UI-feedback
+
+Test Coverage
+Form rendering en prefill ✅
+Form input bindings en state management ✅
+Supabase query en foutafhandeling ✅
+Navigatiegedrag (cancel en redirect) ✅
+UI feedback (success & error states) ✅
+
+---
+
+US47: Wijzigingen Opslaan
+
+User Story:
+Als eigenaar wil ik dat mijn wijzigingen in de tripdetails worden opgeslagen, zodat de data actueel blijft.
+
+Test Scenarios
+Scenario 1: Succesvolle update
+Given: een geldig bewerkformulier met gewijzigde waarden
+When: de gebruiker klikt op “Wijzigingen Opslaan”
+Then: de updateTrip-functie wordt aangeroepen met juiste payload
+And: er verschijnt een melding “Reis succesvol bijgewerkt!”
+And: de gebruiker wordt doorgestuurd naar /trips/[id]
+
+Scenario 2: Backend error
+Given: geldige invoer
+When: de backend retourneert een fout
+Then: de foutmelding “Opslaan mislukt, probeer opnieuw” verschijnt
+And: de formulierwaarden blijven behouden
+
+Scenario 3: Validatiebehoud
+Given: ongeldige invoer (bv. lege titel)
+When: op “Opslaan” geklikt
+Then: er wordt geen request verstuurd
+And: validatie toont verplicht veldmelding
+
+Test files
+unit: EditTripClient.update.test.tsx - Controleren van feedback, state en validatie
+integration: updateTripAction.test.ts - Back-end aanroep en foutafhandeling
+e2e: trip-update-flow.spec.ts - Gebruikersflow en visuele feedback

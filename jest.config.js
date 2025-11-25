@@ -55,7 +55,14 @@ const customJestConfig = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
 
   // Ignore patterns
-  testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/out/'],
+  testPathIgnorePatterns: [
+    '<rootDir>/.next/',
+    '<rootDir>/node_modules/',
+    '<rootDir>/out/',
+    // Ignore any nested e2e test folders (Playwright tests live under tests/**/e2e/)
+    // Use a regex-style pattern instead of glob-star to avoid invalid regex construction on Windows
+    '<rootDir>/tests/.*/e2e/',
+  ],
 
   // Clear mocks between tests
   clearMocks: true,

@@ -15,6 +15,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:unit": "jest --config jest.config.js tests/trips/unit",
+    "test:integration": "jest --config jest.config.js tests/trips/integration",
+    "test:e2e": "playwright test",
     "type-check": "tsc --noEmit",
     "db:generate": "supabase gen types typescript --project-id $SUPABASE_PROJECT_ID > src/types/database.types.ts",
     "analyze": "ANALYZE=true next build"
@@ -49,6 +52,7 @@
     "@tailwindcss/typography": "^0.5.19",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^15.0.7",
+    "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
     "@types/minimatch": "^5.1.2",
     "@types/node": "^20.14.0",
