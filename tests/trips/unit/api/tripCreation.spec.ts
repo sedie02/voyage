@@ -49,7 +49,12 @@ describe('Trip Creation API - Unit Tests', () => {
       mockGetCityPhotoUrl.mockResolvedValue('https://example.com/photo.jpg');
 
       // Missing required fields
-      const invalidData: { title: string; destination: string; startDate: string; endDate: string } = {
+      const invalidData: {
+        title: string;
+        destination: string;
+        startDate: string;
+        endDate: string;
+      } = {
         title: '', // Empty title
         destination: '', // Empty destination
         startDate: 'invalid-date', // Invalid date

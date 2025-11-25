@@ -13,7 +13,10 @@ jest.mock('@/app/trips/actions', () => ({
 describe('NewTripPage - Toast integration', () => {
   it('shows success toast when trip is created successfully', async () => {
     // Arrange
-    (actions.createTrip as jest.Mock).mockResolvedValueOnce({ success: true, trip: { id: 'new-1' } });
+    (actions.createTrip as jest.Mock).mockResolvedValueOnce({
+      success: true,
+      trip: { id: 'new-1' },
+    });
 
     render(<NewTripPage />);
 
@@ -44,7 +47,9 @@ describe('NewTripPage - Toast integration', () => {
 
     // Assert
     // Assert: toast should be shown via useToast
-    await waitFor(() => expect(mockShowToast).toHaveBeenCalledWith('Trip succesvol aangemaakt!', 'success'));
+    await waitFor(() =>
+      expect(mockShowToast).toHaveBeenCalledWith('Trip succesvol aangemaakt!', 'success')
+    );
   });
 
   it('does not show success toast on error', async () => {

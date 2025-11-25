@@ -123,8 +123,7 @@ jest.mock('@/lib/supabase/server', () => ({
 // Use a stable non-jest function so `resetMocks` won't remove the default
 // implementation. Tests can still override `global.fetch` per-test when they
 // need to assert on calls.
-global.fetch = (..._args) =>
-  Promise.resolve({ json: async () => ({ hasTrips: true }) });
+global.fetch = (..._args) => Promise.resolve({ json: async () => ({ hasTrips: true }) });
 
 // Mock react-google-autocomplete to a simple input so tests can type into it.
 jest.mock('react-google-autocomplete', () => {

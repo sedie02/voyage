@@ -5,8 +5,8 @@
 
 import EditTripPage from '@/app/trips/[id]/edit/page';
 import * as supabaseServer from '@/lib/supabase/server';
-import * as nav from 'next/navigation';
 import { render, screen } from '@testing-library/react';
+import * as nav from 'next/navigation';
 
 jest.mock('@/lib/supabase/server');
 jest.mock('@/app/trips/[id]/edit/EditTripClient', () => ({

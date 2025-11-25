@@ -57,7 +57,9 @@ describe('US47 - Opslaan van wijzigingen', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /Wijzigingen Opslaan/i }));
 
-    await waitFor(() => expect(screen.getByText(/Reis succesvol bijgewerkt!/i)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText(/Reis succesvol bijgewerkt!/i)).toBeInTheDocument()
+    );
 
     // Fast-forward the redirect timeout
     jest.runAllTimers();
