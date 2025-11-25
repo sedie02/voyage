@@ -21,3 +21,5 @@ pnpm-lock.yaml
 # Generated files
 *.generated.*
 database.types.ts
+test-results/
+playwright-report/

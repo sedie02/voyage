@@ -1,3 +1,5 @@
+import AppHeader from '@/components/AppHeader';
+import { ToastProvider } from '@/contexts/ToastContext';
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import '../styles/globals.css';
@@ -45,7 +47,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="nl">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <ToastProvider>
+          <AppHeader />
+          {children}
+        </ToastProvider>
+      </body>
     </html>
   );
 }
