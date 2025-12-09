@@ -99,7 +99,12 @@ export async function createInviteLink(
 /**
  * Accept an invite link
  */
-export async function acceptInvite(token: string, name: string, email?: string) {
+export async function acceptInvite(
+  token: string,
+  name: string,
+  email?: string,
+  guestSessionId?: string
+) {
   try {
     const supabase = await createClient();
 
@@ -185,6 +190,17 @@ export async function acceptInvite(token: string, name: string, email?: string) 
     }
     if (email && !user) {
       participantData.guest_email = email;
+    }
+
+    // Attach guest_session_id for guest invitees so they can be recognized by session
+    if (!user) {
+      if (guestSessionId) {
+        participantData.guest_session_id = guestSessionId;
+      } else {
+        // Guest has no session ID and no user - log this issue
+        const errorMsg = 'Guest session ID not provided for guest invitee';
+        throw new Error(errorMsg);
+      }
     }
 
     // Try to insert with all optional fields

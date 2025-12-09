@@ -9,6 +9,7 @@ interface InviteAcceptClientProps {
   trip: any;
   isAuthenticated: boolean;
   userEmail?: string;
+  guestSessionId?: string;
 }
 
 export default function InviteAcceptClient({
@@ -16,6 +17,7 @@ export default function InviteAcceptClient({
   trip,
   isAuthenticated,
   userEmail,
+  guestSessionId,
 }: InviteAcceptClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -38,7 +40,7 @@ export default function InviteAcceptClient({
     startTransition(async () => {
       try {
         setError(null);
-        const result = await acceptInvite(token, name, email);
+        const result = await acceptInvite(token, name, email, guestSessionId);
         if (result.success) {
           setSuccess(true);
           setTimeout(() => {

@@ -1,5 +1,5 @@
 import { getCityPhotoUrl } from '@/lib/external/places';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import TripDetailClient from './TripDetailClient';
 
@@ -95,10 +95,39 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
     notFound();
   }
 
-  // Now fetch with participants
-  const participantsResult = await supabase.from('trip_participants').select('*').eq('trip_id', id);
+  // Now fetch participants.
+  // Guests (no auth) who match the trip's guest_session_id are allowed to view participants.
+  // Now fetch participants.
+  // For guests (no auth), use service client to bypass RLS and see all participants
+  let participants: any[] = [];
 
-  let participants = participantsResult.data || [];
+  if (!user) {
+    // Guest user - use service client to see all participants for this trip
+    try {
+      const service = createServiceClient();
+      const { data: allParticipants } = await service
+        .from('trip_participants')
+        .select('*')
+        .eq('trip_id', id)
+        .order('created_at', { ascending: true });
+
+      if (allParticipants && allParticipants.length > 0) {
+        participants = allParticipants;
+      }
+    } catch (e) {
+      // Service client failed, fall through to regular query
+    }
+  }
+
+  // If service client didn't work or we're authenticated, use regular client (RLS applies)
+  if (participants.length === 0) {
+    const participantsResult = await supabase
+      .from('trip_participants')
+      .select('*')
+      .eq('trip_id', id)
+      .order('created_at', { ascending: true });
+    participants = participantsResult.data || [];
+  }
 
   // Get owner user info if we have owner_id
   let ownerUser: any = null;

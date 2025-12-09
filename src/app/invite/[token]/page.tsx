@@ -1,8 +1,13 @@
+import { getGuestSessionId, getOrCreateGuestSession } from '@/lib/session';
 import { createClient } from '@/lib/supabase/server';
 import InviteAcceptClient from './InviteAcceptClient';
 
 export default async function InviteAcceptPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
+
+  // Ensure guest session is created/set before rendering
+  await getOrCreateGuestSession();
+
   const supabase = await createClient();
 
   // Check if user is authenticated
@@ -148,12 +153,21 @@ export default async function InviteAcceptPage({ params }: { params: Promise<{ t
     );
   }
 
+  // Get the guest session ID that was just created/retrieved
+  let guestSessionId = await getGuestSessionId();
+
+  // If still undefined, create one now
+  if (!guestSessionId) {
+    guestSessionId = await getOrCreateGuestSession();
+  }
+
   return (
     <InviteAcceptClient
       token={token}
       trip={trip}
       isAuthenticated={!!user}
       userEmail={user?.email}
+      guestSessionId={guestSessionId}
     />
   );
 }
