@@ -20,12 +20,7 @@ interface PackingTabProps {
   currentUserName?: string;
 }
 
-function PackingTabContent({
-  tripId,
-  categories,
-  items,
-  currentUserName,
-}: PackingTabProps) {
+function PackingTabContent({ tripId, categories, items, currentUserName }: PackingTabProps) {
   const router = useRouter();
   const [isAddingItem, setIsAddingItem] = useState(false);
   const [newItemText, setNewItemText] = useState('');
@@ -492,8 +487,8 @@ function PackingTabContent({
   );
 }
 
-  // Debug: confirm exported type at module load
-  // This will print when the module is imported so we can verify it's a function
-  console.log('DEBUG: PackingTabContent module loaded, typeof export:', typeof PackingTabContent);
+// Debug: confirm exported type at module load
+// This will print when the module is imported so we can verify it's a function
+console.log('DEBUG: PackingTabContent module loaded, typeof export:', typeof PackingTabContent);
 
-  export default PackingTabContent;
+export default PackingTabContent;
