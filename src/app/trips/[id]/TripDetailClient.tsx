@@ -6,6 +6,7 @@ import ParticipantList from '@/components/ParticipantList';
 import ShareTripModal from '@/components/ShareTripModal';
 import Link from 'next/link';
 import { useState } from 'react';
+import PackingTabContent from './PackingTabContent';
 
 // Destination gradient helper
 const getDestinationGradient = (destination: string) => {
@@ -30,6 +31,8 @@ interface TripDetailClientProps {
   isOwner?: boolean;
   currentUserId?: string;
   days?: any[];
+  packingCategories?: any[];
+  packingItems?: any[];
 }
 
 export default function TripDetailClient({
@@ -38,9 +41,19 @@ export default function TripDetailClient({
   isOwner = false,
   currentUserId,
   days = [],
+  packingCategories = [],
+  packingItems = [],
 }: TripDetailClientProps) {
   const [activeTab, setActiveTab] = useState('overview');
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  // Debug: log imported PackingTabContent shape to debug invalid element type errors
+  console.log('DEBUG: PackingTabContent import value:', PackingTabContent);
+  console.log('DEBUG: typeof PackingTabContent:', typeof PackingTabContent);
+  try {
+    console.log('DEBUG: PackingTabContent keys:', Object.keys(PackingTabContent || {}));
+  } catch (e) {
+    /* ignore */
+  }
 
   // Debug logging
   console.log('📅 TripDetailClient received days:', {
@@ -377,28 +390,14 @@ export default function TripDetailClient({
                 )}
 
                 {activeTab === 'packing' && (
-                  <div className="py-12 text-center">
-                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                      <svg
-                        className="h-8 w-8 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="mb-2 text-lg font-semibold text-gray-900">Inpaklijst is leeg</h3>
-                    <p className="mb-4 text-gray-600">Maak een lijst van wat je wilt meenemen</p>
-                    <button className="rounded-lg bg-sky-600 px-6 py-2.5 font-semibold text-white transition-colors hover:bg-sky-700">
-                      Voeg Item Toe
-                    </button>
-                  </div>
+                  <PackingTabContent
+                    tripId={trip.id}
+                    categories={packingCategories}
+                    items={packingItems}
+                    currentUserName={
+                      participants.find((p: any) => p.user_id === currentUserId)?.guest_name || ''
+                    }
+                  />
                 )}
               </div>
             </div>

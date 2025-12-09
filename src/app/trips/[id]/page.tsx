@@ -258,8 +258,8 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
     participantCount: finalTrip.trip_participants?.length || 0,
   });
 
-  // Check if user is owner (ensure boolean)
-  const isOwner: boolean = !!user && finalTrip.owner_id === user.id;
+  // Check if user is owner
+  const isOwner = user && finalTrip.owner_id === user.id;
 
   // Calculate days until departure
   const startDate = new Date(finalTrip.start_date);
@@ -463,6 +463,20 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
     })),
   });
 
+  // @ts-ignore
+  const { data: packingCategories } = await supabase
+    .from('packing_categories')
+    .select('*')
+    .eq('trip_id', id)
+    .order('order_index', { ascending: true });
+
+  // @ts-ignore
+  const { data: packingItems } = await supabase
+    .from('packing_items')
+    .select('*')
+    .eq('trip_id', id)
+    .order('order_index', { ascending: true });
+
   return (
     <TripDetailClient
       trip={{ ...finalTrip, cityPhotoUrl }}
@@ -470,6 +484,8 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
       isOwner={isOwner}
       currentUserId={user?.id}
       days={days || []}
+      packingCategories={packingCategories || []}
+      packingItems={packingItems || []}
     />
   );
 }
