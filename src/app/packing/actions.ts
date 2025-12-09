@@ -215,3 +215,108 @@ export async function deleteItem(itemId: string) {
     return { error: error.message || 'Fout bij verwijderen item' };
   }
 }
+
+/**
+ * Guest-friendly: Add a packing item (uses service role to bypass RLS)
+ */
+export async function addItemAsGuest(
+  categoryId: string,
+  tripId: string,
+  name: string,
+  guestName: string
+) {
+  try {
+    const { createServiceClient } = await import('@/lib/supabase/server');
+    const service = createServiceClient();
+
+    // Get current max order_index for this category
+    // @ts-ignore
+    const { data: items } = await service
+      .from('packing_items')
+      .select('order_index')
+      .eq('category_id', categoryId)
+      .order('order_index', { ascending: false })
+      .limit(1);
+
+    const maxOrder = items && items.length > 0 ? items[0].order_index : -1;
+
+    // Insert new item with guest info
+    // @ts-ignore
+    const { error } = await service.from('packing_items').insert({
+      category_id: categoryId,
+      trip_id: tripId,
+      name: name.trim(),
+      order_index: maxOrder + 1,
+      created_by: null,
+      created_by_guest: guestName,
+    });
+
+    if (error) throw error;
+
+    revalidatePath(`/trips/${tripId}`);
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error adding item:', error);
+    return { error: error.message || 'Fout bij toevoegen item' };
+  }
+}
+
+/**
+ * Guest-friendly: Toggle item checked status (uses service role to bypass RLS)
+ */
+export async function toggleItemCheckedAsGuest(
+  itemId: string,
+  checked: boolean,
+  guestName: string
+) {
+  try {
+    const { createServiceClient } = await import('@/lib/supabase/server');
+    const service = createServiceClient();
+
+    // Update with checked status and track who checked it
+    // @ts-ignore
+    const { error } = await service
+      .from('packing_items')
+      .update({
+        checked: !checked,
+        checked_by: !checked ? guestName : null,
+        checked_at: !checked ? new Date().toISOString() : null,
+      })
+      .eq('id', itemId);
+
+    if (error) throw error;
+
+    revalidatePath('/packing');
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error toggling item:', error);
+    return { error: error.message || 'Fout bij wijzigen item' };
+  }
+}
+
+/**
+ * Guest-friendly: Mark item as "taken" by guest (uses service role to bypass RLS)
+ */
+export async function takeItemAsGuest(itemId: string, guestName: string) {
+  try {
+    const { createServiceClient } = await import('@/lib/supabase/server');
+    const service = createServiceClient();
+
+    // @ts-ignore
+    const { error } = await service
+      .from('packing_items')
+      .update({
+        taken_by: guestName,
+        taken_at: new Date().toISOString(),
+      })
+      .eq('id', itemId);
+
+    if (error) throw error;
+
+    revalidatePath('/packing');
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error taking item:', error);
+    return { error: error.message || 'Fout bij wijzigen item' };
+  }
+}

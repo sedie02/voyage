@@ -29,7 +29,9 @@ interface TripDetailClientProps {
   trip: any;
   daysUntil: number;
   isOwner?: boolean;
+  isGuest?: boolean;
   currentUserId?: string;
+  guestSessionId?: string | null;
   days?: any[];
   packingCategories?: any[];
   packingItems?: any[];
@@ -39,7 +41,9 @@ export default function TripDetailClient({
   trip,
   daysUntil,
   isOwner = false,
+  isGuest = false,
   currentUserId,
+  guestSessionId,
   days = [],
   packingCategories = [],
   packingItems = [],
@@ -47,24 +51,14 @@ export default function TripDetailClient({
   const [activeTab, setActiveTab] = useState('overview');
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   // Debug: log imported PackingTabContent shape to debug invalid element type errors
-  console.log('DEBUG: PackingTabContent import value:', PackingTabContent);
-  console.log('DEBUG: typeof PackingTabContent:', typeof PackingTabContent);
+
   try {
-    console.log('DEBUG: PackingTabContent keys:', Object.keys(PackingTabContent || {}));
-  } catch (e) {
+    // Removed debug logs
+  } catch {
     /* ignore */
   }
 
-  // Debug logging
-  console.log('📅 TripDetailClient received days:', {
-    daysCount: days.length,
-    days: days.map((day: any) => ({
-      id: day.id,
-      day_number: day.day_number,
-      date: day.date,
-      activitiesCount: day.activities?.length || 0,
-    })),
-  });
+  // Debug logging removed for production
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -394,6 +388,8 @@ export default function TripDetailClient({
                     tripId={trip.id}
                     categories={packingCategories}
                     items={packingItems}
+                    isGuest={isGuest}
+                    guestSessionId={guestSessionId}
                     currentUserName={
                       participants.find((p: any) => p.user_id === currentUserId)?.guest_name || ''
                     }

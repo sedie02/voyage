@@ -493,18 +493,26 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   });
 
   // @ts-ignore
-  const { data: packingCategories } = await supabase
+  let packingCategories: any[] = [];
+  let packingItems: any[] = [];
+
+  // For guests, use service client; for authenticated users, use regular client
+  const clientForPacking = !user ? createServiceClient() : supabase;
+
+  const { data: categoriesData } = await clientForPacking
     .from('packing_categories')
     .select('*')
     .eq('trip_id', id)
     .order('order_index', { ascending: true });
 
-  // @ts-ignore
-  const { data: packingItems } = await supabase
+  const { data: itemsData } = await clientForPacking
     .from('packing_items')
     .select('*')
     .eq('trip_id', id)
     .order('order_index', { ascending: true });
+
+  packingCategories = categoriesData || [];
+  packingItems = itemsData || [];
 
   return (
     <TripDetailClient
@@ -512,6 +520,8 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
       daysUntil={daysUntil}
       isOwner={isOwner}
       currentUserId={user?.id}
+      isGuest={!user}
+      guestSessionId={guestSessionId}
       days={days || []}
       packingCategories={packingCategories || []}
       packingItems={packingItems || []}

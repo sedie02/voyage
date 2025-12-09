@@ -1,6 +1,12 @@
 'use client';
 
-import { addItem, deleteItem, toggleItemChecked } from '@/app/packing/actions';
+import {
+  addItem,
+  addItemAsGuest,
+  deleteItem,
+  toggleItemChecked,
+  toggleItemCheckedAsGuest,
+} from '@/app/packing/actions';
 import { initializeDefaultCategories } from '@/app/packing/init-categories-action';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -15,29 +21,60 @@ const DEFAULT_CATEGORIES = [
 
 interface PackingTabProps {
   tripId: string;
-  categories: any[];
-  items: any[];
+  categories: unknown[];
+  items: unknown[];
+  isGuest?: boolean;
+  guestSessionId?: string | null;
   currentUserName?: string;
 }
 
-function PackingTabContent({ tripId, categories, items, currentUserName }: PackingTabProps) {
+function PackingTabContent({
+  tripId,
+  categories,
+  items,
+  isGuest = false,
+  guestSessionId: _guestSessionId,
+  currentUserName: _currentUserName,
+}: PackingTabProps) {
   const router = useRouter();
   const [isAddingItem, setIsAddingItem] = useState(false);
   const [newItemText, setNewItemText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
+  const [guestName, setGuestName] = useState<string | null>(null);
 
-  const totalItems = items.length;
-  const checkedItems = items.filter((item) => item.checked).length;
+  // Cast to any for ease of development - these are runtime data from server
+  const typedItems = items as unknown as Record<string, unknown>[];
+  const typedCategories = categories as unknown as Record<string, unknown>[];
+
+  const totalItems = typedItems.length;
+  const checkedItems = typedItems.filter((item) => item.checked).length;
   const progress = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 0;
+
+  // Detect guest name on mount
+  useEffect(() => {
+    const detectGuest = async () => {
+      try {
+        // Try to get guest name from storage
+        const stored = localStorage.getItem('guest_name');
+        if (stored) {
+          setGuestName(stored);
+        }
+      } catch {
+        // Not a guest
+      }
+    };
+
+    detectGuest();
+  }, []);
 
   // Auto-select first category when modal opens
   useEffect(() => {
-    if (isAddingItem && categories.length > 0 && !selectedCategory) {
-      setSelectedCategory(categories[0].id);
+    if (isAddingItem && typedCategories.length > 0 && !selectedCategory) {
+      setSelectedCategory((typedCategories[0] as Record<string, unknown>).id as string);
     }
-  }, [isAddingItem, categories, selectedCategory]);
+  }, [isAddingItem, typedCategories, selectedCategory]);
 
   const handleInitializeCategories = async () => {
     setIsInitializing(true);
@@ -51,8 +88,9 @@ function PackingTabContent({ tripId, categories, items, currentUserName }: Packi
       } else {
         setInitError(result.error || 'Onbekende fout');
       }
-    } catch (error: any) {
-      setInitError(error.message || 'Onbekende fout');
+    } catch (error: unknown) {
+      const err = error as Record<string, unknown>;
+      setInitError((err.message as string) || 'Onbekende fout');
     } finally {
       setIsInitializing(false);
     }
@@ -65,23 +103,44 @@ function PackingTabContent({ tripId, categories, items, currentUserName }: Packi
       return;
     }
 
-    const formData = new FormData();
-    formData.append('category_id', selectedCategory);
-    formData.append('trip_id', tripId);
-    formData.append('name', newItemText.trim());
+    if (isGuest && guestName) {
+      // Guest user - use guest action
+      const result = await addItemAsGuest(selectedCategory, tripId, newItemText.trim(), guestName);
 
-    const result = await addItem(formData);
-
-    if (result?.error) {
-      alert('Fout bij toevoegen: ' + result.error);
+      if (result?.error) {
+        alert('Fout bij toevoegen: ' + result.error);
+      } else {
+        setNewItemText('');
+        setIsAddingItem(false);
+        router.refresh();
+      }
     } else {
-      setNewItemText('');
-      setIsAddingItem(false);
+      // Authenticated user - use regular action
+      const formData = new FormData();
+      formData.append('category_id', selectedCategory);
+      formData.append('trip_id', tripId);
+      formData.append('name', newItemText.trim());
+
+      const result = await addItem(formData);
+
+      if (result?.error) {
+        alert('Fout bij toevoegen: ' + result.error);
+      } else {
+        setNewItemText('');
+        setIsAddingItem(false);
+      }
     }
   };
 
   const handleToggleCheck = async (itemId: string, checked: boolean) => {
-    await toggleItemChecked(itemId, checked);
+    if (isGuest && guestName) {
+      // Guest user - use guest action
+      await toggleItemCheckedAsGuest(itemId, checked, guestName);
+      router.refresh();
+    } else {
+      // Authenticated user - use regular action
+      await toggleItemChecked(itemId, checked);
+    }
   };
 
   const handleDelete = async (itemId: string) => {
@@ -127,15 +186,21 @@ function PackingTabContent({ tripId, categories, items, currentUserName }: Packi
 
       {/* Items Grouped by Category - Modern Cards */}
       <div className="space-y-4">
-        {categories.map((category) => {
-          const categoryItems = items.filter((item) => item.category_id === category.id);
-          const catChecked = categoryItems.filter((i) => i.checked).length;
+        {typedCategories.map((category) => {
+          const categoryId = (category as Record<string, unknown>).id as string;
+          const categoryName = (category as Record<string, unknown>).name as string;
+          const categoryItems = typedItems.filter(
+            (item) => (item as Record<string, unknown>).category_id === categoryId
+          );
+          const catChecked = categoryItems.filter(
+            (i) => (i as Record<string, unknown>).checked
+          ).length;
           const catTotal = categoryItems.length;
-          const defaultCat = DEFAULT_CATEGORIES.find((c) => c.name === category.name);
+          const defaultCat = DEFAULT_CATEGORIES.find((c) => c.name === categoryName);
 
           return (
             <div
-              key={category.id}
+              key={categoryId}
               className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
             >
               {/* Category Header - Compact */}
@@ -143,7 +208,7 @@ function PackingTabContent({ tripId, categories, items, currentUserName }: Packi
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">{defaultCat?.icon || '📦'}</span>
-                    <h3 className="text-base font-bold text-gray-900">{category.name}</h3>
+                    <h3 className="text-base font-bold text-gray-900">{categoryName}</h3>
                     {catTotal > 0 && (
                       <span className="ml-2 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600">
                         {catChecked}/{catTotal}
@@ -152,7 +217,7 @@ function PackingTabContent({ tripId, categories, items, currentUserName }: Packi
                   </div>
                   <button
                     onClick={() => {
-                      setSelectedCategory(category.id);
+                      setSelectedCategory(categoryId);
                       setIsAddingItem(true);
                     }}
                     className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-pink-600"
@@ -176,75 +241,112 @@ function PackingTabContent({ tripId, categories, items, currentUserName }: Packi
                     <p className="text-sm text-gray-400">Geen items</p>
                   </div>
                 ) : (
-                  categoryItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-50"
-                    >
-                      {/* Checkbox */}
-                      <button
-                        onClick={() => handleToggleCheck(item.id, item.checked)}
-                        className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-all ${
-                          item.checked
-                            ? 'border-pink-500 bg-pink-500'
-                            : 'border-gray-300 hover:border-pink-400'
-                        }`}
+                  categoryItems.map((item) => {
+                    const itemTyped = item as Record<string, unknown>;
+                    const itemId = itemTyped.id as string;
+                    const itemName = itemTyped.name as string;
+                    const itemChecked = itemTyped.checked as boolean;
+                    const itemCheckedBy = itemTyped.checked_by as string | undefined;
+                    const itemCheckedAt = itemTyped.checked_at as string | undefined;
+                    const itemTakenBy = itemTyped.taken_by as string | undefined;
+                    const itemTakenAt = itemTyped.taken_at as string | undefined;
+
+                    return (
+                      <div
+                        key={itemId}
+                        className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-50"
                       >
-                        {item.checked && (
-                          <svg
-                            className="h-3 w-3 text-white"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="3"
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
-                        )}
-                      </button>
-
-                      {/* Item Text */}
-                      <div className="min-w-0 flex-1">
-                        <p
-                          className={`text-sm font-medium ${item.checked ? 'text-gray-400 line-through' : 'text-gray-900'}`}
-                        >
-                          {item.name}
-                        </p>
-                        {item.taken_by && (
-                          <p className="text-xs text-pink-600">
-                            <span className="font-semibold">✓</span> {item.taken_by}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Actions - Hidden until hover */}
-                      <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                        {/* Checkbox */}
                         <button
-                          onClick={() => handleDelete(item.id)}
-                          className="rounded p-1 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
-                          title="Verwijderen"
+                          onClick={() => handleToggleCheck(itemId, itemChecked)}
+                          className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-all ${
+                            itemChecked
+                              ? 'border-pink-500 bg-pink-500'
+                              : 'border-gray-300 hover:border-pink-400'
+                          }`}
                         >
-                          <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            />
-                          </svg>
+                          {itemChecked && (
+                            <svg
+                              className="h-3 w-3 text-white"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="3"
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          )}
                         </button>
+
+                        {/* Item Text */}
+                        <div className="min-w-0 flex-1">
+                          <p
+                            className={`text-sm font-medium ${itemChecked ? 'text-gray-400 line-through' : 'text-gray-900'}`}
+                          >
+                            {itemName}
+                          </p>
+                          {itemCheckedBy && (
+                            <p className="text-xs text-emerald-600">
+                              <span className="font-semibold">✓</span> Aangevinkt door{' '}
+                              {itemCheckedBy}
+                              {itemCheckedAt && (
+                                <span className="text-gray-500">
+                                  {' '}
+                                  op{' '}
+                                  {new Date(itemCheckedAt).toLocaleDateString('nl-NL', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
+                                </span>
+                              )}
+                            </p>
+                          )}
+                          {itemTakenBy && (
+                            <p className="text-xs text-pink-600">
+                              <span className="font-semibold">📦</span> {itemTakenBy}
+                              {itemTakenAt && (
+                                <span className="text-gray-500">
+                                  {' '}
+                                  op{' '}
+                                  {new Date(itemTakenAt).toLocaleDateString('nl-NL', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
+                                </span>
+                              )}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Actions - Hidden until hover */}
+                        <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                          <button
+                            onClick={() => handleDelete(itemId)}
+                            className="rounded p-1 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                            title="Verwijderen"
+                          >
+                            <svg
+                              className="h-4 w-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
+                            </svg>
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             </div>
@@ -274,20 +376,23 @@ function PackingTabContent({ tripId, categories, items, currentUserName }: Packi
             <div className="mb-4">
               <label className="mb-2 block text-sm font-medium text-gray-700">Categorie</label>
               <div className="grid grid-cols-3 gap-2">
-                {categories.map((cat) => {
-                  const defaultCat = DEFAULT_CATEGORIES.find((c) => c.name === cat.name);
+                {typedCategories.map((cat) => {
+                  const catTyped = cat as Record<string, unknown>;
+                  const catId = catTyped.id as string;
+                  const catName = catTyped.name as string;
+                  const defaultCat = DEFAULT_CATEGORIES.find((c) => c.name === catName);
                   return (
                     <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
+                      key={catId}
+                      onClick={() => setSelectedCategory(catId)}
                       className={`flex flex-col items-center gap-1 rounded-lg border-2 p-3 transition-all ${
-                        selectedCategory === cat.id
+                        selectedCategory === catId
                           ? 'border-pink-500 bg-pink-50'
                           : 'border-gray-200 hover:border-pink-300'
                       }`}
                     >
                       <span className="text-2xl">{defaultCat?.icon || '📦'}</span>
-                      <span className="text-xs font-medium text-gray-700">{cat.name}</span>
+                      <span className="text-xs font-medium text-gray-700">{catName}</span>
                     </button>
                   );
                 })}
@@ -489,6 +594,5 @@ function PackingTabContent({ tripId, categories, items, currentUserName }: Packi
 
 // Debug: confirm exported type at module load
 // This will print when the module is imported so we can verify it's a function
-console.log('DEBUG: PackingTabContent module loaded, typeof export:', typeof PackingTabContent);
 
 export default PackingTabContent;

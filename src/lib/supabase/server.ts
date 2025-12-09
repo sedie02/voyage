@@ -51,7 +51,11 @@ export function createServiceClient(): any {
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    // Service client should not pass cookies
-    undefined as any
+    {
+      cookies: {
+        getAll: () => [],
+        setAll: () => {},
+      },
+    }
   ) as any;
 }
