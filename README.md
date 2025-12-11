@@ -1,259 +1,248 @@
-# 🌍 Voyage - Slimme Collaboratieve Reisplanner
+# 🌍 Voyage - Collaboratieve Reisplanner
 
-**Voyage** is een Progressive Web App (PWA) die groepsreizigers helpt om stressvrij en overzichtelijk hun reis te plannen. Eén centrale plek voor dagplanning, polls, inpaklijsten en budget.
+Een web applicatie voor het plannen van groepsreizen. Je kan er trips aanmaken, activiteiten plannen, inpaklijsten maken en je reisgenoten uitnodigen.
 
-## 📋 Project Overzicht
+## 📋 Project Info
 
-- **Studenten**: Yassine Messaoudi & Sedäle Hoogvliets
+- **Gemaakt door**: Yassine Messaoudi & Sedäle Hoogvliets
 - **Opleiding**: HBO-ICT, Hogeschool Windesheim
-- **Module**: PSEMO (Praktijkgerichte Software Engineering met Onderwijs)
-- **Coach**: Rob Kaesehagen
-- **Periode**: September 2025 - December 2025
+- **Versie**: 0.1.0
 
-## 🎯 Doel
+## 🎯 Wat doet deze app?
 
-Ontwikkel een gebruiksvriendelijke PWA-MVP die groepsreisplanning centraliseert en aantoonbaar stress en coördinatielast verlaagt.
+We hebben een reisplanner gemaakt waar groepen samen hun reis kunnen organiseren. Je kan trips aanmaken, andere mensen uitnodigen, een dagplanning maken en een inpaklijst bijhouden. Het idee is dat alles op één plek staat in plaats van verspreid over WhatsApp, Excel sheets en losse notities.
 
-## ✨ Kernfunctionaliteiten (MVP)
+## ✨ Features die werken
 
-- ✅ **Trip Management** - Reizen aanmaken, bewerken en beheren
-- 📅 **Itinerary Generator** - Heuristische dagplanning met ochtend/middag/avond indeling
-- 🗳️ **Polls** - Groepsbeslissingen via stemmen
-- 🎒 **Packing List** - Gedeelde inpaklijst per trip
-- 💰 **Budget** - Simpel kostenbeheer met equal split
-- 🔗 **Share Links** - Gastmodus zonder verplicht account
-- 🌤️ **Weather Badge** - Weersinformatie per dag
-- 📍 **POI Integration** - Points of Interest via Maps API
+- Trip aanmaken, bewerken en verwijderen
+- Dagplanning met activiteiten
+- Inpaklijst met verschillende categorieën
+- Mensen uitnodigen via share links
+- Guest mode (je hoeft geen account te hebben om mee te doen)
+- Werkt op mobiel en desktop
+- Bottom navigatie op mobiel
 
-## 🛠️ Tech Stack
+## Database
 
-### Frontend
+We gebruiken Supabase (PostgreSQL) met deze tabellen:
+- Trips met deelnemers en hun rollen
+- Itinerary items voor dagplanning
+- Packing lists
+- Invite links die je kan delen
+- Poll systeem (voor groepsbeslissingen)
+- Budget/expenses
+- Row Level Security voor wie wat mag zien
 
-- **Next.js 14** - React framework met App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first CSS framework
-- **Framer Motion** - Animaties en transitions
-- **PWA** - Installable, offline-capable web app
+## 🛠️ Technologieën
 
-### Backend & Database
+**Frontend**
+- Next.js 14 (React met App Router)
+- TypeScript
+- Tailwind CSS
+- React Hook Form + Zod voor formulieren
 
-- **Supabase** - Postgres database, Auth, Storage
-- **Next.js API Routes** - Serverless functions
+**Backend**
+- Supabase (database + auth)
+- Next.js Server Actions
+- Row Level Security in de database
 
-### External APIs
+**External APIs**
+- Google Maps/Places API (voor locaties)
+- Google Geocoding (voor coördinaten)
 
-- **Google Maps/Places** - Locaties en POI's
-- **OpenWeatherMap** - Weersinformatie
+**Testing**
+- Jest (unit tests)
+- React Testing Library
+- Playwright (end-to-end tests)
+- ESLint + Prettier
 
-### DevOps & Hosting
+**Hosting**
+- Skylabs VM
+- PM2 (voor process management)
+- Nginx (reverse proxy)
 
-- **Skylabs VM** - Virtual Machine hosting
-- **GitHub** - Version control & CI/CD
-- **GitHub Projects** - Backlog management
-
-### Testing & Quality
-
-- **Jest** - Unit testing
-- **Playwright** - E2E testing
-- **ESLint** - Code linting
-- **Prettier** - Code formatting
-
-## 📁 Project Structuur
+## 📁 Folder structuur
 
 ```
 voyage/
-├── public/                 # Static assets
-│   ├── icons/             # PWA icons
-│   ├── manifest.json      # PWA manifest
-│   └── ...
 ├── src/
-│   ├── app/               # Next.js App Router
-│   │   ├── (auth)/        # Auth route group
-│   │   ├── (dashboard)/   # Protected routes
-│   │   ├── api/           # API routes
-│   │   ├── layout.tsx     # Root layout
-│   │   └── page.tsx       # Home page
-│   ├── components/        # React components
-│   │   ├── ui/           # Reusable UI components
-│   │   ├── features/     # Feature-specific components
-│   │   └── layouts/      # Layout components
-│   ├── lib/              # Utility functions
-│   │   ├── supabase/     # Supabase client & helpers
-│   │   ├── api/          # API client functions
-│   │   └── utils/        # General utilities
-│   ├── hooks/            # Custom React hooks
-│   ├── types/            # TypeScript type definitions
-│   │   ├── database.types.ts  # Supabase generated types
+│   ├── app/                    # Next.js pages
+│   │   ├── layout.tsx
+│   │   ├── page.tsx            # Homepage
+│   │   ├── login/
+│   │   ├── register/
+│   │   ├── trips/              # Trip paginas
+│   │   ├── packing/            # Inpaklijst
+│   │   └── invite/             # Invite links accepteren
+│   │
+│   ├── components/             # React components
+│   │   ├── ui/
+│   │   ├── AppHeader.tsx
+│   │   ├── BottomNav.tsx
 │   │   └── ...
-│   ├── styles/           # Global styles
-│   └── config/           # App configuration
-├── supabase/             # Supabase configuration
-│   ├── migrations/       # Database migrations
-│   ├── seed.sql          # Seed data
-│   └── schema.sql        # Database schema
-├── tests/                # Test files
-│   ├── unit/            # Unit tests
-│   └── e2e/             # E2E tests
-├── docs/                 # Project documentation
-│   ├── ADR/             # Architecture Decision Records
-│   ├── API.md           # API documentation
-│   └── DEPLOYMENT.md    # Deployment guide
-├── .env.example          # Environment variables template
-├── .eslintrc.json        # ESLint configuration
-├── .prettierrc           # Prettier configuration
-├── next.config.js        # Next.js configuration
-├── tailwind.config.ts    # Tailwind configuration
-├── tsconfig.json         # TypeScript configuration
-├── jest.config.js        # Jest configuration
-├── playwright.config.ts  # Playwright configuration
-└── package.json          # Dependencies & scripts
+│   │
+│   ├── lib/                    # Helper functies
+│   │   ├── supabase/           # Database setup
+│   │   ├── external/           # API calls
+│   │   ├── session.ts          # Guest sessions
+│   │   └── utils/
+│   │
+│   ├── types/
+│   ├── contexts/
+│   ├── config/
+│   └── styles/
+│
+├── supabase/                   # Database files
+│   ├── schema.sql
+│   ├── init.sql
+│   └── *.sql
+│
+├── tests/
+│   └── trips/
+│       ├── unit/
+│       ├── integration/
+│       └── e2e/
+│
+├── docs/                       # Documentatie
+│   ├── ADR/
+│   ├── API.md
+│   └── DEPLOYMENT.md
+│
+└── public/
+    └── manifest.json
 ```
 
-## 🚀 Getting Started
+## 🚀 Installatie
 
-### Prerequisites
+**Je hebt nodig:**
+- Node.js 18 of hoger
+- npm 9 of hoger
 
-- Node.js >= 18.0.0
-- npm >= 9.0.0
-- Supabase account
-- Google Maps API key
-- OpenWeatherMap API key
+**Setup:**
 
-### Installation
-
-1. **Clone de repository**
-
+1. Clone het project
    ```bash
    git clone <repository-url>
    cd voyage
    ```
 
-2. **Install dependencies**
-
+2. Installeer packages
    ```bash
    npm install
    ```
 
-3. **Setup environment variables**
+3. Environment variables
 
-   ```bash
-   cp .env.example .env.local
-   ```
+   Kopieer `env.local.example` naar `.env.local` en vul je eigen keys in.
 
-   Vul de volgende variabelen in:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`
-   - `OPENWEATHER_API_KEY`
+4. Database
 
-4. **Run development server**
+   Upload `supabase/schema.sql` in je Supabase project (via de SQL editor).
 
+5. Start de dev server
    ```bash
    npm run dev
    ```
 
-5. **Open in browser**
-   ```
-   http://localhost:3000
-   ```
+   Gaat naar: http://localhost:3000
 
-## 📝 Development Workflow
+## 📝 Commands
 
-### Git Branching Strategy
+```bash
+# Development
+npm run dev              # Dev server starten
+npm run build            # Build voor productie
+npm start                # Productie server starten
 
-- `main` - Production-ready code
-- `develop` - Integration branch
-- `feature/<issue-nummer-beschrijving>` - Feature branches
+# Code quality
+npm run lint             # ESLint checken
+npm run lint:fix         # ESLint errors fixen
+npm run format           # Code formatten
+npm run type-check       # TypeScript checken
 
-### Scrum Rituelen
+# Testing
+npm test                 # Unit tests
+npm run test:watch       # Tests in watch mode
+npm run test:coverage    # Coverage rapport
+npm run test:e2e         # E2E tests met Playwright
 
-- **Daily Stand-up**: 10:00-10:15 (di/wo/do)
-- **Sprint Planning**: Elke 2 weken, dinsdag 10:30-11:30
-- **Sprint Review**: Laatste donderdag van sprint, 15:30-16:00
-- **Retrospective**: Na review, 30 min
-
-### Definition of Ready (DoR)
-
-- User story heeft titel, beschrijving, acceptatiecriteria
-- Afhankelijkheden zijn bekend
-- Story points zijn geschat
-
-### Definition of Done (DoD)
-
-- Code werkt en is getest
-- Code review is uitgevoerd
-- Documentatie is bijgewerkt
-- Acceptatiecriteria zijn behaald
+# Database
+npm run db:generate      # TypeScript types genereren van Supabase
+```
 
 ## 🧪 Testing
 
-```bash
-# Run unit tests
-npm test
+We hebben verschillende soorten tests:
 
-# Watch mode
-npm run test:watch
+- **Unit tests**: Voor losse components en functies (Jest)
+- **Integration tests**: Voor features met server actions
+- **E2E tests**: Voor complete user flows (Playwright)
 
-# Coverage report
-npm run test:coverage
+## 🏗️ Hoe het werkt
 
-# E2E tests
-npx playwright test
-```
+**Design patterns:**
+- Server Components van Next.js
+- Server Actions voor data updates
+- Context API voor global state (bijvoorbeeld toast messages)
+- Herbruikbare UI components
 
-## 🏗️ Building & Deployment
+**Database security:**
+- Row Level Security (RLS) in Postgres
+- Verschillende rollen: owner, editor, viewer, guest
+- Guest sessions via cookies
+- Invite links met expiratie datum
 
-### Build voor productie
-
-```bash
-npm run build
-```
-
-### Start production server
-
-```bash
-npm start
-```
-
-### Deployment naar Skylabs VM
-
-Zie [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) voor gedetailleerde instructies.
-
-## 📊 Kwaliteitscriteria
-
-- **Performance**: Time to Interactive < 3s
-- **Accessibility**: WCAG 2.1 AA compliance
-- **PWA Score**: Lighthouse PWA score >= 90
-- **Test Coverage**: >= 70%
-- **Browser Support**: Chrome, Firefox, Safari, Edge (laatste 2 versies)
+**APIs:**
+- Google Places voor locatie autocomplete
+- Google Geocoding voor coordinaten van bestemmingen
 
 ## 📚 Documentatie
 
-- [Project Definitie](docs/PROJECT_DEFINITION.pdf)
-- [Ontwerpdocument](docs/ONTWERPDOCUMENT.pdf)
-- [Adviesdocument](docs/ADVIESDOCUMENT.pdf)
-- [API Documentatie](docs/API.md)
-- [Database Schema](supabase/schema.sql)
+- [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) - Uitgebreide uitleg van de folders
+- [docs/API.md](docs/API.md) - API endpoints
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) - Hoe je het host
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Development workflow
+- [docs/ADR/001-tech-stack-keuze.md](docs/ADR/001-tech-stack-keuze.md) - Waarom deze tech stack
 
-## 🤝 Werkafspraken
+## 🔐 Security
 
-- **Werkdagen**: di/wo/do op locatie (09:00-16:00)
-- **Communicatie**: Microsoft Teams & WhatsApp
-- **Tools**: GitHub Projects (Kanban), Figma (Design)
-- **Code Quality**: ESLint + Prettier enforced
+- Environment variables voor gevoelige data
+- Row Level Security in database
+- HTTPS cookies voor sessies
+- Input validatie met Zod
+- TypeScript strict mode
+
+## 📦 Deployment
+
+Het project draait op een Skylabs VM met PM2 en Nginx. Zie [DEPLOYMENT.md](docs/DEPLOYMENT.md) voor de stappen.
+
+## 🤝 Development
+
+**Git branches:**
+- `main` - Productie code
+- `develop` - Development branch
+- `feature/naam` - Feature branches
+
+**Code quality:**
+- ESLint en Prettier draaien voor consistente code
+- TypeScript strict mode aan
+- Tests schrijven voor nieuwe features
+
+**Pull requests:**
+- Duidelijke beschrijving
+- Tests moeten slagen
+- Code review
 
 ## 📄 Licentie
 
-Dit project is ontwikkeld als onderdeel van het HBO-ICT curriculum van Hogeschool Windesheim.
+Dit is een schoolproject voor HBO-ICT aan Hogeschool Windesheim.
 
 ## 👥 Contact
 
-- **Yassine Messaoudi** - yassine.messaoudi@windesheim.nl
-- **Sedäle Hoogvliets** - sedale.hoogvliets@windesheim.nl
-- **Coach**: Rob Kaesehagen - r.kaesehagen@windesheim.nl
+- Yassine Messaoudi - yassine.messaoudi@windesheim.nl
+- Sedäle Hoogvliets - sedale.hoogvliets@windesheim.nl
 
 ---
 
-**Versie**: 0.1.0 - MVP Development
-**Laatst bijgewerkt**: 30 September 2025
+**Status**: In development
+**Update**: December 2025
