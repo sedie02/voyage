@@ -16,7 +16,7 @@ export async function initializeDefaultCategories(tripId: string) {
   ];
 
   try {
-    // @ts-ignore
+    // @ts-expect-error
     const { data: existing, error: checkError } = await supabase
       .from('packing_categories')
       .select('id')
@@ -35,7 +35,7 @@ export async function initializeDefaultCategories(tripId: string) {
       return { success: true, message: 'Categorieën bestaan al!' };
     }
 
-    // @ts-ignore
+    // @ts-expect-error
     const { data, error: insertError } = await supabase
       .from('packing_categories')
       .insert(

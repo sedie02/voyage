@@ -96,13 +96,13 @@ export default async function PackingPage({ searchParams }: { searchParams: { tr
     activeTrip.city_photo_url
       ? Promise.resolve(activeTrip.city_photo_url)
       : getCityPhotoUrl(activeTrip.destination),
-    // @ts-ignore - packing_categories table types need to be regenerated after migration
+    // @ts-expect-error - packing_categories table types need to be regenerated after migration
     supabase
       .from('packing_categories')
       .select('*')
       .eq('trip_id', activeTrip.id)
       .order('order_index', { ascending: true }),
-    // @ts-ignore - packing_items table types need to be regenerated after migration
+    // @ts-expect-error - packing_items table types need to be regenerated after migration
     supabase
       .from('packing_items')
       .select('*')

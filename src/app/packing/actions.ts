@@ -26,7 +26,7 @@ export async function addCategory(formData: FormData) {
     const supabase = await createClient();
 
     // Get current max order_index
-    // @ts-ignore - packing_categories table types need to be regenerated after migration
+    // @ts-expect-error - packing_categories table types need to be regenerated after migration
     const { data: categories } = await supabase
       .from('packing_categories')
       .select('order_index')
@@ -37,7 +37,7 @@ export async function addCategory(formData: FormData) {
     const maxOrder = categories && categories.length > 0 ? categories[0].order_index : -1;
 
     // Insert new category
-    // @ts-ignore - packing_categories table types need to be regenerated after migration
+    // @ts-expect-error - packing_categories table types need to be regenerated after migration
     const { error } = await supabase.from('packing_categories').insert({
       trip_id: tripId,
       name: name.trim(),
@@ -93,7 +93,7 @@ export async function addItem(formData: FormData) {
     const supabase = await createClient();
 
     // Get current max order_index for this category
-    // @ts-ignore - packing_items table types need to be regenerated after migration
+    // @ts-expect-error - packing_items table types need to be regenerated after migration
     const { data: items } = await supabase
       .from('packing_items')
       .select('order_index')
@@ -109,7 +109,7 @@ export async function addItem(formData: FormData) {
     } = await supabase.auth.getUser();
 
     // Insert new item
-    // @ts-ignore - packing_items table types need to be regenerated after migration
+    // @ts-expect-error - packing_items table types need to be regenerated after migration
     const { error } = await supabase.from('packing_items').insert({
       category_id: categoryId,
       trip_id: tripId,
@@ -135,7 +135,7 @@ export async function toggleItemChecked(itemId: string, checked: boolean) {
   try {
     const supabase = await createClient();
 
-    // @ts-ignore - packing_items table types need to be regenerated after migration
+    // @ts-expect-error - packing_items table types need to be regenerated after migration
     const { error } = await supabase
       .from('packing_items')
       .update({ checked: !checked })
@@ -158,7 +158,7 @@ export async function takeItem(itemId: string, userName: string) {
   try {
     const supabase = await createClient();
 
-    // @ts-ignore - packing_items table types need to be regenerated after migration
+    // @ts-expect-error - packing_items table types need to be regenerated after migration
     const { error } = await supabase
       .from('packing_items')
       .update({ taken_by: userName })
@@ -181,7 +181,7 @@ export async function untakeItem(itemId: string) {
   try {
     const supabase = await createClient();
 
-    // @ts-ignore - packing_items table types need to be regenerated after migration
+    // @ts-expect-error - packing_items table types need to be regenerated after migration
     const { error } = await supabase
       .from('packing_items')
       .update({ taken_by: null })
@@ -230,7 +230,7 @@ export async function addItemAsGuest(
     const service = createServiceClient();
 
     // Get current max order_index for this category
-    // @ts-ignore
+    // @ts-expect-error
     const { data: items } = await service
       .from('packing_items')
       .select('order_index')
@@ -241,7 +241,7 @@ export async function addItemAsGuest(
     const maxOrder = items && items.length > 0 ? items[0].order_index : -1;
 
     // Insert new item with guest info
-    // @ts-ignore
+    // @ts-expect-error
     const { error } = await service.from('packing_items').insert({
       category_id: categoryId,
       trip_id: tripId,
@@ -274,7 +274,7 @@ export async function toggleItemCheckedAsGuest(
     const service = createServiceClient();
 
     // Update with checked status and track who checked it
-    // @ts-ignore
+    // @ts-expect-error
     const { error } = await service
       .from('packing_items')
       .update({
@@ -302,7 +302,7 @@ export async function takeItemAsGuest(itemId: string, guestName: string) {
     const { createServiceClient } = await import('@/lib/supabase/server');
     const service = createServiceClient();
 
-    // @ts-ignore
+    // @ts-expect-error
     const { error } = await service
       .from('packing_items')
       .update({
