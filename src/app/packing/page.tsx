@@ -96,13 +96,11 @@ export default async function PackingPage({ searchParams }: { searchParams: { tr
     activeTrip.city_photo_url
       ? Promise.resolve(activeTrip.city_photo_url)
       : getCityPhotoUrl(activeTrip.destination),
-    // @ts-expect-error - packing_categories table types need to be regenerated after migration
     supabase
       .from('packing_categories')
       .select('*')
       .eq('trip_id', activeTrip.id)
       .order('order_index', { ascending: true }),
-    // @ts-expect-error - packing_items table types need to be regenerated after migration
     supabase
       .from('packing_items')
       .select('*')
@@ -209,7 +207,7 @@ export default async function PackingPage({ searchParams }: { searchParams: { tr
               />
             )}
 
-            <form action={addCategory} className="flex flex-1 gap-2">
+            <form action={addCategory as any} className="flex flex-1 gap-2">
               <input type="hidden" name="trip_id" value={activeTrip.id} />
               <input
                 type="text"
