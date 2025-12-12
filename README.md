@@ -54,12 +54,13 @@ We gebruiken Supabase (PostgreSQL) met deze tabellen:
 - Google Maps/Places API (voor locaties)
 - Google Geocoding (voor coördinaten)
 
-**Testing**
+**Testing & Code Quality**
 
-- Jest (unit tests)
+- Jest (unit tests met coverage)
 - React Testing Library
 - Playwright (end-to-end tests)
-- ESLint + Prettier
+- ESLint + Prettier (linting en formatting)
+- Complexity Analysis (code quality metrics)
 
 **Hosting**
 
@@ -169,6 +170,9 @@ npm run lint             # ESLint checken
 npm run lint:fix         # ESLint errors fixen
 npm run format           # Code formatten
 npm run type-check       # TypeScript checken
+npm run lint:complexity  # Complexity analysis
+npm run analyze:deps     # Check unused dependencies
+npm run analyze:bundle   # Bundle size analysis
 
 # Testing
 npm test                 # Unit tests
@@ -187,6 +191,19 @@ We hebben verschillende soorten tests:
 - **Unit tests**: Voor losse components en functies (Jest)
 - **Integration tests**: Voor features met server actions
 - **E2E tests**: Voor complete user flows (Playwright)
+
+## 📊 Code Quality
+
+We gebruiken verschillende **lokale tools** voor code quality (gratis, geen accounts nodig):
+
+- **ESLint**: Linting met strict rules voor code kwaliteit
+- **TypeScript Strict Mode**: Type safety op hoog niveau
+- **Jest Coverage**: Test coverage tracking (`npm run test:coverage`)
+- **Complexity Analysis**: Detecteer complexe functies (`npm run lint:complexity`)
+- **Dependency Check**: Vind unused dependencies (`npm run analyze:deps`)
+- **Bundle Analysis**: Check bundle size (`npm run analyze:bundle`)
+
+Al deze tools draaien lokaal en in de CI/CD pipeline via GitHub Actions.
 
 ## 🏗️ Hoe het werkt
 
