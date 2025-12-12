@@ -26,14 +26,14 @@ process.stdin.on('end', () => {
         totalWarnings += file.warningCount;
         totalErrors += file.errorCount;
 
-        const complexity = file.messages.filter(m =>
-          m.ruleId && m.ruleId.includes('complexity')
+        const complexity = file.messages.filter(
+          (m) => m.ruleId && m.ruleId.includes('complexity'),
         );
 
         if (complexity.length > 0) {
           complexFiles.push({
             file: file.filePath.replace(process.cwd(), ''),
-            issues: complexity.length
+            issues: complexity.length,
           });
         }
       }
@@ -45,7 +45,7 @@ process.stdin.on('end', () => {
 
     if (complexFiles.length > 0) {
       console.log('\n⚠️  Complex Files:');
-      complexFiles.forEach(f => {
+      complexFiles.forEach((f) => {
         console.log(`  ${f.file} (${f.issues} complexity issues)`);
       });
     } else {
@@ -53,10 +53,8 @@ process.stdin.on('end', () => {
     }
 
     console.log('\n' + '='.repeat(50) + '\n');
-
   } catch (error) {
     console.error('Could not parse ESLint output');
     process.exit(0);
   }
 });
-
