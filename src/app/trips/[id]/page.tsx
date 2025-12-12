@@ -492,7 +492,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
     })),
   });
 
-  // @ts-ignore
+  // @ts-expect-error - packing types need regeneration
   let packingCategories: any[] = [];
   let packingItems: any[] = [];
 

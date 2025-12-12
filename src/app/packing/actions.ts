@@ -230,7 +230,7 @@ export async function addItemAsGuest(
     const service = createServiceClient();
 
     // Get current max order_index for this category
-    // @ts-expect-error
+    // @ts-expect-error - packing_items types need regeneration
     const { data: items } = await service
       .from('packing_items')
       .select('order_index')
@@ -241,7 +241,7 @@ export async function addItemAsGuest(
     const maxOrder = items && items.length > 0 ? items[0].order_index : -1;
 
     // Insert new item with guest info
-    // @ts-expect-error
+    // @ts-expect-error - packing_items types need regeneration
     const { error } = await service.from('packing_items').insert({
       category_id: categoryId,
       trip_id: tripId,
@@ -274,7 +274,7 @@ export async function toggleItemCheckedAsGuest(
     const service = createServiceClient();
 
     // Update with checked status and track who checked it
-    // @ts-expect-error
+    // @ts-expect-error - packing_items types need regeneration
     const { error } = await service
       .from('packing_items')
       .update({
@@ -302,7 +302,7 @@ export async function takeItemAsGuest(itemId: string, guestName: string) {
     const { createServiceClient } = await import('@/lib/supabase/server');
     const service = createServiceClient();
 
-    // @ts-expect-error
+    // @ts-expect-error - packing_items types need regeneration
     const { error } = await service
       .from('packing_items')
       .update({
