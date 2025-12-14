@@ -35,12 +35,11 @@ describe('ISO 25010 - Maintainability', () => {
     }
 
     const coveragePath = join(process.cwd(), 'coverage', 'coverage-summary.json');
-    let coverageFileExists = false;
 
     // Check if coverage file already exists (from previous run)
+    let coverageContent: string;
     try {
-      readFileSync(coveragePath, 'utf-8');
-      coverageFileExists = true;
+      coverageContent = readFileSync(coveragePath, 'utf-8');
       console.log('✅ Using existing coverage report');
     } catch {
       // Coverage file doesn't exist, skip in dev mode to save time
@@ -50,7 +49,6 @@ describe('ISO 25010 - Maintainability', () => {
     }
 
     try {
-      const coverageContent = readFileSync(coveragePath, 'utf-8');
       const coverage = JSON.parse(coverageContent);
 
       if (!coverage || typeof coverage !== 'object') {
