@@ -31,6 +31,7 @@
     "test:maintain": "jest tests/iso25010/maintainability.test.ts",
     "test:portability": "jest tests/iso25010/portability.test.ts",
     "test:context": "playwright test tests/iso25010/context.e2e.ts",
+    "test:infoquality": "playwright test tests/iso25010/infoquality.e2e.ts",
     "type-check": "tsc --noEmit",
     "db:generate": "supabase gen types typescript --project-id $SUPABASE_PROJECT_ID > src/types/database.types.ts",
     "analyze": "ANALYZE=true next build"

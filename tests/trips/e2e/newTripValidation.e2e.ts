@@ -69,7 +69,7 @@ test.describe('New Trip Form Validation', () => {
 
     // Navigeer naar date step (als multi-step form)
     const continueButton = page.getByRole('button', { name: /volgende|continue/i });
-    if (await continueButton.isVisible() && !(await continueButton.isDisabled())) {
+    if ((await continueButton.isVisible()) && !(await continueButton.isDisabled())) {
       await continueButton.click();
     }
 
@@ -91,9 +91,9 @@ test.describe('New Trip Form Validation', () => {
 
     // Navigeer door de stappen (simplified - in echte test zou je alle stappen doorlopen)
     // Dit is een basis validatie test
-    const budgetInput = page.getByLabel(/budget|activiteitenbudget/i).or(
-      page.getByPlaceholder(/budget|€/i)
-    );
+    const budgetInput = page
+      .getByLabel(/budget|activiteitenbudget/i)
+      .or(page.getByPlaceholder(/budget|€/i));
 
     if (await budgetInput.isVisible()) {
       // Test met lege waarde
@@ -109,9 +109,7 @@ test.describe('New Trip Form Validation', () => {
       if (!isDisabled) {
         await submitButton.click();
         // Er zou een error moeten verschijnen
-        await expect(
-          page.getByText(/geldig|valid|meer dan 0/i)
-        ).toBeVisible({ timeout: 2000 });
+        await expect(page.getByText(/geldig|valid|meer dan 0/i)).toBeVisible({ timeout: 2000 });
       }
     }
   });
@@ -123,7 +121,7 @@ test.describe('New Trip Form Validation', () => {
     const startDateInput = page.locator('input[type="date"]').first();
     const endDateInput = page.locator('input[type="date"]').last();
 
-    if (await startDateInput.isVisible() && await endDateInput.isVisible()) {
+    if ((await startDateInput.isVisible()) && (await endDateInput.isVisible())) {
       const today = new Date();
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
@@ -140,7 +138,3 @@ test.describe('New Trip Form Validation', () => {
     }
   });
 });
-
-
-
-
