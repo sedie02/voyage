@@ -24,7 +24,7 @@ export default function AppHeader() {
           <span className="text-2xl font-bold text-text">voyage</span>
         </Link>
 
-        <nav className="hidden items-center gap-1 sm:flex">
+        <nav className="hidden items-center gap-1 sm:flex" aria-label="Hoofdnavigatie">
           {[
             { href: '/trips', label: 'Plan' },
             { href: '/budget', label: 'Budget' },

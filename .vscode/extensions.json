@@ -8,6 +8,7 @@
     "christian-kohler.path-intellisense",
     "zignd.html-css-class-completion",
     "formulahendry.auto-rename-tag",
-    "usernamehw.errorlens"
+    "usernamehw.errorlens",
+    "hediet.vscode-drawio"
   ]
 }
