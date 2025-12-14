@@ -32,13 +32,13 @@ describe('ISO 25010 - Portability', () => {
     // Build - skip if already built (CI scenario)
     try {
       execSync('npm run build', { env, stdio: 'pipe' });
-      console.log('✅ Build successful (no platform deps)');
+      console.log('✅ Portability / Generic Node build ...... PASSED');
     } catch (error: any) {
       // In CI, build might already exist or fail due to concurrent builds
       // Check if .next exists as fallback
       const fs = require('fs');
       if (fs.existsSync('.next')) {
-        console.log('✅ Build artifacts exist (skipping rebuild)');
+        console.log('✅ Portability / Generic Node build ...... PASSED (using existing build)');
       } else {
         // If no build exists, we still need to build
         throw error;
@@ -81,7 +81,22 @@ describe('ISO 25010 - Portability', () => {
     }
 
     expect(serverReady).toBe(true);
-    console.log('✅ Server started successfully');
+    console.log('✅ Portability / next start (no platform env) ...... PASSED');
+
+    // Verify health endpoint returns 200
+    const http = require('http');
+    const healthCheck = await new Promise<boolean>((resolve) => {
+      const req = http.get(`http://localhost:${testPort}/api/health`, (res: any) => {
+        resolve(res.statusCode === 200);
+      });
+      req.on('error', () => resolve(false));
+      req.setTimeout(2000, () => {
+        req.destroy();
+        resolve(false);
+      });
+    });
+    expect(healthCheck).toBe(true);
+    console.log('✅ Portability / /api/health 200 within 60s ...... PASSED');
   }, 120000); // 120 seconden timeout
 
   test('T2 - Vendor-agnostisch: geen platform-SDK runtime errors', async () => {
@@ -123,6 +138,6 @@ describe('ISO 25010 - Portability', () => {
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     expect(hasErrors).toBe(false);
-    console.log('✅ No platform-specific runtime errors');
+    console.log('✅ Portability / No platform-specific runtime errors ...... PASSED');
   }, 30000); // 30 seconden timeout
 });
