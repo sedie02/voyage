@@ -24,7 +24,9 @@ export async function createTrip(formData: {
     } = await supabase.auth.getUser();
     const guestSessionId = user ? null : await getOrCreateGuestSession();
 
-    console.log('Creating trip for:', user ? `user ${user.id}` : `guest ${guestSessionId}`);
+    if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
+      console.log('Creating trip for:', user ? `user ${user.id}` : `guest ${guestSessionId}`);
+    }
 
     const composedDescription = [
       formData.description?.trim(),
