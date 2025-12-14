@@ -82,7 +82,9 @@ export async function createTrip(formData: {
     }
 
     if (error) {
-      console.error('Error creating trip:', error);
+      if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
+        console.error('Error creating trip:', error);
+      }
       return {
         success: false,
         error: `Failed to create trip: ${error.message}`,
@@ -98,7 +100,9 @@ export async function createTrip(formData: {
       message: 'Trip succesvol aangemaakt',
     };
   } catch (error) {
-    console.error('Error in createTrip:', error);
+    if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
+      console.error('Error in createTrip:', error);
+    }
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -131,14 +135,18 @@ export async function updateTrip(
       .eq('id', tripId);
 
     if (error) {
-      console.error('Error updating trip:', error);
+      if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
+        console.error('Error updating trip:', error);
+      }
       throw new Error(`Failed to update trip: ${error.message}`);
     }
 
     revalidatePath(`/trips/${tripId}`);
     redirect(`/trips/${tripId}`);
   } catch (error) {
-    console.error('Error in updateTrip:', error);
+    if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
+      console.error('Error in updateTrip:', error);
+    }
     throw error;
   }
 }

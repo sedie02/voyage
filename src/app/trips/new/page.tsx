@@ -76,7 +76,9 @@ export default function NewTripPage() {
           throw new Error(result.error || 'Er ging iets mis bij het aanmaken van de trip');
         }
       } catch (error) {
-        console.error('Error creating trip:', error);
+        if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
+          console.error('Error creating trip:', error);
+        }
         const errorMessage =
           error instanceof Error ? error.message : 'Er ging iets mis. Probeer opnieuw.';
         setError(errorMessage);
