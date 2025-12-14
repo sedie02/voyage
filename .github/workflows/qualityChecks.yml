@@ -57,7 +57,12 @@ jobs:
         run: npm run analyze:deps --if-present
         continue-on-error: true
 
-      # 1️⃣1️⃣ E2E tests (optioneel)
+      # 1️⃣1️⃣ Install Playwright browsers
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+        if: always()
+
+      # 1️⃣2️⃣ E2E tests (optioneel)
       - name: Run E2E tests
         run: npm run test:e2e --if-present
         continue-on-error: true
