@@ -5,6 +5,7 @@ import '@testing-library/jest-dom';
 import React from 'react';
 
 // Mock environment variables
+process.env.NODE_ENV = 'test';
 process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
 process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY = 'test-maps-key';
