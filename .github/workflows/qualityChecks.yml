@@ -43,9 +43,9 @@ jobs:
       - name: Build project
         run: npm run build
 
-      # 8️⃣ Unit & Integration tests (zonder coverage in CI voor snelheid)
-      - name: Run tests
-        run: npm run test -- --ci --passWithNoTests
+      # 8️⃣ Unit & Integration tests met coverage (geoptimaliseerd voor snelheid)
+      - name: Run tests with coverage
+        run: npm run test:coverage -- --ci --maxWorkers=2
 
       # 9️⃣ Code Complexity Analysis
       - name: Complexity Check
