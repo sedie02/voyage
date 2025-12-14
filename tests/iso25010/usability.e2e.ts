@@ -48,19 +48,22 @@ test.describe('ISO 25010 - Usability', () => {
       const id = violation.id.toLowerCase();
       // Filter out color-contrast (often false positive in dev)
       // and other non-critical critical violations
-      return !id.includes('color-contrast') &&
-             !id.includes('aria-hidden-focus');
+      return !id.includes('color-contrast') && !id.includes('aria-hidden-focus');
     });
 
     // Log summary
     if (violationsNew.length > 0) {
-      console.error(`\n📊 A11y Summary: ${violationsNew.length} total, ${filteredViolations.length} after filtering`);
+      console.error(
+        `\n📊 A11y Summary: ${violationsNew.length} total, ${filteredViolations.length} after filtering`
+      );
     }
 
     // For now, accept up to 3 violations in development mode
     // These should be fixed before production
     if (filteredViolations.length > 0) {
-      console.warn(`\n⚠️  Warning: ${filteredViolations.length} critical A11y violations found. These should be fixed.`);
+      console.warn(
+        `\n⚠️  Warning: ${filteredViolations.length} critical A11y violations found. These should be fixed.`
+      );
     }
 
     // Test passes if filtered violations <= 3 (development tolerance)
@@ -113,9 +116,7 @@ test.describe('ISO 25010 - Usability', () => {
       await page.waitForTimeout(500);
 
       // Check of actie getriggerd is (geen focus trap)
-      const stillFocused = await page.evaluate(
-        () => document.activeElement === document.body
-      );
+      const stillFocused = await page.evaluate(() => document.activeElement === document.body);
       // Focus mag verplaatst zijn, maar niet vastzitten
       expect(stillFocused !== undefined).toBe(true);
     }
@@ -179,5 +180,3 @@ test.describe('ISO 25010 - Usability', () => {
     expect(actionCount).toBeLessThanOrEqual(8);
   });
 });
-
-

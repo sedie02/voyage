@@ -17,9 +17,7 @@ describe('ISO 25010 - Portability', () => {
     }
   });
 
-  test(
-    'T1 - Generic Node build & start',
-    async () => {
+  test('T1 - Generic Node build & start', async () => {
     // Unset platform-specific env vars
     const env = { ...process.env };
     delete env.VERCEL;
@@ -66,13 +64,9 @@ describe('ISO 25010 - Portability', () => {
 
     expect(serverReady).toBe(true);
     console.log('✅ Server started successfully');
-    },
-    120000 // 120 seconden timeout
-  );
+  }, 120000); // 120 seconden timeout
 
-  test(
-    'T2 - Vendor-agnostisch: geen platform-SDK runtime errors',
-    async () => {
+  test('T2 - Vendor-agnostisch: geen platform-SDK runtime errors', async () => {
     const env = { ...process.env };
     delete env.VERCEL;
     delete env.NETLIFY;
@@ -105,8 +99,5 @@ describe('ISO 25010 - Portability', () => {
 
     expect(hasErrors).toBe(false);
     console.log('✅ No platform-specific runtime errors');
-    },
-    30000 // 30 seconden timeout
-  );
+  }, 30000); // 30 seconden timeout
 });
-

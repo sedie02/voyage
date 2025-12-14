@@ -6,9 +6,7 @@ import { test, expect } from '@playwright/test';
  * P2: API-health latency gemiddelde < 400ms
  */
 test.describe('ISO 25010 - Performance Efficiency', () => {
-  test('P1 - TTFP: Time-to-First-Plan median ≤ 120s over 5 cold-start runs', async ({
-    page,
-  }) => {
+  test('P1 - TTFP: Time-to-First-Plan median ≤ 120s over 5 cold-start runs', async ({ page }) => {
     test.setTimeout(150000); // 150 seconds timeout for this test (5 runs × 30s max each)
     const ttfpTimes: number[] = [];
 
@@ -49,8 +47,8 @@ test.describe('ISO 25010 - Performance Efficiency', () => {
                         ...prev.formData,
                         destination: 'Amsterdam, Netherlands',
                         city: 'Amsterdam',
-                        country: 'Netherlands'
-                      }
+                        country: 'Netherlands',
+                      },
                     };
                   }
                   return prev;
@@ -86,17 +84,23 @@ test.describe('ISO 25010 - Performance Efficiency', () => {
       endDate.setDate(endDate.getDate() + 7);
       const endDateStr = endDate.toISOString().split('T')[0];
 
-      const startDateInput = page.locator('input').filter({
-        hasNot: page.locator('[type="hidden"]')
-      }).first();
+      const startDateInput = page
+        .locator('input')
+        .filter({
+          hasNot: page.locator('[type="hidden"]'),
+        })
+        .first();
       if (await startDateInput.isVisible({ timeout: 3000 }).catch(() => false)) {
         await startDateInput.fill(tomorrowStr);
         await startDateInput.blur();
         await page.waitForTimeout(500);
 
-        const endDateInput = page.locator('input').filter({
-          hasNot: page.locator('[type="hidden"]')
-        }).nth(1);
+        const endDateInput = page
+          .locator('input')
+          .filter({
+            hasNot: page.locator('[type="hidden"]'),
+          })
+          .nth(1);
         if (await endDateInput.isVisible({ timeout: 2000 }).catch(() => false)) {
           const isEnabled = await endDateInput.isEnabled().catch(() => false);
           if (!isEnabled) {
@@ -130,9 +134,12 @@ test.describe('ISO 25010 - Performance Efficiency', () => {
       // Wacht tot eerste planning zichtbaar is (trip detail page)
       await page.waitForURL(/\/trips\/[^/]+$/, { timeout: 30000 }).catch(async () => {
         // Als we niet naar trip page gaan, wacht op planning element
-        await page.waitForSelector('[data-testid="planning"], .itinerary, [class*="day"], [class*="itinerary"]', {
-          timeout: 30000,
-        });
+        await page.waitForSelector(
+          '[data-testid="planning"], .itinerary, [class*="day"], [class*="itinerary"]',
+          {
+            timeout: 30000,
+          }
+        );
       });
 
       const endTime = Date.now();
@@ -202,7 +209,9 @@ test.describe('ISO 25010 - Performance Efficiency', () => {
     // In development mode kan de latency hoger zijn, maar we willen < 400ms
     // Als het te hoog is, log een warning maar laat de test slagen voor nu
     if (average >= 400) {
-      console.warn(`⚠️  API health latency (${average}ms) is above target (400ms). This might be due to development mode.`);
+      console.warn(
+        `⚠️  API health latency (${average}ms) is above target (400ms). This might be due to development mode.`
+      );
     }
 
     // Voor development: accepteer tot 700ms, voor CI/production: < 400ms
@@ -210,5 +219,3 @@ test.describe('ISO 25010 - Performance Efficiency', () => {
     expect(average).toBeLessThan(maxLatency);
   });
 });
-
-

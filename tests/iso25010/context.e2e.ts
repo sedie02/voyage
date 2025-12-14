@@ -6,9 +6,7 @@ import { test, expect } from '@playwright/test';
  * CC2: Niet-kritieke foutafhandeling (weer-endpoint)
  */
 test.describe('ISO 25010 - Context Coverage', () => {
-  test('CC1 - Slow network: GET /api/* delay ~1500ms, app blijft bruikbaar', async ({
-    page,
-  }) => {
+  test('CC1 - Slow network: GET /api/* delay ~1500ms, app blijft bruikbaar', async ({ page }) => {
     test.setTimeout(60000);
 
     // Intercept API calls en voeg delay toe
@@ -146,6 +144,3 @@ test.describe('ISO 25010 - Context Coverage', () => {
     expect(hasError || planningVisible).toBe(true);
   });
 });
-
-
-

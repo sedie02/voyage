@@ -50,13 +50,21 @@ test.describe('ISO 25010 - Functional Suitability', () => {
 
     // Step 2: Enter destination
     // Find the autocomplete input - try multiple approaches
-    let destinationInput = page.locator('input[placeholder*="Barcelona"], input[placeholder*="barcelona"], input[placeholder*="bijv"]').first();
+    let destinationInput = page
+      .locator(
+        'input[placeholder*="Barcelona"], input[placeholder*="barcelona"], input[placeholder*="bijv"]'
+      )
+      .first();
 
     // Check if found, if not try to find by label
     const found = await destinationInput.isVisible({ timeout: 2000 }).catch(() => false);
     if (!found) {
       // Try to find by label "Bestemming"
-      destinationInput = page.locator('label:has-text("Bestemming")').locator('..').locator('input').first();
+      destinationInput = page
+        .locator('label:has-text("Bestemming")')
+        .locator('..')
+        .locator('input')
+        .first();
     }
 
     // If still not found, just get the first text input on the page
@@ -90,8 +98,8 @@ test.describe('ISO 25010 - Functional Suitability', () => {
                       ...prev.formData,
                       destination: 'Amsterdam, Netherlands',
                       city: 'Amsterdam',
-                      country: 'Netherlands'
-                    }
+                      country: 'Netherlands',
+                    },
                   };
                 }
                 return prev;
@@ -147,7 +155,10 @@ test.describe('ISO 25010 - Functional Suitability', () => {
       await expect(step3Heading.or(step3Label).or(step3Indicator)).toBeVisible({ timeout: 10000 });
     } catch {
       // If heading not found, check if we're still on step 2
-      const stillOnStep2 = await page.getByText(/waar ga je naartoe/i).isVisible({ timeout: 2000 }).catch(() => false);
+      const stillOnStep2 = await page
+        .getByText(/waar ga je naartoe/i)
+        .isVisible({ timeout: 2000 })
+        .catch(() => false);
       if (stillOnStep2) {
         // Still on step 2 - form state wasn't updated properly
         // Force update form state and click again
@@ -166,8 +177,8 @@ test.describe('ISO 25010 - Functional Suitability', () => {
                       ...prev.formData,
                       destination: 'Amsterdam, Netherlands',
                       city: 'Amsterdam',
-                      country: 'Netherlands'
-                    }
+                      country: 'Netherlands',
+                    },
                   }));
                   break;
                 }
@@ -209,9 +220,9 @@ test.describe('ISO 25010 - Functional Suitability', () => {
                         ...(prev.formData || {}),
                         destination: 'Amsterdam, Netherlands',
                         city: 'Amsterdam',
-                        country: 'Netherlands'
+                        country: 'Netherlands',
                       },
-                      step: 3 // Force step to 3
+                      step: 3, // Force step to 3
                     }));
                     break;
                   }
@@ -245,9 +256,12 @@ test.describe('ISO 25010 - Functional Suitability', () => {
     // React DatePicker renders an input - find it by looking for inputs in step 3
     // The DatePicker has placeholderText="Selecteer startdatum"
     // But we need to find the actual input element
-    const startDateInput = page.locator('input').filter({
-      hasNot: page.locator('[type="hidden"]')
-    }).first();
+    const startDateInput = page
+      .locator('input')
+      .filter({
+        hasNot: page.locator('[type="hidden"]'),
+      })
+      .first();
 
     await expect(startDateInput).toBeVisible({ timeout: 5000 });
 
@@ -285,7 +299,7 @@ test.describe('ISO 25010 - Functional Suitability', () => {
     if (!foundByPlaceholder) {
       // If not found by placeholder, try to find the second input
       const allInputs = page.locator('input').filter({
-        hasNot: page.locator('[type="hidden"]')
+        hasNot: page.locator('[type="hidden"]'),
       });
       const inputCount = await allInputs.count();
 
@@ -377,9 +391,11 @@ test.describe('ISO 25010 - Functional Suitability', () => {
     }
 
     // Click the add item button (FAB or + button)
-    const addItemButton = page.locator('button:has(svg), button').filter({ hasText: /\+/ }).or(
-      page.locator('button').filter({ has: page.locator('svg') })
-    ).first();
+    const addItemButton = page
+      .locator('button:has(svg), button')
+      .filter({ hasText: /\+/ })
+      .or(page.locator('button').filter({ has: page.locator('svg') }))
+      .first();
 
     // Try to find the FAB button (fixed bottom right)
     const fabButton = page.locator('button[class*="fixed"][class*="bottom"]').first();
@@ -389,15 +405,18 @@ test.describe('ISO 25010 - Functional Suitability', () => {
       await addItemButton.click();
     } else {
       // Try clicking on a category's + button
-      const categoryAddButton = page.locator('button').filter({ has: page.locator('svg[viewBox="0 0 24 24"]') }).first();
+      const categoryAddButton = page
+        .locator('button')
+        .filter({ has: page.locator('svg[viewBox="0 0 24 24"]') })
+        .first();
       await categoryAddButton.click();
     }
     await page.waitForTimeout(1000);
 
     // Fill in item name in the modal
-    const itemInput = page.getByPlaceholder(/bijv\. t-shirts/i).or(
-      page.locator('input[type="text"]').filter({ hasText: /item/i })
-    );
+    const itemInput = page
+      .getByPlaceholder(/bijv\. t-shirts/i)
+      .or(page.locator('input[type="text"]').filter({ hasText: /item/i }));
     await expect(itemInput).toBeVisible({ timeout: 5000 });
     await itemInput.fill('Test item');
     await page.waitForTimeout(500);
@@ -416,7 +435,10 @@ test.describe('ISO 25010 - Functional Suitability', () => {
 
     // Verify checkbox is checked (it should have pink background)
     const isChecked = await checkbox.evaluate((el) => {
-      return el.classList.toString().includes('bg-pink') || el.classList.toString().includes('border-pink-500');
+      return (
+        el.classList.toString().includes('bg-pink') ||
+        el.classList.toString().includes('border-pink-500')
+      );
     });
     expect(isChecked).toBe(true);
   });
@@ -446,9 +468,7 @@ test.describe('ISO 25010 - Functional Suitability', () => {
     expect(isDisabled2).toBe(true); // Button should be disabled without destination
   });
 
-  test('F3 - Geen runtime-fouten: 0 uncaught exceptions & alle API calls 2xx', async ({
-    page,
-  }) => {
+  test('F3 - Geen runtime-fouten: 0 uncaught exceptions & alle API calls 2xx', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
@@ -468,7 +488,10 @@ test.describe('ISO 25010 - Functional Suitability', () => {
       const message = error.message || '';
 
       // Filter out Supabase config errors (expected in test environment without full setup)
-      if (message.includes('Supabase') && (message.includes('URL and Key') || message.includes('required'))) {
+      if (
+        message.includes('Supabase') &&
+        (message.includes('URL and Key') || message.includes('required'))
+      ) {
         return false;
       }
 
@@ -487,7 +510,10 @@ test.describe('ISO 25010 - Functional Suitability', () => {
     });
 
     if (criticalExceptions.length > 0) {
-      console.log('Critical exceptions:', criticalExceptions.map((e) => e.message));
+      console.log(
+        'Critical exceptions:',
+        criticalExceptions.map((e) => e.message)
+      );
     }
     expect(criticalExceptions.length).toBe(0);
 
@@ -508,5 +534,3 @@ test.describe('ISO 25010 - Functional Suitability', () => {
     expect(criticalFailedCalls.length).toBe(0);
   });
 });
-
-

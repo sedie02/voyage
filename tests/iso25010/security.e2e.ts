@@ -41,5 +41,3 @@ test.describe('ISO 25010 - Security', () => {
     // In echte test zou je een token genereren, intrekken, en dan testen
   });
 });
-
-

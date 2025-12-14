@@ -43,7 +43,10 @@ test.describe('ISO 25010 - Reliability', () => {
       const currentUrl = page.url();
       const tripId = currentUrl.match(/\/trips\/([^\/]+)/)?.[1];
       if (tripId) {
-        await page.goto(`/packing?trip=${tripId}`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await page.goto(`/packing?trip=${tripId}`, {
+          waitUntil: 'domcontentloaded',
+          timeout: 30000,
+        });
       } else {
         await page.goto('/packing', { waitUntil: 'domcontentloaded', timeout: 30000 });
       }
@@ -144,7 +147,12 @@ test.describe('ISO 25010 - Reliability', () => {
     // Wijzig activiteitstitel - probeer verschillende selectors
     const activityInput = page
       .getByPlaceholder(/activiteit|activity|titel/i)
-      .or(page.locator('input[type="text"]').filter({ hasNot: page.locator('[type="hidden"]') }).first())
+      .or(
+        page
+          .locator('input[type="text"]')
+          .filter({ hasNot: page.locator('[type="hidden"]') })
+          .first()
+      )
       .first();
 
     if (await activityInput.isVisible({ timeout: 5000 }).catch(() => false)) {
@@ -164,7 +172,12 @@ test.describe('ISO 25010 - Reliability', () => {
       // Check of wijziging blijft - probeer opnieuw input te vinden
       const activityInputAfterReload = page
         .getByPlaceholder(/activiteit|activity|titel/i)
-        .or(page.locator('input[type="text"]').filter({ hasNot: page.locator('[type="hidden"]') }).first())
+        .or(
+          page
+            .locator('input[type="text"]')
+            .filter({ hasNot: page.locator('[type="hidden"]') })
+            .first()
+        )
         .first();
 
       if (await activityInputAfterReload.isVisible({ timeout: 5000 }).catch(() => false)) {
@@ -177,5 +190,3 @@ test.describe('ISO 25010 - Reliability', () => {
     }
   });
 });
-
-
