@@ -1,0 +1,22 @@
+{
+  "ignoreMatches": [
+    "@hookform/resolvers",
+    "@supabase/auth-helpers-nextjs",
+    "autocomplete",
+    "axios",
+    "framer-motion",
+    "google",
+    "react-hook-form",
+    "@swc/core",
+    "@swc/jest",
+    "@types/jest",
+    "@types/minimatch",
+    "@types/react-dom",
+    "@types/testing-library__jest-dom",
+    "autoprefixer",
+    "jest-environment-jsdom",
+    "postcss",
+    "prettier-plugin-tailwindcss"
+  ],
+  "ignorePatterns": ["*.test.ts", "*.spec.ts", "*.e2e.ts"]
+}

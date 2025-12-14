@@ -52,9 +52,9 @@ jobs:
         run: npm run lint:complexity --if-present
         continue-on-error: true
 
-      # 🔟 Dependency Check (geskipt in CI - depcheck heeft issues met Next.js config)
+      # 🔟 Dependency Check
       - name: Check Dependencies
-        run: echo "Skipping depcheck in CI due to Next.js webpack config issues"
+        run: npm run analyze:deps --if-present || echo "Depcheck completed with warnings (non-blocking)"
         continue-on-error: true
 
       # 1️⃣1️⃣ Install Playwright browsers
