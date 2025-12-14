@@ -5,6 +5,7 @@ Dit document beschrijft hoe je Voyage deployt naar productie. We gebruiken momen
 ## Overzicht
 
 **Huidige setup:**
+
 - **Server:** Skylabs VM (Ubuntu)
 - **Process Manager:** PM2
 - **Reverse Proxy:** Nginx
@@ -86,6 +87,7 @@ nano /var/www/voyage/.env.local
 ```
 
 Vul in:
+
 ```env
 NODE_ENV=production
 NEXT_PUBLIC_APP_URL=https://jouw-domain.nl
@@ -115,6 +117,7 @@ npm run build
 Dit maakt een productie build in `.next/` folder.
 
 **Troubleshooting:**
+
 - Als build faalt, check environment variables
 - Zorg dat alle dependencies geïnstalleerd zijn
 - Check TypeScript errors: `npm run type-check`
@@ -127,24 +130,26 @@ Maak `ecosystem.config.js` in de root:
 
 ```javascript
 module.exports = {
-  apps: [{
-    name: 'voyage',
-    script: 'npm',
-    args: 'start',
-    cwd: '/var/www/voyage',
-    instances: 2,  // Run 2 instances voor load balancing
-    exec_mode: 'cluster',
-    env: {
-      NODE_ENV: 'production',
-      PORT: 3000
+  apps: [
+    {
+      name: 'voyage',
+      script: 'npm',
+      args: 'start',
+      cwd: '/var/www/voyage',
+      instances: 2, // Run 2 instances voor load balancing
+      exec_mode: 'cluster',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3000,
+      },
+      error_file: '/var/log/voyage/error.log',
+      out_file: '/var/log/voyage/out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
+      autorestart: true,
+      max_memory_restart: '1G',
     },
-    error_file: '/var/log/voyage/error.log',
-    out_file: '/var/log/voyage/out.log',
-    log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
-    merge_logs: true,
-    autorestart: true,
-    max_memory_restart: '1G'
-  }]
+  ],
 };
 ```
 
@@ -370,10 +375,12 @@ tail -f /var/log/voyage/error.log
 ## Backup Strategy
 
 **Database:**
+
 - Supabase heeft automatische backups (cloud)
 - Voor extra backup: gebruik Supabase dashboard → Database → Backups
 
 **Code:**
+
 - Code staat in Git, dus altijd terug te halen
 - Overweeg periodieke backups van `.env.local` (encrypted!)
 
@@ -392,4 +399,3 @@ Als je meer traffic krijgt:
 **Auteurs:** Yassine & Sedäle
 
 **Note:** Deze guide is gebaseerd op onze huidige setup. Als je andere hosting gebruikt (Vercel, Railway, etc.), pas dan aan waar nodig.
-

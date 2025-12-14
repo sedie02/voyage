@@ -56,6 +56,7 @@ src/app/
 ```
 
 **Belangrijk:**
+
 - `page.tsx` = de pagina component (Server Component standaard)
 - `actions.ts` = Server Actions voor data mutations
 - Client Components hebben vaak `Client.tsx` in de naam (zoals `TripDetailClient.tsx`)
@@ -76,6 +77,7 @@ src/components/
 ```
 
 **Design principe:**
+
 - Components zijn herbruikbaar en onafhankelijk
 - UI components in `ui/` zijn de meest basis components
 - Feature-specifieke components staan direct in `components/`
@@ -100,6 +102,7 @@ src/lib/
 ```
 
 **Waarom hier:**
+
 - `lib/` is een Next.js conventie voor utility code
 - `supabase/` heeft aparte clients voor client/server omdat ze anders werken
 - `external/` bevat alle code die met externe APIs praat
@@ -157,6 +160,7 @@ supabase/
 ```
 
 **Workflow:**
+
 - `schema.sql` = de complete, up-to-date schema
 - Nieuwe migrations komen in aparte `.sql` files
 - Run migrations via Supabase SQL Editor
@@ -179,6 +183,7 @@ tests/
 ```
 
 **Test types:**
+
 - **Unit**: Losse functies/components testen
 - **Integration**: Features met server actions testen
 - **E2E**: Complete user flows testen
@@ -220,26 +225,31 @@ Belangrijke configuratie files in de root:
 ## Waar vind ik...?
 
 **Een nieuwe feature toevoegen?**
+
 - Pages: `src/app/[feature]/page.tsx`
 - Components: `src/components/[FeatureName].tsx`
 - Server Actions: `src/app/[feature]/actions.ts`
 - Types: `src/types/` of inline in component
 
 **Database queries?**
+
 - Server Actions gebruiken Supabase client uit `src/lib/supabase/server.ts`
 - Client-side queries gebruiken `src/lib/supabase/client.ts`
 
 **Styling?**
+
 - Tailwind utility classes in components
 - Global styles in `src/styles/globals.css`
 - Custom CSS alleen als Tailwind niet genoeg is
 
 **Tests schrijven?**
+
 - Unit tests: `tests/[feature]/unit/`
 - Integration: `tests/[feature]/integration/`
 - E2E: `tests/[feature]/e2e/` of `tests/iso25010/`
 
 **Configuratie aanpassen?**
+
 - Next.js: `next.config.js`
 - TypeScript: `tsconfig.json`
 - Tailwind: `tailwind.config.ts`
@@ -248,16 +258,19 @@ Belangrijke configuratie files in de root:
 ## Conventies
 
 **Naming:**
+
 - Components: PascalCase (`TripCard.tsx`)
 - Files: kebab-case voor pages, PascalCase voor components
 - Functions: camelCase
 - Types/Interfaces: PascalCase
 
 **Imports:**
+
 - Absolute imports met `@/` alias (configureerd in `tsconfig.json`)
 - Bijvoorbeeld: `import { cn } from '@/lib/utils/cn'`
 
 **File organisatie:**
+
 - Eén component per file
 - Related code bij elkaar (actions bij de page die ze gebruikt)
 - Shared utilities in `lib/`
@@ -266,4 +279,3 @@ Belangrijke configuratie files in de root:
 
 **Laatste update:** December 2025
 **Auteurs:** Yassine & Sedäle
-

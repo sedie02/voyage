@@ -5,6 +5,7 @@ Dit document beschrijft alle API endpoints en Server Actions die beschikbaar zij
 ## Overzicht
 
 Voyage gebruikt twee soorten "API's":
+
 1. **Next.js Server Actions** - Voor data mutations (create, update, delete)
 2. **REST API Routes** - Voor simpele endpoints (zoals health checks)
 
@@ -19,6 +20,7 @@ De meeste functionaliteit gebruikt Server Actions omdat die beter integreren met
 Check of de applicatie draait.
 
 **Response:**
+
 ```json
 {
   "status": "ok",
@@ -27,6 +29,7 @@ Check of de applicatie draait.
 ```
 
 **Gebruik:**
+
 - Monitoring
 - Load balancer health checks
 - Deployment verificatie
@@ -42,14 +45,16 @@ Server Actions zijn async functies die je direct vanuit Client Components kunt a
 **Locatie:** `src/app/trips/actions.ts`
 
 **Functie:**
+
 ```typescript
-export async function createTrip(formData: FormData): Promise<{ success: boolean; error?: string }>
+export async function createTrip(formData: FormData): Promise<{ success: boolean; error?: string }>;
 ```
 
 **Beschrijving:**
 Maakt een nieuwe trip aan. Werkt voor zowel ingelogde gebruikers als guest sessions.
 
 **Parameters:**
+
 - `formData` - FormData object met:
   - `title` (string, required)
   - `destination` (string, required)
@@ -59,11 +64,13 @@ Maakt een nieuwe trip aan. Werkt voor zowel ingelogde gebruikers als guest sessi
   - `tripType` (string, optional)
 
 **Returns:**
+
 ```typescript
 { success: true } | { success: false, error: string }
 ```
 
 **Voorbeeld:**
+
 ```typescript
 const result = await createTrip(formData);
 if (result.success) {
@@ -78,18 +85,21 @@ if (result.success) {
 **Locatie:** `src/app/trips/actions.ts`
 
 **Functie:**
+
 ```typescript
-export async function updateTrip(tripId: string, formData: FormData): Promise<void>
+export async function updateTrip(tripId: string, formData: FormData): Promise<void>;
 ```
 
 **Beschrijving:**
 Update een bestaande trip. Alleen owner of editor kan dit doen.
 
 **Parameters:**
+
 - `tripId` - UUID van de trip
 - `formData` - Zelfde structuur als createTrip
 
 **Throws:**
+
 - Error als gebruiker geen rechten heeft
 - Error als trip niet bestaat
 
@@ -98,8 +108,9 @@ Update een bestaande trip. Alleen owner of editor kan dit doen.
 **Locatie:** `src/app/trips/actions.ts`
 
 **Functie:**
+
 ```typescript
-export async function deleteTrip(tripId: string): Promise<void>
+export async function deleteTrip(tripId: string): Promise<void>;
 ```
 
 **Beschrijving:**
@@ -110,8 +121,9 @@ Verwijdert een trip. Alleen owner kan dit doen. Verwijdert ook alle gerelateerde
 **Locatie:** `src/app/trips/actions.ts`
 
 **Functie:**
+
 ```typescript
-export async function archiveTrip(tripId: string): Promise<void>
+export async function archiveTrip(tripId: string): Promise<void>;
 ```
 
 **Beschrijving:**
@@ -124,14 +136,20 @@ Archiveert een trip (soft delete). Trip blijft in database maar wordt niet meer 
 **Locatie:** `src/app/trips/[id]/participants/actions.ts`
 
 **Functie:**
+
 ```typescript
-export async function addParticipant(tripId: string, userId: string, role: 'editor' | 'viewer'): Promise<void>
+export async function addParticipant(
+  tripId: string,
+  userId: string,
+  role: 'editor' | 'viewer'
+): Promise<void>;
 ```
 
 **Beschrijving:**
 Voegt een gebruiker toe aan een trip als participant.
 
 **Parameters:**
+
 - `tripId` - UUID van de trip
 - `userId` - UUID van de gebruiker (of null voor guest)
 - `role` - 'editor' of 'viewer'
@@ -141,8 +159,9 @@ Voegt een gebruiker toe aan een trip als participant.
 **Locatie:** `src/app/trips/[id]/participants/actions.ts`
 
 **Functie:**
+
 ```typescript
-export async function removeParticipant(tripId: string, participantId: string): Promise<void>
+export async function removeParticipant(tripId: string, participantId: string): Promise<void>;
 ```
 
 **Beschrijving:**
@@ -155,18 +174,24 @@ Verwijdert een participant uit een trip. Alleen owner kan dit doen.
 **Locatie:** `src/app/trips/[id]/invite/actions.ts`
 
 **Functie:**
+
 ```typescript
-export async function createInviteLink(tripId: string, expiresInDays?: number): Promise<{ token: string; url: string }>
+export async function createInviteLink(
+  tripId: string,
+  expiresInDays?: number
+): Promise<{ token: string; url: string }>;
 ```
 
 **Beschrijving:**
 Maakt een invite link aan voor een trip. Link kan gedeeld worden met anderen.
 
 **Parameters:**
+
 - `tripId` - UUID van de trip
 - `expiresInDays` - Optioneel, standaard 30 dagen
 
 **Returns:**
+
 ```typescript
 {
   token: string,  // Het invite token
@@ -179,17 +204,22 @@ Maakt een invite link aan voor een trip. Link kan gedeeld worden met anderen.
 **Locatie:** `src/app/trips/[id]/invite/actions.ts`
 
 **Functie:**
+
 ```typescript
-export async function acceptInvite(token: string): Promise<{ success: boolean; tripId?: string; error?: string }>
+export async function acceptInvite(
+  token: string
+): Promise<{ success: boolean; tripId?: string; error?: string }>;
 ```
 
 **Beschrijving:**
 Accepteert een invite link. Gebruiker wordt toegevoegd als participant aan de trip.
 
 **Parameters:**
+
 - `token` - Het invite token uit de URL
 
 **Returns:**
+
 ```typescript
 { success: true, tripId: string } | { success: false, error: string }
 ```
@@ -201,14 +231,16 @@ Accepteert een invite link. Gebruiker wordt toegevoegd als participant aan de tr
 **Locatie:** `src/app/trips/[id]/itinerary/actions.ts`
 
 **Functie:**
+
 ```typescript
-export async function generateItinerary(tripId: string, options?: ItineraryOptions): Promise<void>
+export async function generateItinerary(tripId: string, options?: ItineraryOptions): Promise<void>;
 ```
 
 **Beschrijving:**
 Genereert automatisch een itinerary voor een trip op basis van bestemming en reisstijl. Gebruikt GetYourGuide scraping (experimenteel).
 
 **Parameters:**
+
 - `tripId` - UUID van de trip
 - `options` - Optionele configuratie:
   - `travelStyle` - 'avontuur', 'relaxed', 'cultureel', etc.
@@ -219,14 +251,19 @@ Genereert automatisch een itinerary voor een trip op basis van bestemming en rei
 **Locatie:** `src/app/trips/[id]/itinerary/actions.ts`
 
 **Functie:**
+
 ```typescript
-export async function addActivitiesToExistingDays(tripId: string, activities: ActivityInput[]): Promise<void>
+export async function addActivitiesToExistingDays(
+  tripId: string,
+  activities: ActivityInput[]
+): Promise<void>;
 ```
 
 **Beschrijving:**
 Voegt activiteiten toe aan bestaande dagen in een trip.
 
 **Parameters:**
+
 - `tripId` - UUID van de trip
 - `activities` - Array van activiteit objecten:
   ```typescript
@@ -245,8 +282,9 @@ Voegt activiteiten toe aan bestaande dagen in een trip.
 **Locatie:** `src/app/trips/[id]/itinerary/actions.ts`
 
 **Functie:**
+
 ```typescript
-export async function deleteItinerary(tripId: string): Promise<void>
+export async function deleteItinerary(tripId: string): Promise<void>;
 ```
 
 **Beschrijving:**
@@ -259,8 +297,13 @@ Verwijdert alle dagen en activiteiten van een trip. Alleen owner of editor kan d
 **Locatie:** `src/app/packing/actions.ts`
 
 **Functie:**
+
 ```typescript
-export async function addPackingItem(tripId: string, itemName: string, category?: string): Promise<void>
+export async function addPackingItem(
+  tripId: string,
+  itemName: string,
+  category?: string
+): Promise<void>;
 ```
 
 **Beschrijving:**
@@ -271,8 +314,12 @@ Voegt een item toe aan de packing list van een trip.
 **Locatie:** `src/app/packing/actions.ts`
 
 **Functie:**
+
 ```typescript
-export async function updatePackingItem(itemId: string, updates: { isPacked?: boolean; quantity?: number }): Promise<void>
+export async function updatePackingItem(
+  itemId: string,
+  updates: { isPacked?: boolean; quantity?: number }
+): Promise<void>;
 ```
 
 **Beschrijving:**
@@ -283,8 +330,9 @@ Update een packing item (bijv. markeren als ingepakt).
 **Locatie:** `src/app/packing/actions.ts`
 
 **Functie:**
+
 ```typescript
-export async function deletePackingItem(itemId: string): Promise<void>
+export async function deletePackingItem(itemId: string): Promise<void>;
 ```
 
 **Beschrijving:**
@@ -295,8 +343,9 @@ Verwijdert een item uit de packing list.
 **Locatie:** `src/app/packing/init-categories-action.ts`
 
 **Functie:**
+
 ```typescript
-export async function initPackingCategories(tripId: string): Promise<void>
+export async function initPackingCategories(tripId: string): Promise<void>;
 ```
 
 **Beschrijving:**
@@ -319,6 +368,7 @@ try {
 ## Authentication & Authorization
 
 **Row Level Security (RLS):**
+
 - Database queries worden automatisch gefilterd op basis van gebruiker
 - Guest sessions hebben beperkte rechten
 - Alleen owner kan trip verwijderen
@@ -326,6 +376,7 @@ try {
 - Viewer kan alleen lezen
 
 **Guest Sessions:**
+
 - Guest sessions worden opgeslagen in cookies
 - UUID wordt gegenereerd met `uuid` package
 - Guest kan trips aanmaken en bewerken (met beperkingen)
@@ -333,6 +384,7 @@ try {
 ## Rate Limiting
 
 Momenteel geen rate limiting geïmplementeerd. Voor productie zou dit toegevoegd moeten worden, vooral voor:
+
 - Trip creation
 - Invite link generation
 - Itinerary generation (gebruikt externe API's)
@@ -342,11 +394,13 @@ Momenteel geen rate limiting geïmplementeerd. Voor productie zou dit toegevoegd
 Voyage gebruikt externe APIs voor bepaalde features:
 
 **Google Places API:**
+
 - Autocomplete voor bestemmingen
 - Geocoding voor coördinaten
 - Gebruikt in: `src/lib/external/places.ts`
 
 **GetYourGuide (experimenteel):**
+
 - Web scraping voor activiteiten
 - Gebruikt in: `src/lib/external/getyourguide.ts`
 - **Note:** Dit is experimenteel en kan breaking changes hebben
@@ -365,4 +419,3 @@ Dit genereert `src/types/database.types.ts` met alle database types.
 
 **Laatste update:** December 2025
 **Auteurs:** Yassine & Sedäle
-
