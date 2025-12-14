@@ -4,8 +4,7 @@
  * T2: Vendor-agnostisch gedrag
  */
 
-import { execSync } from 'child_process';
-import { spawn } from 'child_process';
+import { execSync, spawn } from 'child_process';
 
 describe('ISO 25010 - Portability', () => {
   let serverProcess: any;

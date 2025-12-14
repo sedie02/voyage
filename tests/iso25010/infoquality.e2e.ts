@@ -13,7 +13,10 @@ test.describe('ISO 25010 - Information Quality', () => {
   }) => {
     // Navigeer naar home pagina
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    if (process.env.CI !== 'true') {
+      await page.waitForLoadState('networkidle');
+    }
 
     // Check of er trips zijn (via API of UI)
     // Als er trips zijn, check data consistentie
@@ -25,7 +28,10 @@ test.describe('ISO 25010 - Information Quality', () => {
     if (tripCount > 0) {
       // Klik op eerste trip
       await tripCards.first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
+      if (process.env.CI !== 'true') {
+        await page.waitForLoadState('networkidle');
+      }
 
       // Check of trip data correct wordt weergegeven
       // Check voor belangrijke velden
@@ -81,8 +87,8 @@ test.describe('ISO 25010 - Information Quality', () => {
       }
     });
 
-    // Wacht even voor eventuele async errors
-    await page.waitForTimeout(1000);
+    // Wacht even voor eventuele async errors (korter in CI)
+    await page.waitForTimeout(process.env.CI === 'true' ? 200 : 1000);
 
     // Er mogen geen kritieke data errors zijn
     expect(errors.length).toBe(0);

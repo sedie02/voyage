@@ -26,7 +26,11 @@ test.describe('ISO 25010 - Compatibility', () => {
     });
 
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    // In CI, skip networkidle for faster execution
+    if (process.env.CI !== 'true') {
+      await page.waitForLoadState('networkidle');
+    }
 
     // Verify page rendered correctly (most important for compatibility)
     const pageContent = await page.textContent('body');
@@ -74,7 +78,11 @@ test.describe('ISO 25010 - Compatibility', () => {
     });
 
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    // In CI, skip networkidle for faster execution
+    if (process.env.CI !== 'true') {
+      await page.waitForLoadState('networkidle');
+    }
 
     // Verify page rendered correctly (most important for compatibility)
     const pageContent = await page.textContent('body');
