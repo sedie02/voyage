@@ -38,7 +38,10 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="safe-bottom fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-surface">
+    <nav
+      className="safe-bottom fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-surface"
+      aria-label="Hoofdnavigatie"
+    >
       <div className="mx-auto flex max-w-2xl items-center justify-around px-2 py-2">
         <Link
           href={getNavLink('/trips')}
@@ -90,13 +93,18 @@ export default function BottomNav() {
           <span className="text-xs font-semibold">Budget</span>
         </Link>
 
-        <Link href="/trips/new" className="-mt-6 flex flex-col items-center">
+        <Link
+          href="/trips/new"
+          className="-mt-6 flex flex-col items-center"
+          aria-label="Nieuwe trip aanmaken"
+        >
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 hover:bg-primary-hover sm:h-14 sm:w-14">
             <svg
               className="h-6 w-6 text-white sm:h-7 sm:w-7"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"

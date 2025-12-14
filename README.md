@@ -25,7 +25,6 @@ We hebben een reisplanner gemaakt waar groepen samen hun reis kunnen organiseren
 ## Database
 
 We gebruiken Supabase (PostgreSQL) met deze tabellen:
-
 - Trips met deelnemers en hun rollen
 - Itinerary items voor dagplanning
 - Packing lists
@@ -37,33 +36,27 @@ We gebruiken Supabase (PostgreSQL) met deze tabellen:
 ## 🛠️ Technologieën
 
 **Frontend**
-
 - Next.js 14 (React met App Router)
 - TypeScript
 - Tailwind CSS
 - React Hook Form + Zod voor formulieren
 
 **Backend**
-
 - Supabase (database + auth)
 - Next.js Server Actions
 - Row Level Security in de database
 
 **External APIs**
-
 - Google Maps/Places API (voor locaties)
 - Google Geocoding (voor coördinaten)
 
-**Testing & Code Quality**
-
-- Jest (unit tests met coverage)
+**Testing**
+- Jest (unit tests)
 - React Testing Library
 - Playwright (end-to-end tests)
-- ESLint + Prettier (linting en formatting)
-- Complexity Analysis (code quality metrics)
+- ESLint + Prettier
 
 **Hosting**
-
 - Skylabs VM
 - PM2 (voor process management)
 - Nginx (reverse proxy)
@@ -122,21 +115,18 @@ voyage/
 ## 🚀 Installatie
 
 **Je hebt nodig:**
-
 - Node.js 18 of hoger
 - npm 9 of hoger
 
 **Setup:**
 
 1. Clone het project
-
    ```bash
    git clone <repository-url>
    cd voyage
    ```
 
 2. Installeer packages
-
    ```bash
    npm install
    ```
@@ -150,7 +140,6 @@ voyage/
    Upload `supabase/schema.sql` in je Supabase project (via de SQL editor).
 
 5. Start de dev server
-
    ```bash
    npm run dev
    ```
@@ -170,9 +159,6 @@ npm run lint             # ESLint checken
 npm run lint:fix         # ESLint errors fixen
 npm run format           # Code formatten
 npm run type-check       # TypeScript checken
-npm run lint:complexity  # Complexity analysis
-npm run analyze:deps     # Check unused dependencies
-npm run analyze:bundle   # Bundle size analysis
 
 # Testing
 npm test                 # Unit tests
@@ -192,37 +178,21 @@ We hebben verschillende soorten tests:
 - **Integration tests**: Voor features met server actions
 - **E2E tests**: Voor complete user flows (Playwright)
 
-## 📊 Code Quality
-
-We gebruiken verschillende **lokale tools** voor code quality (gratis, geen accounts nodig):
-
-- **ESLint**: Linting met strict rules voor code kwaliteit
-- **TypeScript Strict Mode**: Type safety op hoog niveau
-- **Jest Coverage**: Test coverage tracking (`npm run test:coverage`)
-- **Complexity Analysis**: Detecteer complexe functies (`npm run lint:complexity`)
-- **Dependency Check**: Vind unused dependencies (`npm run analyze:deps`)
-- **Bundle Analysis**: Check bundle size (`npm run analyze:bundle`)
-
-Al deze tools draaien lokaal en in de CI/CD pipeline via GitHub Actions.
-
 ## 🏗️ Hoe het werkt
 
 **Design patterns:**
-
 - Server Components van Next.js
 - Server Actions voor data updates
 - Context API voor global state (bijvoorbeeld toast messages)
 - Herbruikbare UI components
 
 **Database security:**
-
 - Row Level Security (RLS) in Postgres
 - Verschillende rollen: owner, editor, viewer, guest
 - Guest sessions via cookies
 - Invite links met expiratie datum
 
 **APIs:**
-
 - Google Places voor locatie autocomplete
 - Google Geocoding voor coordinaten van bestemmingen
 
@@ -249,19 +219,16 @@ Het project draait op een Skylabs VM met PM2 en Nginx. Zie [DEPLOYMENT.md](docs/
 ## 🤝 Development
 
 **Git branches:**
-
 - `main` - Productie code
 - `develop` - Development branch
 - `feature/naam` - Feature branches
 
 **Code quality:**
-
 - ESLint en Prettier draaien voor consistente code
 - TypeScript strict mode aan
 - Tests schrijven voor nieuwe features
 
 **Pull requests:**
-
 - Duidelijke beschrijving
 - Tests moeten slagen
 - Code review

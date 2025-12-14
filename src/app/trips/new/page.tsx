@@ -120,7 +120,7 @@ export default function NewTripPage() {
   return (
     <div className="min-h-screen bg-bg pb-24" ref={containerRef}>
       {/* Header */}
-      <nav className="sticky top-0 z-50 border-b border-border bg-surface">
+      <nav className="sticky top-0 z-50 border-b border-border bg-surface" aria-label="Trip aanmaken navigatie">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <div className="flex h-14 items-center justify-between sm:h-16">
             <Link
