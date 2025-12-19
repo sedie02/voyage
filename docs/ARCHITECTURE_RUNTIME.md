@@ -56,6 +56,7 @@ Dit document beschrijft volledig hoe Voyage technisch in elkaar zit: van code st
 ### Technologie Stack
 
 **Frontend:**
+
 - Next.js 14 (App Router)
 - React 18
 - TypeScript
@@ -63,17 +64,20 @@ Dit document beschrijft volledig hoe Voyage technisch in elkaar zit: van code st
 - React Hook Form + Zod
 
 **Backend:**
+
 - Next.js Server Actions (geen aparte API server)
 - Supabase (PostgreSQL database + Auth)
 - Server Components voor data fetching
 
 **Hosting:**
+
 - Skylabs VM (Ubuntu)
 - PM2 (process manager)
 - Nginx (reverse proxy)
 - Node.js 20
 
 **Externe Services:**
+
 - Supabase (cloud database)
 - Google Places API
 - GetYourGuide (web scraping)
@@ -167,7 +171,7 @@ voyage/
 export default async function TripsPage() {
   const supabase = await createClient(); // Server-side
   const { data: trips } = await supabase.from('trips').select('*');
-  
+
   return <TripsList trips={trips} />; // Server Component
 }
 
@@ -175,11 +179,11 @@ export default async function TripsPage() {
 'use client';
 export default function NewTripPage() {
   const [formData, setFormData] = useState({});
-  
+
   async function handleSubmit() {
     await createTrip(formData); // Server Action
   }
-  
+
   return <form onSubmit={handleSubmit}>...</form>;
 }
 
@@ -230,6 +234,7 @@ export async function createTrip(formData: FormData) {
 ### Server vs Client Execution
 
 **Server Components:**
+
 - **Waar draaien:** Node.js server (Skylabs VM)
 - **Wanneer:** Bij elke page request
 - **Toegang tot:** Database, file system, environment variables
@@ -237,6 +242,7 @@ export async function createTrip(formData: FormData) {
 - **Output:** HTML string die naar browser wordt gestuurd
 
 **Client Components:**
+
 - **Waar draaien:** Browser (JavaScript engine)
 - **Wanneer:** Na initial render, bij interactie
 - **Toegang tot:** Browser APIs, DOM, localStorage
@@ -244,6 +250,7 @@ export async function createTrip(formData: FormData) {
 - **Output:** DOM manipulatie, state updates
 
 **Server Actions:**
+
 - **Waar draaien:** Node.js server
 - **Wanneer:** Bij aanroep vanuit Client Component
 - **Toegang tot:** Alles wat Server Components kunnen
@@ -291,6 +298,7 @@ npm start (of PM2)
 ### Data Fetching Patterns
 
 **Server Components (data fetching):**
+
 ```typescript
 // src/app/trips/page.tsx
 export default async function TripsPage() {
@@ -299,52 +307,50 @@ export default async function TripsPage() {
     .from('trips')
     .select('*')
     .order('created_at', { ascending: false });
-  
+
   return <TripsList trips={trips} />;
 }
 ```
 
 **Client Components (interactie):**
+
 ```typescript
 // src/app/trips/new/page.tsx
 'use client';
 export default function NewTripPage() {
   const [formData, setFormData] = useState({});
   const router = useRouter();
-  
+
   async function handleSubmit() {
     const result = await createTrip(formData);
     if (result.success) {
       router.push(`/trips/${result.tripId}`);
     }
   }
-  
+
   return <form onSubmit={handleSubmit}>...</form>;
 }
 ```
 
 **Server Actions (mutations):**
+
 ```typescript
 // src/app/trips/actions.ts
 'use server';
 export async function createTrip(formData: FormData) {
   const supabase = await createClient();
-  
+
   // Validatie
   const validated = tripSchema.parse(formData);
-  
+
   // Database insert
-  const { data, error } = await supabase
-    .from('trips')
-    .insert(validated)
-    .select()
-    .single();
-  
+  const { data, error } = await supabase.from('trips').insert(validated).select().single();
+
   if (error) throw new Error(error.message);
-  
+
   // Revalidate cache
   revalidatePath('/trips');
-  
+
   return { success: true, tripId: data.id };
 }
 ```
@@ -352,14 +358,17 @@ export async function createTrip(formData: FormData) {
 ### State Management
 
 **Lokaal State:**
+
 - `useState` voor component state
 - `useForm` (React Hook Form) voor form state
 
 **Global State:**
+
 - React Context API voor toast notifications
 - Geen Redux/Zustand nodig (voor nu)
 
 **Server State:**
+
 - Next.js cache voor Server Components
 - `revalidatePath()` om cache te invalidaten
 - Supabase real-time subscriptions (optioneel, niet in MVP)
@@ -367,18 +376,21 @@ export async function createTrip(formData: FormData) {
 ### Database Queries
 
 **Server-side (Server Components & Actions):**
+
 ```typescript
 const supabase = await createClient(); // Server client
 const { data } = await supabase.from('trips').select('*');
 ```
 
 **Client-side (Client Components):**
+
 ```typescript
 const supabase = createClient(); // Client client
 const { data } = await supabase.from('trips').select('*');
 ```
 
 **Belangrijk verschil:**
+
 - Server client: Heeft toegang tot cookies, kan RLS policies gebruiken
 - Client client: Gebruikt anon key, RLS bepaalt toegang
 
@@ -479,17 +491,19 @@ const { data } = await supabase.from('trips').select('*');
 ```javascript
 // ecosystem.config.js
 module.exports = {
-  apps: [{
-    name: 'voyage',
-    script: 'npm',
-    args: 'start',
-    instances: 2,        // Cluster mode
-    exec_mode: 'cluster',
-    env: {
-      NODE_ENV: 'production',
-      PORT: 3000
-    }
-  }]
+  apps: [
+    {
+      name: 'voyage',
+      script: 'npm',
+      args: 'start',
+      instances: 2, // Cluster mode
+      exec_mode: 'cluster',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3000,
+      },
+    },
+  ],
 };
 ```
 
@@ -499,7 +513,7 @@ module.exports = {
 server {
     listen 80;
     server_name jouw-domain.nl;
-    
+
     # Redirect HTTP → HTTPS
     return 301 https://$server_name$request_uri;
 }
@@ -507,10 +521,10 @@ server {
 server {
     listen 443 ssl;
     server_name jouw-domain.nl;
-    
+
     ssl_certificate /etc/letsencrypt/live/jouw-domain.nl/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/jouw-domain.nl/privkey.pem;
-    
+
     location / {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
@@ -521,7 +535,7 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
-    
+
     # Cache static files
     location /_next/static {
         proxy_pass http://localhost:3000;
@@ -534,6 +548,7 @@ server {
 ### Environment Variables
 
 **Development (.env.local):**
+
 ```env
 NODE_ENV=development
 NEXT_PUBLIC_SUPABASE_URL=...
@@ -543,11 +558,13 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=...
 ```
 
 **Production (Skylabs VM):**
+
 - Zelfde variabelen, maar andere waardes
 - Staan in `/var/www/voyage/.env.local`
 - Nooit in git
 
 **Next.js Environment Variable Handling:**
+
 - `NEXT_PUBLIC_*` → Beschikbaar in browser (client-side)
 - Andere vars → Alleen server-side
 - Next.js injecteert deze tijdens build/runtime
@@ -620,6 +637,7 @@ export function createClient() {
 ### Google Places API Integratie
 
 **Client-side Flow:**
+
 ```
 Browser
   ↓
@@ -635,6 +653,7 @@ FormData update
 ```
 
 **Server-side Flow:**
+
 ```
 Server Action (createTrip)
   ↓
@@ -652,6 +671,7 @@ Photo URL opgeslagen in database
 ### GetYourGuide Scraping
 
 **Flow:**
+
 ```
 Server Action (generateItinerary)
   ↓
@@ -675,16 +695,19 @@ Toegevoegd aan itinerary
 ### Authentication & Authorization
 
 **Supabase Auth:**
+
 - Email/password authentication
 - Session management via HTTP-only cookies
 - JWT tokens (handled door Supabase)
 
 **Guest Sessions:**
+
 - UUID gegenereerd met `uuid` package
 - Opgeslagen in cookies (niet HTTP-only voor nu)
 - Beperkte rechten via RLS policies
 
 **Row Level Security:**
+
 - Database-level security
 - Policies bepalen toegang per gebruiker/trip
 - Geen security logic in applicatie code nodig
@@ -692,11 +715,13 @@ Toegevoegd aan itinerary
 ### API Security
 
 **Google Places API:**
+
 - API key restricted in Google Console
 - HTTP referrer restrictions
 - API restrictions (alleen Places API enabled)
 
 **Server Actions:**
+
 - Type-safe (TypeScript)
 - Input validatie (Zod schemas)
 - Server-side execution (geen client-side manipulatie)
@@ -704,11 +729,13 @@ Toegevoegd aan itinerary
 ### Data Protection
 
 **Environment Variables:**
+
 - Nooit in git (`.env.local` in `.gitignore`)
 - Server-side keys niet naar client
 - Client-side keys restricted via service providers
 
 **HTTPS:**
+
 - SSL/TLS via Let's Encrypt
 - Alle verkeer encrypted
 - Secure cookies
@@ -720,22 +747,26 @@ Toegevoegd aan itinerary
 ### Next.js Optimalisaties
 
 **Server Components:**
+
 - Geen JavaScript naar client (kleinere bundles)
 - Data fetching op server (sneller)
 - Streaming SSR mogelijk
 
 **Code Splitting:**
+
 - Automatisch per route
 - Client Components lazy loaded
 - Tree shaking (ongebruikte code verwijderd)
 
 **Image Optimization:**
+
 - Next.js Image component
 - Automatische format conversion (WebP, AVIF)
 - Lazy loading
 - Responsive images
 
 **Caching:**
+
 - Next.js cache voor Server Components
 - `revalidate` voor time-based cache
 - Database caching voor photo URLs
@@ -743,11 +774,13 @@ Toegevoegd aan itinerary
 ### Database Optimalisaties
 
 **Supabase:**
+
 - Connection pooling (automatisch)
 - Indexes op veelgebruikte queries
 - RLS policies zijn performant
 
 **Queries:**
+
 - Select alleen benodigde velden
 - Gebruik indexes (foreign keys, dates)
 - Paginatie voor grote datasets
@@ -755,11 +788,13 @@ Toegevoegd aan itinerary
 ### External API Optimalisaties
 
 **Google Places:**
+
 - Caching (1 uur revalidate)
 - Database opslag van photo URLs
 - Fallback naar Unsplash (geen blocking)
 
 **GetYourGuide:**
+
 - Caching (1 uur)
 - Fallback naar handmatige activiteiten
 - Geen blocking (app blijft functioneel)
@@ -771,11 +806,13 @@ Toegevoegd aan itinerary
 ### Logging
 
 **PM2 Logs:**
+
 - `/var/log/voyage/out.log` - stdout
 - `/var/log/voyage/error.log` - stderr
 - Rotatie via PM2
 
 **Application Logs:**
+
 - Console.log in development
 - Console.error voor errors
 - Geen PII in logs
@@ -783,11 +820,13 @@ Toegevoegd aan itinerary
 ### Monitoring
 
 **Health Check:**
+
 - `/api/health` endpoint
 - Returns: `{ status: 'ok', timestamp: '...' }`
 - Gebruikt voor load balancer checks
 
 **Error Tracking:**
+
 - Geen externe service (voor nu)
 - Errors in PM2 logs
 - Console errors in browser (development)
@@ -806,20 +845,22 @@ Toegevoegd aan itinerary
 ### Scaling Options
 
 **Horizontal Scaling:**
+
 - Meerdere VMs achter load balancer
 - Shared session storage (Redis)
 - Database blijft Supabase (cloud)
 
 **Vertical Scaling:**
+
 - Meer PM2 instances op zelfde VM
 - Meer RAM/CPU voor VM
 
 **CDN:**
+
 - Cloudflare voor static assets
 - Edge caching voor snellere laadtijden
 
 ---
 
-**Laatste update:** December 2025  
+**Laatste update:** December 2025
 **Auteurs:** Yassine & Sedäle
-
