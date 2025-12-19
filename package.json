@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:static": "next build --config next.config.static.js",
+    "export": "npm run build:static",
     "start": "next start -p 3000",
     "lint": "next lint",
     "lint:ci": "next lint --max-warnings 999",
