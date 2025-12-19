@@ -31,7 +31,8 @@ We gebruiken Supabase (PostgreSQL) met deze tabellen:
 - Packing lists
 - Invite links die je kan delen
 - Row Level Security voor wie wat mag zien
-- Row Level Security voor wie wat mag zien
+
+Zie `supabase/schema.sql` voor het database schema.
 
 ## 🛠️ Technologieën
 
@@ -50,7 +51,7 @@ We gebruiken Supabase (PostgreSQL) met deze tabellen:
 
 **External APIs**
 
-- Google Maps/Places API (voor locaties)
+- Google Maps/Places API (voor locaties) - zie [docs/EXTERNAL_APIS.md](docs/EXTERNAL_APIS.md)
 - Google Geocoding (voor coördinaten)
 
 **Testing**
@@ -212,6 +213,10 @@ We hebben verschillende soorten tests:
 
 - [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) - Uitgebreide uitleg van de folders
 - [docs/API.md](docs/API.md) - API endpoints
+- [docs/EXTERNAL_APIS.md](docs/EXTERNAL_APIS.md) - Google Maps/Places API integratie
+- [GOOGLE_MAPS_SETUP.md](GOOGLE_MAPS_SETUP.md) - Google Maps API key setup
+- [DATABASE_MIGRATION.md](DATABASE_MIGRATION.md) - Database migrations
+- [PLAYWRIGHT_REPORTS.md](PLAYWRIGHT_REPORTS.md) - Playwright test runs en rapporten
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) - Hoe je het host
 - [VM_RUNBOOK.md](VM_RUNBOOK.md) - VM deployment referentie (Nginx, PM2, commands)
 - [SKYLABS_SETUP.md](SKYLABS_SETUP.md) - Skylabs server setup guide
@@ -228,7 +233,7 @@ We hebben verschillende soorten tests:
 
 ## 📦 Deployment
 
-**Productie**: Voyage draait op [Vercel](https://voyagetravel.nl) (voyagetravel.nl). 
+**Productie**: Voyage draait op [Vercel](https://voyagetravel.nl) (voyagetravel.nl).
 
 **VM-deploybaar**: De applicatie is technisch deploybaar op een generieke VM (bijv. Skylabs) met `next build` en `next start`, zonder vendor-specifieke SDK's. Zie [VM_RUNBOOK.md](VM_RUNBOOK.md) voor Nginx/PM2 configuratie en deployment commands, of [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) voor uitgebreide instructies.
 
@@ -263,5 +268,5 @@ Dit is een schoolproject voor HBO-ICT aan Hogeschool Windesheim.
 
 ---
 
-**Status**: Productie live op [voyagetravel.nl](https://voyagetravel.nl)  
+**Status**: Productie live op [voyagetravel.nl](https://voyagetravel.nl)
 **Update**: Januari 2025
