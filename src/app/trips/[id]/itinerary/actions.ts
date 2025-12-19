@@ -16,19 +16,17 @@ export async function generateItinerary(tripId: string, includeActivities: boole
   try {
     const supabase = await createClient();
 
-    // Check if user is authenticated and is owner
+    // Get user or guest session
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error('Je moet ingelogd zijn om planning te genereren');
-    }
+    const { getGuestSessionId } = await import('@/lib/session');
+    const guestSessionId = user ? null : await getGuestSessionId();
 
     // Get trip details
     const { data: trip, error: tripError } = await supabase
       .from('trips')
-      .select('start_date, end_date, owner_id, destination, travel_style')
+      .select('start_date, end_date, owner_id, guest_session_id, destination, travel_style')
       .eq('id', tripId)
       .single();
 
@@ -36,7 +34,11 @@ export async function generateItinerary(tripId: string, includeActivities: boole
       throw new Error('Trip niet gevonden');
     }
 
-    if (trip.owner_id !== user.id) {
+    // Check permissions: user must be owner OR guest must match guest_session_id
+    const isOwner = user && trip.owner_id === user.id;
+    const isGuestOwner = !user && guestSessionId && trip.guest_session_id === guestSessionId;
+
+    if (!isOwner && !isGuestOwner) {
       throw new Error('Alleen de planner kan planning genereren');
     }
 

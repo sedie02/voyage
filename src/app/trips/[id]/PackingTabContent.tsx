@@ -562,30 +562,6 @@ function PackingTabContent({
               )}
             </div>
           )}
-
-          {/* Alternative Manual Fix */}
-          <details className="mt-6">
-            <summary className="cursor-pointer text-sm font-semibold text-gray-600 hover:text-gray-900">
-              ⚙️ Werkt de knop niet? Klik hier voor manual fix
-            </summary>
-            <div className="mt-3 rounded-lg border border-gray-200 bg-white p-4 text-left">
-              <p className="mb-2 text-xs font-bold text-gray-900">
-                📝 Run dit in Supabase SQL Editor:
-              </p>
-              <code className="block overflow-x-auto rounded bg-gray-100 p-2 text-xs">
-                {`INSERT INTO packing_categories (trip_id, name, order_index) VALUES
-  ('${tripId}', 'Kleding', 0),
-  ('${tripId}', 'Toiletartikelen', 1),
-  ('${tripId}', 'Elektronica', 2),
-  ('${tripId}', 'Documenten', 3),
-  ('${tripId}', 'Medicijnen', 4),
-  ('${tripId}', 'Overig', 5);`}
-              </code>
-              <p className="mt-2 text-xs text-gray-600">
-                Daarna deze pagina refreshen (Cmd+R / Ctrl+R)
-              </p>
-            </div>
-          </details>
         </div>
       )}
     </div>
