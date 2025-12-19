@@ -1,27 +1,22 @@
-# 🖥️ Skylabs Fresh Ubuntu Setup
+# Skylabs Setup
 
-Complete setup guide voor een nieuwe Ubuntu server op Skylabs.
+Setup voor een nieuwe Ubuntu server op Skylabs.
 
 ## Stap 1: Basis Setup
 
 ```bash
-# Update system
 sudo apt update
 sudo apt upgrade -y
-
-# Install basis tools
 sudo apt install -y git curl wget build-essential
 ```
 
 ## Stap 2: Node.js Installeren
 
 ```bash
-# Install Node.js 20 (LTS)
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
-# Verify
-node --version  # Moet v20.x.x zijn
+node --version  # moet v20.x.x zijn
 npm --version
 ```
 
@@ -29,12 +24,10 @@ npm --version
 
 ```bash
 sudo npm install -g pm2
-
-# Verify
 pm2 --version
 ```
 
-## Stap 4: Nginx Installeren (optioneel, voor reverse proxy)
+## Stap 4: Nginx Installeren (optioneel)
 
 ```bash
 sudo apt install -y nginx
@@ -44,24 +37,18 @@ sudo systemctl start nginx
 
 ## Stap 5: Git Repository Clonen
 
-### Optie A: Via HTTPS (simpelste, vraagt om GitHub username/password)
+### Optie A: Via HTTPS
 
 ```bash
-# Maak app directory
 sudo mkdir -p /var/www/voyage
 sudo chown $USER:$USER /var/www/voyage
-
-# Clone repository
 cd /var/www/voyage
 git clone https://github.com/sedie02/voyage.git .
-
-# Als je private repo hebt, gebruik dan:
-# git clone https://YOUR_USERNAME@github.com/sedie02/voyage.git .
 ```
 
-### Optie B: Via SSH (aanbevolen, geen password nodig)
+### Optie B: Via SSH
 
-**Eerst SSH key genereren:**
+**SSH key genereren:**
 
 ```bash
 # Genereer SSH key (als je die nog niet hebt)
@@ -73,12 +60,12 @@ ssh-keygen -t ed25519 -C "your_email@example.com"
 cat ~/.ssh/id_ed25519.pub
 ```
 
-**Voeg SSH key toe aan GitHub:**
+**SSH key toevoegen aan GitHub:**
 
-1. Kopieer de output van `cat ~/.ssh/id_ed25519.pub`
-2. Ga naar GitHub → Settings → SSH and GPG keys
-3. Klik "New SSH key"
-4. Plak de key en save
+1. Kopieer output van `cat ~/.ssh/id_ed25519.pub`
+2. GitHub → Settings → SSH and GPG keys
+3. New SSH key
+4. Plak en save
 
 **Clone met SSH:**
 
@@ -87,16 +74,14 @@ cd /var/www/voyage
 git clone git@github.com:sedie02/voyage.git .
 ```
 
-## Stap 6: Environment Variables Instellen
+## Stap 6: Environment Variables
 
 ```bash
 cd /var/www/voyage
-
-# Maak .env.local bestand
 nano .env.local
 ```
 
-**Vul dit in (pas aan met jouw waardes):**
+**Vul dit in:**
 
 ```env
 NODE_ENV=production
@@ -111,53 +96,41 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyDYak-2uSDvX8K63127eLHYklyxk1t_J2A
 ```
 
-**Save en exit:** `Ctrl+X`, dan `Y`, dan `Enter`
+**Save:** `Ctrl+X`, dan `Y`, dan `Enter`
 
-## Stap 7: Dependencies Installeren
+## Stap 7: Dependencies
 
 ```bash
 cd /var/www/voyage
 npm ci --production
 ```
 
-## Stap 8: Build Application
+## Stap 8: Build
 
 ```bash
 npm run build
 ```
 
-Dit kan een paar minuten duren.
-
-## Stap 9: Start met PM2
+## Stap 9: PM2 Starten
 
 ```bash
-# Maak log directory
 sudo mkdir -p /var/log/voyage
 sudo chown $USER:$USER /var/log/voyage
-
-# Start applicatie
 pm2 start npm --name voyage -- start
-
-# Save PM2 config (start automatisch bij reboot)
 pm2 save
 pm2 startup
-# Volg de instructies die dit commando geeft (kopieer en run het sudo commando)
+# volg instructies (kopieer en run sudo commando)
 ```
 
 ## Stap 10: Check Status
 
 ```bash
-# Check of app draait
 pm2 status
-
-# Check logs
 pm2 logs voyage --lines 50
-
-# Test health endpoint
 curl http://localhost:3000/api/health
 ```
 
-## Stap 11: Firewall (als je externe toegang wilt)
+## Stap 11: Firewall
 
 ```bash
 # Allow poort 3000 (of 80/443 als je Nginx gebruikt)
@@ -166,15 +139,13 @@ sudo ufw allow OpenSSH
 sudo ufw enable
 ```
 
-## Stap 12: Nginx Configuratie (optioneel, voor reverse proxy)
-
-Als je Nginx gebruikt voor reverse proxy:
+## Stap 12: Nginx Configuratie (optioneel)
 
 ```bash
 sudo nano /etc/nginx/sites-available/voyage
 ```
 
-**Plaats deze config:**
+**Config:**
 
 ```nginx
 server {
@@ -195,7 +166,7 @@ server {
 }
 ```
 
-**Enable site:**
+**Enable:**
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/voyage /etc/nginx/sites-enabled/
@@ -203,14 +174,14 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-## Updates Deployen (na eerste setup)
+## Updates Deployen
 
 ```bash
 cd /var/www/voyage
 ./deploy.sh
 ```
 
-Of handmatig:
+**Of handmatig:**
 
 ```bash
 cd /var/www/voyage
@@ -223,55 +194,34 @@ pm2 reload voyage
 ## Troubleshooting
 
 **Git clone vraagt om password:**
-
-- Gebruik SSH key (zie Stap 5 Optie B)
-- Of gebruik GitHub Personal Access Token
+- gebruik SSH key (stap 5 optie B)
+- of GitHub Personal Access Token
 
 **npm ci faalt:**
-
 ```bash
-# Check Node.js versie
-node --version  # Moet 20+ zijn
-
-# Probeer opnieuw
+node --version  # moet 20+ zijn
 rm -rf node_modules package-lock.json
 npm install
 ```
 
 **Build faalt:**
-
 ```bash
-# Check errors
 npm run build 2>&1 | tee build.log
-
-# Check TypeScript errors
 npm run type-check
 ```
 
 **PM2 start niet:**
-
 ```bash
-# Check logs
 pm2 logs voyage
-
-# Check of poort 3000 vrij is
 sudo lsof -i :3000
-
-# Start handmatig
 cd /var/www/voyage
 npm start
 ```
 
 **App niet bereikbaar:**
-
 ```bash
-# Check of app draait
 pm2 status
-
-# Check firewall
 sudo ufw status
-
-# Test lokaal
 curl http://localhost:3000/api/health
 ```
 
@@ -279,23 +229,22 @@ curl http://localhost:3000/api/health
 
 ```bash
 # PM2
-pm2 status              # Status checken
-pm2 logs voyage         # Logs bekijken
-pm2 restart voyage      # Restart
-pm2 stop voyage         # Stop
-pm2 reload voyage       # Zero-downtime reload
+pm2 status
+pm2 logs voyage
+pm2 restart voyage
+pm2 stop voyage
+pm2 reload voyage
 
 # Git
-git pull origin main    # Pull latest code
-git status              # Check status
-git log --oneline -5    # Laatste 5 commits
+git pull origin main
+git status
+git log --oneline -5
 
 # System
-df -h                   # Disk usage
-free -h                 # Memory usage
-top                     # Process monitor
+df -h
+free -h
+top
 ```
 
----
+**Klaar!** App draait op `http://jouw-skylabs-ip:3000`
 
-**Klaar!** Je app zou nu moeten draaien op `http://jouw-skylabs-ip:3000`

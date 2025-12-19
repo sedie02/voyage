@@ -419,3 +419,4 @@ Dit genereert `src/types/database.types.ts` met alle database types.
 
 **Laatste update:** December 2025
 **Auteurs:** Yassine & Sedäle
+

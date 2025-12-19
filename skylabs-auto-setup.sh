@@ -1,81 +1,80 @@
 #!/bin/bash
-# Complete automatische setup voor Skylabs
-# Run dit ALLEEN op Skylabs server!
+# auto setup voor skylabs
+# run alleen op skylabs server
 
 set -e
 
-echo "🚀 Voyage Auto Setup voor Skylabs"
-echo "=================================="
+echo "voyage setup voor skylabs"
 echo ""
 
-# 1. SSH key toevoegen
-echo "🔑 [1/13] Setting up SSH access..."
+# 1. ssh key
+echo "[1/13] ssh key toevoegen..."
 mkdir -p ~/.ssh
 if ! grep -q "skylabs-voyage" ~/.ssh/authorized_keys 2>/dev/null; then
     echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINRpqChGw4qvyUQp5QeGiFNCNT4NYdcKJd1Yr2+X4Twh skylabs-voyage" >> ~/.ssh/authorized_keys
     chmod 600 ~/.ssh/authorized_keys
     chmod 700 ~/.ssh
-    echo "✅ SSH key toegevoegd"
+    echo "ssh key toegevoegd"
 else
-    echo "✅ SSH key bestaat al"
+    echo "ssh key bestaat al"
 fi
 
-# 2. Update system
+# 2. system update
 echo ""
-echo "📦 [2/13] Updating system..."
+echo "[2/13] system updaten..."
 sudo apt update -qq
 sudo apt upgrade -y -qq
 
-# 3. Install basics
+# 3. basis tools
 echo ""
-echo "📦 [3/13] Installing basic tools..."
+echo "[3/13] basis tools installeren..."
 sudo apt install -y git curl wget build-essential > /dev/null 2>&1
 
-# 4. Install Node.js
+# 4. node.js
 echo ""
-echo "📦 [4/13] Installing Node.js 20..."
+echo "[4/13] node.js 20 installeren..."
 if ! command -v node &> /dev/null || [ "$(node --version | cut -d'v' -f2 | cut -d'.' -f1)" -lt 20 ]; then
     curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - > /dev/null 2>&1
     sudo apt-get install -y nodejs > /dev/null 2>&1
 fi
-echo "✅ Node.js $(node --version)"
+echo "node.js $(node --version) geïnstalleerd"
 
-# 5. Install PM2
+# 5. pm2
 echo ""
-echo "📦 [5/13] Installing PM2..."
+echo "[5/13] pm2 installeren..."
 if ! command -v pm2 &> /dev/null; then
     sudo npm install -g pm2 > /dev/null 2>&1
 fi
-echo "✅ PM2 geïnstalleerd"
+echo "pm2 geïnstalleerd"
 
-# 6. Maak directories
+# 6. directories
 echo ""
-echo "📁 [6/13] Creating directories..."
+echo "[6/13] directories maken..."
 sudo mkdir -p /var/www/voyage
 sudo mkdir -p /var/log/voyage
 sudo chown -R $USER:$USER /var/www/voyage
 sudo chown -R $USER:$USER /var/log/voyage
-echo "✅ Directories gemaakt"
+echo "directories gemaakt"
 
-# 7. Clone repository
+# 7. repo clonen
 echo ""
-echo "📥 [7/13] Cloning repository..."
+echo "[7/13] repository clonen..."
 cd /var/www/voyage
 if [ ! -d ".git" ]; then
     git clone https://github.com/sedie02/voyage.git . > /dev/null 2>&1
-    echo "✅ Repository gecloned"
+    echo "repository gecloned"
 else
-    git pull origin main > /dev/null 2>&1 || echo "⚠️  Git pull failed, maar we gaan door..."
-    echo "✅ Repository bijgewerkt"
+    git pull origin main > /dev/null 2>&1 || echo "git pull gefaald, maar we gaan door"
+    echo "repository bijgewerkt"
 fi
 
-# 8. Check .env.local
+# 8. .env.local check
 echo ""
-echo "⚙️  [8/13] Checking .env.local..."
+echo "[8/13] .env.local checken..."
 if [ ! -f ".env.local" ]; then
-    echo "⚠️  .env.local niet gevonden!"
+    echo ".env.local niet gevonden!"
     echo ""
-    echo "Maak .env.local aan met deze waardes:"
+    echo "maak .env.local aan met:"
     echo ""
     cat << 'EOF'
 NODE_ENV=production
@@ -88,70 +87,61 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyDYak-2uSDvX8K63127eLHYklyxk1t_J2A
 EOF
     echo ""
-    echo "Run: nano .env.local"
-    echo "Plak bovenstaande, pas NEXT_PUBLIC_APP_URL aan, save (Ctrl+X, Y, Enter)"
+    echo "run: nano .env.local"
+    echo "plak bovenstaande, pas NEXT_PUBLIC_APP_URL aan, save (Ctrl+X, Y, Enter)"
     echo ""
-    read -p "Druk Enter als je .env.local hebt aangemaakt..."
+    read -p "druk enter als je .env.local hebt aangemaakt..."
 fi
 
-# 9. Install dependencies
+# 9. dependencies
 echo ""
-echo "📦 [9/13] Installing dependencies..."
+echo "[9/13] dependencies installeren..."
 npm ci --production > /dev/null 2>&1
-echo "✅ Dependencies geïnstalleerd"
+echo "dependencies geïnstalleerd"
 
-# 10. Build
+# 10. build
 echo ""
-echo "🔨 [10/13] Building application..."
+echo "[10/13] builden..."
 npm run build
-echo "✅ Build voltooid"
+echo "build klaar"
 
-# 11. PM2 setup
+# 11. pm2 start
 echo ""
-echo "🚀 [11/13] Starting with PM2..."
+echo "[11/13] pm2 starten..."
 if pm2 list | grep -q "voyage"; then
     pm2 reload voyage > /dev/null 2>&1
-    echo "✅ App gereloaded"
+    echo "app gereloaded"
 else
     pm2 start npm --name voyage -- start > /dev/null 2>&1
-    echo "✅ App gestart"
+    echo "app gestart"
 fi
 pm2 save > /dev/null 2>&1
 
-# 12. PM2 startup
+# 12. pm2 startup
 echo ""
-echo "⚙️  [12/13] Setting up PM2 startup..."
+echo "[12/13] pm2 startup configureren..."
 STARTUP_CMD=$(pm2 startup 2>&1 | grep "sudo" || echo "")
 if [ ! -z "$STARTUP_CMD" ]; then
-    echo "Run dit commando:"
+    echo "run dit commando:"
     echo "$STARTUP_CMD"
     echo ""
-    read -p "Druk Enter als je het commando hebt gerund..."
+    read -p "druk enter als je het commando hebt gerund..."
 fi
 
-# 13. Firewall
+# 13. firewall
 echo ""
-echo "🔥 [13/13] Configuring firewall..."
-sudo ufw allow 3000/tcp > /dev/null 2>&1 || echo "⚠️  UFW al geconfigureerd"
+echo "[13/13] firewall configureren..."
+sudo ufw allow 3000/tcp > /dev/null 2>&1 || echo "ufw al geconfigureerd"
 sudo ufw allow OpenSSH > /dev/null 2>&1 || true
 sudo ufw --force enable > /dev/null 2>&1 || true
-echo "✅ Firewall geconfigureerd"
+echo "firewall geconfigureerd"
 
-# Done!
+# klaar
 echo ""
-echo "=================================="
-echo "✅ SETUP VOLTOOID!"
-echo "=================================="
+echo "setup klaar!"
 echo ""
-echo "📊 Check status:"
-echo "   pm2 status"
+echo "check status: pm2 status"
+echo "check logs: pm2 logs voyage --lines 50"
+echo "test app: curl http://localhost:3000/api/health"
 echo ""
-echo "📋 View logs:"
-echo "   pm2 logs voyage --lines 50"
-echo ""
-echo "🌐 Test app:"
-echo "   curl http://localhost:3000/api/health"
-echo ""
-echo "💡 Vanaf je Mac kun je nu inloggen met:"
-echo "   ssh student@jouw-skylabs-ip"
-echo ""
+echo "vanaf je mac inloggen: ssh student@jouw-skylabs-ip"

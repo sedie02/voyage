@@ -213,3 +213,4 @@ Deze stack is geaccepteerd en in gebruik sinds project start. We zijn tevreden m
 
 **Laatste update:** December 2025
 **Review:** Gepland voor Q1 2026 (als project verder ontwikkeld wordt)
+
