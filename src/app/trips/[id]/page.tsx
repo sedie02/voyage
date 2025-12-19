@@ -287,8 +287,10 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
     participantCount: finalTrip.trip_participants?.length || 0,
   });
 
-  // Check if user is owner
-  const isOwner = user && finalTrip.owner_id === user.id;
+  // Check if user is owner (authenticated user) OR guest is owner (via guest_session_id)
+  const isOwner =
+    (user && finalTrip.owner_id === user.id) ||
+    (!user && guestSessionId && finalTrip.guest_session_id === guestSessionId);
 
   // Calculate days until departure
   const startDate = new Date(finalTrip.start_date);
