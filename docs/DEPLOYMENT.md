@@ -1,40 +1,33 @@
-# 🚀 Voyage Deployment Guide
+# Voyage Deployment
 
-Dit document beschrijft hoe je Voyage deployt naar productie. We gebruiken momenteel een Skylabs VM met PM2 en Nginx.
+Hoe je Voyage deployt op een VM (bijv. Skylabs) met PM2 en Nginx.
 
-## Overzicht
+**Note**: Productie draait op Vercel (voyagetravel.nl). Deze guide is voor VM-deployment en toont aan dat de app generiek deploybaar is zonder vendor-lock-in.
 
-**Huidige setup:**
+## Setup
 
-- **Server:** Skylabs VM (Ubuntu)
-- **Process Manager:** PM2
-- **Reverse Proxy:** Nginx
-- **Database:** Supabase (cloud)
-- **Domain:** (jouw domain hier)
+- Server: Skylabs VM (Ubuntu)
+- Process Manager: PM2
+- Reverse Proxy: Nginx
+- Database: Supabase (cloud)
 
 ## Vereisten
 
-- Ubuntu server (20.04 of hoger)
-- Node.js 18+ geïnstalleerd
-- Nginx geïnstalleerd
-- PM2 geïnstalleerd
-- Domain met DNS configuratie
-- Supabase project (cloud)
+- Ubuntu server (20.04+)
+- Node.js 18+
+- Nginx
+- PM2
+- Supabase project
 
 ## Stap 1: Server Setup
 
 ### Node.js Installeren
 
 ```bash
-# Update package list
 sudo apt update
-
-# Install Node.js 20 (LTS)
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
-
-# Verify installatie
-node --version  # Should be v20.x.x
+node --version
 npm --version
 ```
 
@@ -57,15 +50,12 @@ sudo systemctl start nginx
 ### Clone Repository
 
 ```bash
-# Maak app directory
 sudo mkdir -p /var/www/voyage
 sudo chown $USER:$USER /var/www/voyage
-
-# Clone repo
 cd /var/www/voyage
-git clone <repository-url> .
+git clone https://github.com/sedie02/voyage.git .
 
-# Of als je al code hebt, pull latest
+# of als je al code hebt
 git pull origin main
 ```
 
@@ -76,11 +66,7 @@ cd /var/www/voyage
 npm ci --production
 ```
 
-**Note:** `npm ci` is sneller en betrouwbaarder voor productie dan `npm install`.
-
 ### Environment Variables
-
-Maak `.env.local` bestand:
 
 ```bash
 nano /var/www/voyage/.env.local
@@ -90,115 +76,64 @@ Vul in:
 
 ```env
 NODE_ENV=production
-NEXT_PUBLIC_APP_URL=https://jouw-domain.nl
+NEXT_PUBLIC_APP_URL=http://jouw-skylabs-ip:3000
 
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+NEXT_PUBLIC_SUPABASE_URL=https://kslkoizgefalcxvtjeqg.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzbGtvaXpnZWZhbGN4dnRqZXFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyMjI1NjMsImV4cCI6MjA3NDc5ODU2M30.I2QE4PoC48dr3UavQUmEMsHQLg5HzC1U1TJtUGjd-8k
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzbGtvaXpnZWZhbGN4dnRqZXFnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTIyMjU2MywiZXhwIjoyMDc0Nzk4NTYzfQ.QIkgSdv4yJDfmpaaOF9KVjJ5EQSbGWyog9J5k9ZafvE
 
-# Google Maps
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_key
-
-# Security
-NEXTAUTH_SECRET=generate_with_openssl_rand_base64_32
-NEXTAUTH_URL=https://jouw-domain.nl
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyDYak-2uSDvX8K63127eLHYklyxk1t_J2A
 ```
 
-**Belangrijk:** Zorg dat `.env.local` niet in git staat (staat al in `.gitignore`).
+`.env.local` staat al in `.gitignore`.
 
-## Stap 3: Build Application
+## Stap 3: Build
 
 ```bash
 cd /var/www/voyage
 npm run build
 ```
 
-Dit maakt een productie build in `.next/` folder.
-
-**Troubleshooting:**
-
-- Als build faalt, check environment variables
-- Zorg dat alle dependencies geïnstalleerd zijn
-- Check TypeScript errors: `npm run type-check`
+**Als build faalt:**
+- check environment variables
+- check dependencies: `npm ci`
+- check TypeScript: `npm run type-check`
 
 ## Stap 4: PM2 Setup
 
-### PM2 Configuratie
-
-Maak `ecosystem.config.js` in de root:
-
-```javascript
-module.exports = {
-  apps: [
-    {
-      name: 'voyage',
-      script: 'npm',
-      args: 'start',
-      cwd: '/var/www/voyage',
-      instances: 2, // Run 2 instances voor load balancing
-      exec_mode: 'cluster',
-      env: {
-        NODE_ENV: 'production',
-        PORT: 3000,
-      },
-      error_file: '/var/log/voyage/error.log',
-      out_file: '/var/log/voyage/out.log',
-      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
-      merge_logs: true,
-      autorestart: true,
-      max_memory_restart: '1G',
-    },
-  ],
-};
-```
-
-### Start PM2
+### PM2 Starten
 
 ```bash
-# Maak log directory
 sudo mkdir -p /var/log/voyage
 sudo chown $USER:$USER /var/log/voyage
-
-# Start applicatie
-pm2 start ecosystem.config.js
-
-# Save PM2 config (start automatisch bij reboot)
+pm2 start npm --name voyage -- start
 pm2 save
-pm2 startup  # Volg de instructies die dit commando geeft
+pm2 startup  # volg instructies
 ```
 
 ### PM2 Commands
 
 ```bash
-pm2 status              # Check status
-pm2 logs voyage         # View logs
-pm2 restart voyage      # Restart app
-pm2 stop voyage         # Stop app
-pm2 reload voyage       # Zero-downtime reload
+pm2 status
+pm2 logs voyage
+pm2 restart voyage
+pm2 stop voyage
+pm2 reload voyage
 ```
 
-## Stap 5: Nginx Configuratie
-
-### Nginx Config
-
-Maak configuratie bestand:
+## Stap 5: Nginx Configuratie (optioneel)
 
 ```bash
 sudo nano /etc/nginx/sites-available/voyage
 ```
 
-Plaats deze configuratie:
+**Config:**
 
 ```nginx
 server {
     listen 80;
-    server_name jouw-domain.nl www.jouw-domain.nl;
+    server_name _;
 
-    # Redirect HTTP to HTTPS (als je SSL hebt)
-    # return 301 https://$server_name$request_uri;
-
-    # Voor nu, proxy naar Next.js
     location / {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
@@ -211,7 +146,6 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 
-    # Static files caching
     location /_next/static {
         proxy_pass http://localhost:3000;
         proxy_cache_valid 200 60m;
@@ -220,41 +154,18 @@ server {
 }
 ```
 
-### Enable Site
+**Enable:**
 
 ```bash
-# Create symlink
 sudo ln -s /etc/nginx/sites-available/voyage /etc/nginx/sites-enabled/
-
-# Test configuratie
 sudo nginx -t
-
-# Reload Nginx
 sudo systemctl reload nginx
 ```
 
-## Stap 6: SSL Certificate (Let's Encrypt)
-
-Voor HTTPS (aanbevolen voor productie):
+## Stap 6: Firewall
 
 ```bash
-# Install Certbot
-sudo apt install certbot python3-certbot-nginx
-
-# Get certificate
-sudo certbot --nginx -d jouw-domain.nl -d www.jouw-domain.nl
-
-# Auto-renewal (automatisch geconfigureerd)
-sudo certbot renew --dry-run
-```
-
-Certbot past automatisch je Nginx config aan voor HTTPS.
-
-## Stap 7: Firewall
-
-```bash
-# Allow HTTP/HTTPS
-sudo ufw allow 'Nginx Full'
+sudo ufw allow 3000/tcp
 sudo ufw allow OpenSSH
 sudo ufw enable
 ```
@@ -264,32 +175,23 @@ sudo ufw enable
 ### Update Deployen
 
 ```bash
-# SSH naar server
-ssh user@jouw-server
-
-# Ga naar app directory
 cd /var/www/voyage
-
-# Pull latest code
 git pull origin main
-
-# Install nieuwe dependencies (als die er zijn)
 npm ci --production
-
-# Rebuild
 npm run build
-
-# Reload PM2 (zero-downtime)
 pm2 reload voyage
-
-# Check logs
 pm2 logs voyage --lines 50
 ```
 
-### Rollback (als iets misgaat)
+**Of gebruik deploy script:**
+```bash
+cd /var/www/voyage
+./deploy.sh
+```
+
+### Rollback
 
 ```bash
-# Ga terug naar vorige commit
 cd /var/www/voyage
 git checkout <previous-commit-hash>
 npm ci --production
@@ -299,103 +201,45 @@ pm2 reload voyage
 
 ## Monitoring
 
-### PM2 Monitoring
-
 ```bash
-pm2 monit  # Real-time monitoring
-pm2 logs   # View all logs
-```
-
-### Nginx Logs
-
-```bash
-# Access logs
-sudo tail -f /var/log/nginx/access.log
-
-# Error logs
-sudo tail -f /var/log/nginx/error.log
-```
-
-### Application Logs
-
-```bash
-# PM2 logs
+pm2 monit
 pm2 logs voyage
-
-# Of direct
+sudo tail -f /var/log/nginx/error.log
 tail -f /var/log/voyage/out.log
-tail -f /var/log/voyage/error.log
 ```
 
 ## Troubleshooting
 
-### App start niet
+**App start niet:**
+```bash
+pm2 status
+pm2 logs voyage
+cat .env.local
+ls -la .next/
+```
 
-1. Check PM2 status: `pm2 status`
-2. Check logs: `pm2 logs voyage`
-3. Check environment variables: `cat .env.local`
-4. Check build: `ls -la .next/`
+**502 Bad Gateway:**
+```bash
+pm2 status
+netstat -tulpn | grep 3000
+sudo tail -f /var/log/nginx/error.log
+```
 
-### 502 Bad Gateway
+**Database connectie errors:**
+- check Supabase URL en keys in `.env.local`
+- check of Supabase project actief is
 
-- Check of PM2 draait: `pm2 status`
-- Check of app luistert op poort 3000: `netstat -tulpn | grep 3000`
-- Check Nginx error log: `sudo tail -f /var/log/nginx/error.log`
+**Build errors:**
+```bash
+node --version  # moet 18+ zijn
+npm ci
+npm run type-check
+```
 
-### Database connectie errors
+## Security
 
-- Check Supabase URL en keys in `.env.local`
-- Check of Supabase project actief is
-- Check firewall (Supabase moet toegang hebben)
+- environment variables niet in git
+- firewall actief (UFW)
+- PM2 als non-root user
+- Supabase RLS policies correct
 
-### Build errors
-
-- Check Node.js versie: `node --version` (moet 18+ zijn)
-- Check dependencies: `npm ci`
-- Check TypeScript: `npm run type-check`
-
-## Performance Tips
-
-1. **PM2 Cluster Mode**: Gebruik `exec_mode: 'cluster'` voor multi-core gebruik
-2. **Nginx Caching**: Cache static files (`/_next/static`)
-3. **CDN**: Overweeg Cloudflare voor static assets
-4. **Database**: Supabase heeft al connection pooling, maar check je query performance
-
-## Security Checklist
-
-- [ ] Environment variables zijn niet in git
-- [ ] HTTPS is geconfigureerd (Let's Encrypt)
-- [ ] Firewall is actief (UFW)
-- [ ] PM2 draait als non-root user
-- [ ] Nginx is up-to-date
-- [ ] Node.js is up-to-date
-- [ ] Supabase RLS policies zijn correct
-- [ ] Google Maps API heeft restricties (domain/IP whitelist)
-
-## Backup Strategy
-
-**Database:**
-
-- Supabase heeft automatische backups (cloud)
-- Voor extra backup: gebruik Supabase dashboard → Database → Backups
-
-**Code:**
-
-- Code staat in Git, dus altijd terug te halen
-- Overweeg periodieke backups van `.env.local` (encrypted!)
-
-## Scaling
-
-Als je meer traffic krijgt:
-
-1. **Horizontal Scaling**: Meer PM2 instances (`instances: 'max'`)
-2. **Load Balancer**: Meerdere servers achter load balancer
-3. **Database**: Supabase schaalt automatisch, maar check je plan limits
-4. **CDN**: Cloudflare voor static assets
-
----
-
-**Laatste update:** December 2025
-**Auteurs:** Yassine & Sedäle
-
-**Note:** Deze guide is gebaseerd op onze huidige setup. Als je andere hosting gebruikt (Vercel, Railway, etc.), pas dan aan waar nodig.

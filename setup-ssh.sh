@@ -40,3 +40,4 @@ echo ""
 echo "💡 Na het toevoegen van de key, test met:"
 echo "   ssh student@jouw-skylabs-ip"
 
+

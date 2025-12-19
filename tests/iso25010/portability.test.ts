@@ -1,7 +1,7 @@
 /**
- * ISO/IEC 25010 - Portability Tests
- * T1: Generic Node start
- * T2: Vendor-agnostisch gedrag
+ * ISO 25010 - Portability Tests
+ * T1: Generic Node build & start
+ * T2: Vendor-agnostisch (geen platform-specifieke errors)
  */
 
 import { execSync, spawn } from 'child_process';

@@ -1,49 +1,41 @@
 #!/bin/bash
-# Voyage Deployment Script voor Skylabs
-# Gebruik: ./deploy.sh
+# deploy script voor skylabs
+# run: ./deploy.sh
 
-set -e  # Stop bij errors
+set -e
 
-echo "🚀 Voyage Deployment Script"
-echo "============================"
-
-# Check of we in de juiste directory zijn
 if [ ! -f "package.json" ]; then
-    echo "❌ Error: package.json niet gevonden. Zorg dat je in de voyage directory bent."
+    echo "fout: package.json niet gevonden"
     exit 1
 fi
 
-# Check Node.js
 if ! command -v node &> /dev/null; then
-    echo "❌ Node.js niet gevonden. Installeer eerst Node.js 20+"
+    echo "fout: node.js niet gevonden"
     exit 1
 fi
 
-echo "📦 Pulling latest code..."
-git pull origin main || echo "⚠️  Git pull failed, maar we gaan door..."
+echo "pulling latest code..."
+git pull origin main || echo "git pull gefaald, maar we gaan door"
 
-echo "📥 Installing dependencies..."
+echo "installing dependencies..."
 npm ci --production
 
-echo "🔨 Building application..."
+echo "building..."
 npm run build
 
-echo "🔄 Reloading PM2..."
+echo "reloading pm2..."
 if command -v pm2 &> /dev/null; then
     pm2 reload voyage || pm2 start npm --name voyage -- start
     pm2 save
-    echo "✅ PM2 reloaded"
+    echo "pm2 reloaded"
 else
-    echo "⚠️  PM2 niet gevonden. Start handmatig met: npm start"
+    echo "pm2 niet gevonden, start handmatig: npm start"
 fi
 
 echo ""
-echo "✅ Deployment voltooid!"
+echo "klaar!"
 echo ""
-echo "📊 Check status:"
-echo "   pm2 status"
-echo ""
-echo "📋 View logs:"
-echo "   pm2 logs voyage --lines 50"
-echo ""
+echo "check status: pm2 status"
+echo "check logs: pm2 logs voyage --lines 50"
+
 
