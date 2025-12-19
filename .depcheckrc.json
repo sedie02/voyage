@@ -20,4 +20,3 @@
   ],
   "ignorePatterns": ["*.test.ts", "*.spec.ts", "*.e2e.ts"]
 }
-

@@ -43,4 +43,3 @@ npm run dev
 ## Testen
 
 Ga naar `/trips/new` en zoek een stad. Je zou autocomplete suggesties moeten zien.
-

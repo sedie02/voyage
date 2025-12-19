@@ -95,6 +95,7 @@ npm run build
 ```
 
 **Als build faalt:**
+
 - check environment variables
 - check dependencies: `npm ci`
 - check TypeScript: `npm run type-check`
@@ -184,6 +185,7 @@ pm2 logs voyage --lines 50
 ```
 
 **Of gebruik deploy script:**
+
 ```bash
 cd /var/www/voyage
 ./deploy.sh
@@ -211,6 +213,7 @@ tail -f /var/log/voyage/out.log
 ## Troubleshooting
 
 **App start niet:**
+
 ```bash
 pm2 status
 pm2 logs voyage
@@ -219,6 +222,7 @@ ls -la .next/
 ```
 
 **502 Bad Gateway:**
+
 ```bash
 pm2 status
 netstat -tulpn | grep 3000
@@ -226,10 +230,12 @@ sudo tail -f /var/log/nginx/error.log
 ```
 
 **Database connectie errors:**
+
 - check Supabase URL en keys in `.env.local`
 - check of Supabase project actief is
 
 **Build errors:**
+
 ```bash
 node --version  # moet 18+ zijn
 npm ci
@@ -242,4 +248,3 @@ npm run type-check
 - firewall actief (UFW)
 - PM2 als non-root user
 - Supabase RLS policies correct
-

@@ -279,4 +279,3 @@ Belangrijke configuratie files in de root:
 
 **Laatste update:** December 2025
 **Auteurs:** Yassine & Sedäle
-

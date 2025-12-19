@@ -30,11 +30,13 @@ npm run test:infoquality     # Information quality tests
 Na het uitvoeren van tests wordt automatisch een HTML rapport gegenereerd in `playwright-report/`.
 
 Open het rapport:
+
 ```bash
 npx playwright show-report
 ```
 
 Of open handmatig:
+
 ```bash
 open playwright-report/index.html  # macOS
 xdg-open playwright-report/index.html  # Linux
@@ -44,6 +46,7 @@ start playwright-report/index.html  # Windows
 ## Rapport Inhoud
 
 Het HTML rapport bevat:
+
 - Test overzicht (passed/failed/skipped)
 - Per test: screenshots bij failures
 - Video opnames bij failures
@@ -54,6 +57,7 @@ Het HTML rapport bevat:
 ## CI/CD Integratie
 
 In CI (GitHub Actions) worden tests uitgevoerd met:
+
 - HTML reporter (voor artefacten)
 - GitHub reporter (voor inline comments)
 - Screenshots en videos worden bewaard bij failures
@@ -67,9 +71,9 @@ In CI (GitHub Actions) worden tests uitgevoerd met:
 ## Configuratie
 
 Zie `playwright.config.ts` voor:
+
 - Timeout settings (30s per test)
 - Retry logic (2 retries in CI)
 - Screenshot/video settings
 - Browser configuratie (Chromium)
 - Reporter configuratie
-

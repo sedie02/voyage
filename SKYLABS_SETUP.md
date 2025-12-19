@@ -194,10 +194,12 @@ pm2 reload voyage
 ## Troubleshooting
 
 **Git clone vraagt om password:**
+
 - gebruik SSH key (stap 5 optie B)
 - of GitHub Personal Access Token
 
 **npm ci faalt:**
+
 ```bash
 node --version  # moet 20+ zijn
 rm -rf node_modules package-lock.json
@@ -205,12 +207,14 @@ npm install
 ```
 
 **Build faalt:**
+
 ```bash
 npm run build 2>&1 | tee build.log
 npm run type-check
 ```
 
 **PM2 start niet:**
+
 ```bash
 pm2 logs voyage
 sudo lsof -i :3000
@@ -219,6 +223,7 @@ npm start
 ```
 
 **App niet bereikbaar:**
+
 ```bash
 pm2 status
 sudo ufw status
@@ -247,4 +252,3 @@ top
 ```
 
 **Klaar!** App draait op `http://jouw-skylabs-ip:3000`
-
