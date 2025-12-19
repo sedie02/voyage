@@ -1,6 +1,6 @@
 # VM Runbook - Voyage Deployment
 
-Korte referentie voor VM-deployment (bijv. Skylabs). 
+Korte referentie voor VM-deployment (bijv. Skylabs).
 
 **Note**: Productie draait op Vercel (voyagetravel.nl). Deze configuratie is voor VM-hosting en toont aan dat de app generiek deploybaar is zonder vendor-lock-in.
 

@@ -408,4 +408,3 @@ https://www.getyourguide.com/s/?q=Barcelona&searchId=adventure,excursion
 
 **Laatste update:** December 2025
 **Auteurs:** Yassine & Sedäle
-
