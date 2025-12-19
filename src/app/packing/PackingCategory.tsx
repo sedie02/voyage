@@ -4,7 +4,8 @@
  * Packing Category Component - Een categorie met items
  */
 
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState, useTransition } from 'react';
 import { addItem, deleteCategory } from './actions';
 import PackingItem from './PackingItem';
 
@@ -25,15 +26,21 @@ interface PackingCategoryProps {
 
 export default function PackingCategory({
   category,
-  items,
+  items: initialItems,
   tripId,
   currentUserName,
 }: PackingCategoryProps) {
+  const router = useRouter();
+  const [, startTransition] = useTransition();
   const [showAddItem, setShowAddItem] = useState(false);
   const [newItemName, setNewItemName] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Optimistic UI: local state voor items
+  const [localItems, setLocalItems] = useState(initialItems);
 
+  // Use local items for display (optimistic updates)
+  const items = localItems;
   const checkedCount = items.filter((item) => item.checked).length;
   const totalCount = items.length;
   const progressPercentage = totalCount > 0 ? (checkedCount / totalCount) * 100 : 0;
@@ -45,23 +52,49 @@ export default function PackingCategory({
     setIsAdding(true);
     setError(null);
 
+    // Save current state for rollback
+    const previousItems = [...localItems];
+    const itemName = newItemName.trim();
+
+    // Optimistic update: voeg item direct toe aan UI
+    const tempId = `temp-${Date.now()}`;
+    const optimisticItem = {
+      id: tempId,
+      name: itemName,
+      checked: false,
+      taken_by: null,
+    };
+    setLocalItems([...previousItems, optimisticItem]);
+    setNewItemName('');
+    setShowAddItem(false);
+
     try {
       const formData = new FormData();
       formData.append('category_id', category.id);
       formData.append('trip_id', tripId);
-      formData.append('name', newItemName.trim());
+      formData.append('name', itemName);
 
       const result = await addItem(formData);
 
       if (result?.error) {
+        // Rollback optimistic update bij error
+        setLocalItems(previousItems);
         setError(result.error);
+        setShowAddItem(true);
+        setNewItemName(itemName);
       } else {
-        setNewItemName('');
-        setShowAddItem(false);
+        // Refresh data in background (zonder blocking)
+        startTransition(() => {
+          router.refresh();
+        });
       }
     } catch (err) {
+      // Rollback optimistic update bij error
+      setLocalItems(previousItems);
       console.error('❌ Unexpected error:', err);
       setError('Er ging iets mis. Probeer opnieuw.');
+      setShowAddItem(true);
+      setNewItemName(itemName);
     } finally {
       setIsAdding(false);
     }
@@ -73,7 +106,10 @@ export default function PackingCategory({
         `Weet je zeker dat je de categorie "${category.name}" wilt verwijderen? Alle items worden ook verwijderd.`
       )
     ) {
-      await deleteCategory(category.id);
+      startTransition(async () => {
+        await deleteCategory(category.id);
+        router.refresh();
+      });
     }
   };
 
@@ -121,9 +157,11 @@ export default function PackingCategory({
           <p className="py-4 text-center text-sm text-gray-400">Nog geen items in deze categorie</p>
         )}
 
-        {items.map((item) => (
-          <PackingItem key={item.id} item={item} currentUserName={currentUserName} />
-        ))}
+        {items
+          .filter((item) => item.name && item.name.trim().length > 0) // Filter out deleted items (optimistic update)
+          .map((item) => (
+            <PackingItem key={item.id} item={item} currentUserName={currentUserName} />
+          ))}
 
         {/* Add Item Form */}
         {showAddItem ? (

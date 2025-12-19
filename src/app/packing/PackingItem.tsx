@@ -4,7 +4,8 @@
  * Packing Item Component - Client Component voor interactieve item
  */
 
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState, useTransition } from 'react';
 import { deleteItem, takeItem, toggleItemChecked, untakeItem } from './actions';
 
 interface PackingItemProps {
@@ -17,12 +18,37 @@ interface PackingItemProps {
   currentUserName?: string;
 }
 
-export default function PackingItem({ item, currentUserName }: PackingItemProps) {
+export default function PackingItem({ item: initialItem, currentUserName }: PackingItemProps) {
+  const router = useRouter();
+  const [, startTransition] = useTransition();
   const [showTakeModal, setShowTakeModal] = useState(false);
   const [userName, setUserName] = useState(currentUserName || '');
 
+  // Optimistic UI: local state voor item
+  const [item, setItem] = useState(initialItem);
+
   const handleCheck = async () => {
-    await toggleItemChecked(item.id, item.checked);
+    // Optimistic update: toggle direct in UI
+    const newChecked = !item.checked;
+    setItem({ ...item, checked: newChecked });
+
+    try {
+      const result = await toggleItemChecked(item.id, item.checked);
+      if (result?.error) {
+        // Rollback bij error
+        setItem(initialItem);
+        alert(result.error);
+      } else {
+        // Refresh in background
+        startTransition(() => {
+          router.refresh();
+        });
+      }
+    } catch (err) {
+      // Rollback bij error
+      setItem(initialItem);
+      console.error('Error toggling item:', err);
+    }
   };
 
   const handleTake = async () => {
@@ -30,17 +56,80 @@ export default function PackingItem({ item, currentUserName }: PackingItemProps)
       alert('Vul je naam in');
       return;
     }
-    await takeItem(item.id, userName.trim());
+
+    // Optimistic update
+    setItem({ ...item, taken_by: userName.trim() });
     setShowTakeModal(false);
+
+    try {
+      const result = await takeItem(item.id, userName.trim());
+      if (result?.error) {
+        // Rollback bij error
+        setItem(initialItem);
+        alert(result.error);
+        setShowTakeModal(true);
+      } else {
+        // Refresh in background
+        startTransition(() => {
+          router.refresh();
+        });
+      }
+    } catch (err) {
+      // Rollback bij error
+      setItem(initialItem);
+      setShowTakeModal(true);
+      console.error('Error taking item:', err);
+    }
   };
 
   const handleUntake = async () => {
-    await untakeItem(item.id);
+    // Optimistic update
+    setItem({ ...item, taken_by: null });
+
+    try {
+      const result = await untakeItem(item.id);
+      if (result?.error) {
+        // Rollback bij error
+        setItem(initialItem);
+        alert(result.error);
+      } else {
+        // Refresh in background
+        startTransition(() => {
+          router.refresh();
+        });
+      }
+    } catch (err) {
+      // Rollback bij error
+      setItem(initialItem);
+      console.error('Error untaking item:', err);
+    }
   };
 
   const handleDelete = async () => {
-    if (confirm('Weet je zeker dat je dit item wilt verwijderen?')) {
-      await deleteItem(item.id);
+    if (!confirm('Weet je zeker dat je dit item wilt verwijderen?')) {
+      return;
+    }
+
+    // Optimistic update: hide item immediately
+    const previousItem = item;
+    setItem({ ...item, name: '', checked: false }); // Hide visually
+
+    try {
+      const result = await deleteItem(item.id);
+      if (result?.error) {
+        // Rollback bij error
+        setItem(previousItem);
+        alert(result.error);
+      } else {
+        // Refresh in background
+        startTransition(() => {
+          router.refresh();
+        });
+      }
+    } catch (err) {
+      // Rollback bij error
+      setItem(previousItem);
+      console.error('Error deleting item:', err);
     }
   };
 

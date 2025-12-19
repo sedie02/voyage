@@ -243,6 +243,11 @@ export async function acceptInvite(
         delete retryData.guest_email;
       }
 
+      // Try without guest_session_id (if column doesn't exist)
+      if (participantError.message?.includes('guest_session_id')) {
+        delete retryData.guest_session_id;
+      }
+
       try {
         const retry = await supabase.from('trip_participants').insert(retryData);
         participantError = retry.error;

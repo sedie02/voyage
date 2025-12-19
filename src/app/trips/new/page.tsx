@@ -14,7 +14,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 type TripType = 'adventure' | 'beach' | 'culture' | 'nature' | 'mixed';
 
-const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyBRCqv9EXAMPLE';
+const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
 export default function NewTripPage() {
   const [isPending, startTransition] = useTransition();
@@ -41,6 +41,12 @@ export default function NewTripPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validatie: destination moet ingevuld zijn
+    if (!formData.destination || formData.destination.trim().length === 0) {
+      setError('Vul alsjeblieft een bestemming in');
+      return;
+    }
 
     if (!formData.startDate || !formData.endDate) {
       setError('Selecteer alsjeblieft beide datums');
@@ -219,32 +225,80 @@ export default function NewTripPage() {
                 <label className="mb-2 block text-sm font-bold text-text">
                   Bestemming <span className="text-primary">*</span>
                 </label>
-                <Autocomplete
-                  apiKey={GOOGLE_MAPS_API_KEY}
-                  onPlaceSelected={(place) => {
-                    if (place && place.formatted_address) {
+                {GOOGLE_MAPS_API_KEY ? (
+                  <div className="relative">
+                    <Autocomplete
+                      apiKey={GOOGLE_MAPS_API_KEY}
+                      onPlaceSelected={(place) => {
+                        if (place && place.formatted_address) {
+                          const placeWithComponents = place as {
+                            formatted_address: string;
+                            address_components?: Array<{
+                              types: string[];
+                              long_name: string;
+                            }>;
+                          };
+                          setFormData({
+                            ...formData,
+                            destination: place.formatted_address,
+                            city:
+                              placeWithComponents.address_components?.find((c) =>
+                                c.types.includes('locality')
+                              )?.long_name || '',
+                            country:
+                              placeWithComponents.address_components?.find((c) =>
+                                c.types.includes('country')
+                              )?.long_name || '',
+                          });
+                          setError(null);
+                        }
+                      }}
+                      options={{
+                        types: ['(cities)'],
+                        fields: ['formatted_address', 'address_components', 'geometry'],
+                      }}
+                      placeholder="bijv. Barcelona, Spanje of Malaga, Spanje"
+                      className="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm font-medium text-text transition-all focus:border-primary focus:ring-4 focus:ring-primary/20 sm:px-5 sm:py-4 sm:text-base"
+                      style={{ width: '100%' }}
+                      defaultValue={formData.destination}
+                      onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                        // Fallback: als gebruiker handmatig typt zonder autocomplete te selecteren
+                        const value = e.target.value.trim();
+                        if (value && value !== formData.destination) {
+                          setFormData({
+                            ...formData,
+                            destination: value,
+                          });
+                          setError(null);
+                        }
+                      }}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        // Update destination als gebruiker typt (voor fallback)
+                        const value = e.target.value;
+                        setFormData({
+                          ...formData,
+                          destination: value,
+                        });
+                        setError(null);
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <input
+                    type="text"
+                    value={formData.destination}
+                    onChange={(e) => {
+                      const value = e.target.value;
                       setFormData({
                         ...formData,
-                        destination: place.formatted_address,
-                        city:
-                          (place as any).address_components?.find((c: any) =>
-                            c.types.includes('locality')
-                          )?.long_name || '',
-                        country:
-                          (place as any).address_components?.find((c: any) =>
-                            c.types.includes('country')
-                          )?.long_name || '',
+                        destination: value,
                       });
-                    }
-                  }}
-                  options={{
-                    types: ['(cities)'],
-                    fields: ['formatted_address', 'address_components', 'geometry'],
-                  }}
-                  placeholder="bijv. Barcelona, Spanje"
-                  className="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm font-medium text-text transition-all focus:border-primary focus:ring-4 focus:ring-primary/20 sm:px-5 sm:py-4 sm:text-base"
-                  style={{ width: '100%' }}
-                />
+                      setError(null);
+                    }}
+                    placeholder="bijv. Barcelona, Spanje of Malaga, Spanje"
+                    className="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm font-medium text-text transition-all focus:border-primary focus:ring-4 focus:ring-primary/20 sm:px-5 sm:py-4 sm:text-base"
+                  />
+                )}
                 {formData.destination && (
                   <div className="mt-3 rounded-xl border border-primary/20 bg-primary-50 p-3 sm:p-4">
                     <div className="flex items-center gap-2">
@@ -405,7 +459,11 @@ export default function NewTripPage() {
             {step < 4 ? (
               <button
                 type="button"
-                onClick={() => setStep(step + 1)}
+                onClick={() => {
+                  // Clear error when moving to next step
+                  setError(null);
+                  setStep(step + 1);
+                }}
                 disabled={!canContinue()}
                 className="flex-1 rounded-full bg-primary px-5 py-3 text-sm font-bold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 sm:px-6 sm:py-4 sm:text-base"
               >
