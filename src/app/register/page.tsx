@@ -18,13 +18,40 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
 
-    if (password !== confirmPassword) {
-      setError('Wachtwoorden komen niet overeen');
+    // Validatie
+    if (name && name.length > 100) {
+      setError('Naam is te lang (maximaal 100 karakters)');
       return;
     }
 
-    if (password.length < 6) {
+    if (!email || !email.trim()) {
+      setError('Vul een e-mailadres in');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Vul een geldig e-mailadres in');
+      return;
+    }
+
+    if (email.length > 255) {
+      setError('E-mailadres is te lang (maximaal 255 karakters)');
+      return;
+    }
+
+    if (!password || password.length < 6) {
       setError('Wachtwoord moet minimaal 6 tekens lang zijn');
+      return;
+    }
+
+    if (password.length > 128) {
+      setError('Wachtwoord is te lang (maximaal 128 karakters)');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Wachtwoorden komen niet overeen');
       return;
     }
 
@@ -125,6 +152,7 @@ export default function RegisterPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              maxLength={100}
               placeholder="Jouw naam"
               className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
@@ -137,6 +165,7 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              maxLength={255}
               placeholder="jouw@email.nl"
               className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
@@ -151,6 +180,7 @@ export default function RegisterPage() {
               required
               placeholder="••••••••"
               minLength={6}
+              maxLength={128}
               className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
             <p className="mt-1 text-xs text-gray-500">Minimaal 6 tekens</p>
@@ -167,6 +197,7 @@ export default function RegisterPage() {
               required
               placeholder="••••••••"
               minLength={6}
+              maxLength={128}
               className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>

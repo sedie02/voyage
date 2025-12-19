@@ -15,12 +15,40 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    // Validatie
+    if (!email || !email.trim()) {
+      setError('Vul een e-mailadres in');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Vul een geldig e-mailadres in');
+      return;
+    }
+
+    if (email.length > 255) {
+      setError('E-mailadres is te lang (maximaal 255 karakters)');
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      setError('Wachtwoord moet minimaal 6 tekens lang zijn');
+      return;
+    }
+
+    if (password.length > 128) {
+      setError('Wachtwoord is te lang (maximaal 128 karakters)');
+      return;
+    }
+
     setLoading(true);
 
     try {
       const supabase = createClient();
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       });
 
@@ -77,6 +105,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              maxLength={255}
               placeholder="jouw@email.nl"
               className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
@@ -89,6 +118,8 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
+              maxLength={128}
               placeholder="••••••••"
               className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />

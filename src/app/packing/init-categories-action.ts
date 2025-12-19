@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 
 export async function initializeDefaultCategories(tripId: string) {
   const supabase = await createClient();
-  
+
   // Get user or guest session
   const {
     data: { user },
@@ -39,7 +39,7 @@ export async function initializeDefaultCategories(tripId: string) {
           .select('id')
           .eq('trip_id', tripId)
           .limit(1);
-        
+
         if (existingService && existingService.length > 0) {
           revalidatePath(`/trips/${tripId}`);
           return { success: true, message: 'Categorieën bestaan al!' };
@@ -82,7 +82,7 @@ export async function initializeDefaultCategories(tripId: string) {
           }))
         )
         .select();
-      
+
       data = result.data;
       insertError = result.error;
     }

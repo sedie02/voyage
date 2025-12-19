@@ -120,21 +120,42 @@ export async function updateTrip(
     startDate: string;
     endDate: string;
     description?: string;
+    activitiesBudget?: number;
   }
 ) {
   try {
     const supabase = await createClient();
 
-    const { error } = await supabase
+    // Fetch city photo URL if destination changed
+    const { data: currentTrip } = await supabase
       .from('trips')
-      .update({
-        title: formData.title,
-        destination: formData.destination,
-        start_date: formData.startDate,
-        end_date: formData.endDate,
-        description: formData.description || null,
-      })
-      .eq('id', tripId);
+      .select('destination')
+      .eq('id', tripId)
+      .single();
+
+    let cityPhotoUrl: string | null = null;
+    if (currentTrip && currentTrip.destination !== formData.destination) {
+      const { getCityPhotoUrl } = await import('@/lib/external/places');
+      cityPhotoUrl = await getCityPhotoUrl(formData.destination);
+    }
+
+    const updateData: any = {
+      title: formData.title,
+      destination: formData.destination,
+      start_date: formData.startDate,
+      end_date: formData.endDate,
+      description: formData.description || null,
+    };
+
+    if (typeof formData.activitiesBudget === 'number') {
+      updateData.activities_budget = formData.activitiesBudget;
+    }
+
+    if (cityPhotoUrl) {
+      updateData.city_photo_url = cityPhotoUrl;
+    }
+
+    const { error } = await supabase.from('trips').update(updateData).eq('id', tripId);
 
     if (error) {
       if (process.env.NODE_ENV !== 'test' && !process.env.CI) {

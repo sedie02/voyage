@@ -4,7 +4,10 @@ import BottomNav from '@/components/BottomNav';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
+import Autocomplete from 'react-google-autocomplete';
 import { archiveTrip, deleteTrip, duplicateTrip, updateTrip } from '../../actions';
+
+const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
 interface EditTripClientProps {
   trip: any;
@@ -23,16 +26,39 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
     endDate: trip.end_date,
     description: trip.description || '',
     tripType: trip.travel_style || 'mixed',
+    activitiesBudget: trip.activities_budget ? String(trip.activities_budget) : '',
   });
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validatie
+    if (!formData.title || formData.title.trim().length === 0) {
+      setError('Vul een titel in');
+      return;
+    }
+
+    if (!formData.destination || formData.destination.trim().length === 0) {
+      setError('Vul een bestemming in');
+      return;
+    }
+
+    const budgetNum = formData.activitiesBudget
+      ? Number(formData.activitiesBudget)
+      : null;
+    if (formData.activitiesBudget && (isNaN(budgetNum!) || budgetNum! <= 0)) {
+      setError('Vul een geldig budget in (meer dan 0)');
+      return;
+    }
+
     startTransition(async () => {
       try {
         setError(null);
         setSuccess(null);
-        await updateTrip(trip.id, formData);
+        await updateTrip(trip.id, {
+          ...formData,
+          activitiesBudget: budgetNum || undefined,
+        });
         setSuccess('Reis succesvol bijgewerkt!');
         setTimeout(() => {
           router.push(`/trips/${trip.id}`);
@@ -200,14 +226,47 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
                 >
                   Bestemming <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  id="destination"
-                  required
-                  value={formData.destination}
-                  onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 transition-all focus:border-transparent focus:ring-2 focus:ring-sky-500"
-                />
+                {GOOGLE_MAPS_API_KEY ? (
+                  <Autocomplete
+                    apiKey={GOOGLE_MAPS_API_KEY}
+                    onPlaceSelected={(place) => {
+                      if (place && place.formatted_address) {
+                        setFormData({
+                          ...formData,
+                          destination: place.formatted_address,
+                        });
+                        setError(null);
+                      }
+                    }}
+                    options={{
+                      types: ['(cities)'],
+                      fields: ['formatted_address', 'address_components', 'geometry'],
+                    }}
+                    placeholder="bijv. Barcelona, Spanje"
+                    defaultValue={formData.destination}
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 transition-all focus:border-transparent focus:ring-2 focus:ring-sky-500"
+                    style={{ width: '100%' }}
+                    onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                      const value = e.target.value.trim();
+                      if (value && value !== formData.destination) {
+                        setFormData({
+                          ...formData,
+                          destination: value,
+                        });
+                        setError(null);
+                      }
+                    }}
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    id="destination"
+                    required
+                    value={formData.destination}
+                    onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 transition-all focus:border-transparent focus:ring-2 focus:ring-sky-500"
+                  />
+                )}
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -259,6 +318,30 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
                   rows={4}
                   className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-gray-900 transition-all focus:border-transparent focus:ring-2 focus:ring-sky-500"
                 />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="activitiesBudget"
+                  className="mb-2 block text-sm font-semibold text-gray-700"
+                >
+                  Budget voor activiteiten (EUR)
+                </label>
+                <input
+                  type="number"
+                  id="activitiesBudget"
+                  min="0"
+                  step="1"
+                  placeholder="bijv. 300"
+                  value={formData.activitiesBudget}
+                  onChange={(e) =>
+                    setFormData({ ...formData, activitiesBudget: e.target.value })
+                  }
+                  className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 transition-all focus:border-transparent focus:ring-2 focus:ring-sky-500"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Optioneel: totale budget voor activiteiten en uitgaven tijdens deze reis
+                </p>
               </div>
             </div>
           </form>
