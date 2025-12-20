@@ -5,7 +5,6 @@ import ItineraryTab from '@/components/ItineraryTab';
 import ParticipantList from '@/components/ParticipantList';
 import ShareTripModal from '@/components/ShareTripModal';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import PackingTabContent from './PackingTabContent';
 
@@ -36,6 +35,7 @@ interface TripDetailClientProps {
   days?: any[];
   packingCategories?: any[];
   packingItems?: any[];
+  initialTab?: string;
 }
 
 export default function TripDetailClient({
@@ -48,18 +48,26 @@ export default function TripDetailClient({
   days = [],
   packingCategories = [],
   packingItems = [],
+  initialTab,
 }: TripDetailClientProps) {
-  const searchParams = useSearchParams();
-  const tabFromUrl = searchParams.get('tab');
-  const [activeTab, setActiveTab] = useState(tabFromUrl || 'overview');
+  const [activeTab, setActiveTab] = useState(initialTab || 'overview');
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
-  // Update activeTab when URL parameter changes
+  // Update activeTab when URL parameter changes (client-side navigation)
   useEffect(() => {
-    if (tabFromUrl) {
-      setActiveTab(tabFromUrl);
-    }
-  }, [tabFromUrl]);
+    const updateTabFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab) {
+        setActiveTab(tab);
+      }
+    };
+
+    updateTabFromUrl();
+    // Listen for popstate events (back/forward navigation)
+    window.addEventListener('popstate', updateTabFromUrl);
+    return () => window.removeEventListener('popstate', updateTabFromUrl);
+  }, []);
   // Debug: log imported PackingTabContent shape to debug invalid element type errors
 
   try {

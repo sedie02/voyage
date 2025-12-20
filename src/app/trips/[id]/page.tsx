@@ -3,8 +3,15 @@ import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import TripDetailClient from './TripDetailClient';
 
-export default async function TripDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function TripDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const { id } = await params;
+  const { tab } = await searchParams;
   const supabase = await createClient();
 
   // Get current user for permission check
@@ -430,6 +437,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
       days={days || []}
       packingCategories={packingCategories || []}
       packingItems={packingItems || []}
+      initialTab={tab}
     />
   );
 }
