@@ -88,12 +88,12 @@ NODE_ENV=production
 NEXT_PUBLIC_APP_URL=http://jouw-skylabs-ip:3000
 
 # Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://kslkoizgefalcxvtjeqg.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzbGtvaXpnZWZhbGN4dnRqZXFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyMjI1NjMsImV4cCI6MjA3NDc5ODU2M30.I2QE4PoC48dr3UavQUmEMsHQLg5HzC1U1TJtUGjd-8k
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzbGtvaXpnZWZhbGN4dnRqZXFnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTIyMjU2MywiZXhwIjoyMDc0Nzk4NTYzfQ.QIkgSdv4yJDfmpaaOF9KVjJ5EQSbGWyog9J5k9ZafvE
+NEXT_PUBLIC_SUPABASE_URL=https://jouw-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=jouw_supabase_anon_key_hier
+SUPABASE_SERVICE_ROLE_KEY=jouw_supabase_service_role_key_hier
 
 # Google Maps
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyDYak-2uSDvX8K63127eLHYklyxk1t_J2A
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=jouw_google_maps_api_key_hier
 ```
 
 **Save:** `Ctrl+X`, dan `Y`, dan `Enter`
