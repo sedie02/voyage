@@ -40,23 +40,7 @@ export default function ItineraryTab({ tripId, days, isOwner }: ItineraryTabProp
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Debug logging
-  console.log('📅 ItineraryTab loaded:', {
-    tripId,
-    daysCount: days.length,
-    isOwner,
-    days: days.map((day) => ({
-      id: day.id,
-      day_number: day.day_number,
-      date: day.date,
-      activitiesCount: day.activities?.length || 0,
-      activities: day.activities?.map((a: any) => ({
-        id: a.id,
-        title: a.title,
-        day_part: a.day_part,
-      })),
-    })),
-  });
+  // ItineraryTab loaded
 
   const handleGenerate = () => {
     if (!isOwner) {
@@ -238,14 +222,6 @@ export default function ItineraryTab({ tripId, days, isOwner }: ItineraryTabProp
             </div>
 
             {(() => {
-              console.log(`📅 Day ${day.day_number} activities check:`, {
-                dayId: day.id,
-                hasActivities: !!day.activities,
-                isArray: Array.isArray(day.activities),
-                length: day.activities?.length || 0,
-                activities: day.activities,
-              });
-
               return day.activities &&
                 Array.isArray(day.activities) &&
                 day.activities.length > 0 ? (

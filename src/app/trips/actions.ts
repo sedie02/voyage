@@ -24,8 +24,7 @@ export async function createTrip(formData: {
     } = await supabase.auth.getUser();
     const guestSessionId = user ? null : await getOrCreateGuestSession();
 
-    if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
-    }
+    // Trip creation in progress
 
     const composedDescription = [
       formData.description?.trim(),
@@ -100,8 +99,7 @@ export async function createTrip(formData: {
       message: 'Trip succesvol aangemaakt',
     };
   } catch (error) {
-    if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
-    }
+    // Trip creation in progress
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -163,8 +161,7 @@ export async function updateTrip(
     revalidatePath(`/trips/${tripId}`);
     redirect(`/trips/${tripId}`);
   } catch (error) {
-    if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
-    }
+    // Trip creation in progress
     throw error;
   }
 }
