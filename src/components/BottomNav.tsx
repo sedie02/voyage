@@ -22,6 +22,10 @@ export default function BottomNav() {
     checkTrips();
   }, [pathname]);
 
+  // Extract trip ID from pathname if we're on a trip detail page
+  const tripIdMatch = pathname?.match(/^\/trips\/([^\/]+)$/);
+  const currentTripId = tripIdMatch ? tripIdMatch[1] : null;
+
   const isActive = (path: string) => {
     if (path === '/trips') {
       return pathname === '/trips' || pathname?.startsWith('/trips/');
@@ -117,9 +121,15 @@ export default function BottomNav() {
         </Link>
 
         <Link
-          href={getNavLink('/packing')}
+          href={
+            currentTripId
+              ? `/trips/${currentTripId}?tab=packing`
+              : getNavLink('/packing')
+          }
           className={`flex flex-col items-center gap-1 rounded-full px-4 py-2.5 transition-all duration-200 sm:px-6 ${
-            isActive('/packing') ? 'bg-primary-50 text-primary' : 'text-text-muted hover:text-text'
+            isActive('/packing') || pathname?.startsWith('/trips/')
+              ? 'bg-primary-50 text-primary'
+              : 'text-text-muted hover:text-text'
           }`}
         >
           <svg

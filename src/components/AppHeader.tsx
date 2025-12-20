@@ -7,6 +7,20 @@ export default function AppHeader() {
   const pathname = usePathname();
   const isCurrent = (p: string) => pathname === p || pathname?.startsWith(`${p}/`);
 
+  // Extract trip ID from pathname if we're on a trip detail page
+  const tripIdMatch = pathname?.match(/^\/trips\/([^\/]+)$/);
+  const currentTripId = tripIdMatch ? tripIdMatch[1] : null;
+
+  const navItems = [
+    { href: '/trips', label: 'Plan' },
+    { href: '/budget', label: 'Budget' },
+    {
+      href: currentTripId ? `/trips/${currentTripId}?tab=packing` : '/packing',
+      label: 'Pack',
+    },
+    { href: '/discover', label: 'Ontdek' },
+  ];
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-surface/90 backdrop-blur">
       <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -25,19 +39,16 @@ export default function AppHeader() {
         </Link>
 
         <nav className="hidden items-center gap-1 sm:flex" aria-label="Hoofdnavigatie">
-          {[
-            { href: '/trips', label: 'Plan' },
-            { href: '/budget', label: 'Budget' },
-            { href: '/packing', label: 'Pack' },
-            { href: '/discover', label: 'Ontdek' },
-          ].map((item) => (
+          {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={`rounded-full px-3 py-1.5 text-sm font-semibold transition-colors ${
-                isCurrent(item.href)
+                isCurrent('/trips') && item.label === 'Pack'
                   ? 'bg-primary-50 text-primary'
-                  : 'text-text-muted hover:text-text'
+                  : isCurrent(item.href)
+                    ? 'bg-primary-50 text-primary'
+                    : 'text-text-muted hover:text-text'
               }`}
             >
               {item.label}

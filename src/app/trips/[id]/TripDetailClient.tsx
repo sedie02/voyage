@@ -5,7 +5,8 @@ import ItineraryTab from '@/components/ItineraryTab';
 import ParticipantList from '@/components/ParticipantList';
 import ShareTripModal from '@/components/ShareTripModal';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import PackingTabContent from './PackingTabContent';
 
 // Destination gradient helper
@@ -48,8 +49,17 @@ export default function TripDetailClient({
   packingCategories = [],
   packingItems = [],
 }: TripDetailClientProps) {
-  const [activeTab, setActiveTab] = useState('overview');
+  const searchParams = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabFromUrl || 'overview');
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  // Update activeTab when URL parameter changes
+  useEffect(() => {
+    if (tabFromUrl) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
   // Debug: log imported PackingTabContent shape to debug invalid element type errors
 
   try {
