@@ -22,7 +22,8 @@ export default function BudgetPage() {
             </svg>
             <h2 className="mb-3 text-2xl font-bold text-gray-900">Budget Beheer</h2>
             <p className="mx-auto mb-10 max-w-md leading-relaxed text-gray-600">
-              We zijn nog bezig met het ontwikkelen van de budget functionaliteit. Deze pagina komt binnenkort beschikbaar.
+              We zijn nog bezig met het ontwikkelen van de budget functionaliteit. Deze pagina komt
+              binnenkort beschikbaar.
             </p>
             <Link
               href="/trips"
@@ -37,4 +38,3 @@ export default function BudgetPage() {
     </div>
   );
 }
-

@@ -88,7 +88,9 @@ export default function LoginPage() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Inloggen</h1>
-          <p className="mt-1.5 text-sm text-gray-600 sm:mt-2 sm:text-base">Log in op je Voyage account</p>
+          <p className="mt-1.5 text-sm text-gray-600 sm:mt-2 sm:text-base">
+            Log in op je Voyage account
+          </p>
         </div>
 
         {error && (
@@ -99,7 +101,9 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-3 sm:space-y-4">
           <div>
-            <label className="mb-1.5 block text-sm font-semibold text-gray-700 sm:mb-2">E-mailadres</label>
+            <label className="mb-1.5 block text-sm font-semibold text-gray-700 sm:mb-2">
+              E-mailadres
+            </label>
             <input
               type="email"
               value={email}
@@ -112,7 +116,9 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-semibold text-gray-700 sm:mb-2">Wachtwoord</label>
+            <label className="mb-1.5 block text-sm font-semibold text-gray-700 sm:mb-2">
+              Wachtwoord
+            </label>
             <input
               type="password"
               value={password}

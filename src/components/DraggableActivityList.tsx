@@ -53,16 +53,19 @@ function SortableActivityItem({ activity }: { activity: Activity }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="cursor-grab active:cursor-grabbing"
+    >
       <ActivityCard activity={activity} isDragging={isDragging} />
     </div>
   );
 }
 
-export default function DraggableActivityList({
-  dayId,
-  activities,
-}: DraggableActivityListProps) {
+export default function DraggableActivityList({ dayId, activities }: DraggableActivityListProps) {
   const [isPending, startTransition] = useTransition();
   const [localActivities, setLocalActivities] = useState(activities);
 
@@ -118,7 +121,10 @@ export default function DraggableActivityList({
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={localActivities.map((a) => a.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext
+        items={localActivities.map((a) => a.id)}
+        strategy={verticalListSortingStrategy}
+      >
         <div className="space-y-4">
           {localActivities.map((activity) => (
             <SortableActivityItem key={activity.id} activity={activity} />

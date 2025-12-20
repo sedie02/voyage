@@ -126,7 +126,10 @@ export default function NewTripPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg pb-24 overflow-x-hidden w-full max-w-full" ref={containerRef}>
+    <div
+      className="min-h-screen w-full max-w-full overflow-x-hidden bg-bg pb-24"
+      ref={containerRef}
+    >
       {/* Header */}
       <nav
         className="sticky top-0 z-50 border-b border-border bg-surface"
@@ -177,7 +180,7 @@ export default function NewTripPage() {
                 <p className="text-base text-text-muted sm:text-lg">Kies maximaal 2</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4 w-full max-w-full">
+              <div className="grid w-full max-w-full grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
                 {[
                   { type: 'adventure', label: 'Avontuur', icon: '🏔️', desc: 'Actie en spanning' },
                   { type: 'beach', label: 'Strand', icon: '🏖️', desc: 'Zon, zee & relax' },
@@ -195,9 +198,15 @@ export default function NewTripPage() {
                         : 'border-border hover:border-primary/30 hover:bg-gray-50 active:scale-95'
                     }`}
                   >
-                    <span className="mb-1.5 block text-2xl sm:mb-2 sm:text-3xl lg:text-4xl">{option.icon}</span>
-                    <p className="mb-0.5 text-xs font-bold text-text sm:mb-1 sm:text-sm lg:text-base">{option.label}</p>
-                    <p className="text-[10px] text-text-muted sm:text-xs lg:text-sm">{option.desc}</p>
+                    <span className="mb-1.5 block text-2xl sm:mb-2 sm:text-3xl lg:text-4xl">
+                      {option.icon}
+                    </span>
+                    <p className="mb-0.5 text-xs font-bold text-text sm:mb-1 sm:text-sm lg:text-base">
+                      {option.label}
+                    </p>
+                    <p className="text-[10px] text-text-muted sm:text-xs lg:text-sm">
+                      {option.desc}
+                    </p>
                   </button>
                 ))}
               </div>

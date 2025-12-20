@@ -104,7 +104,7 @@ export default function TripDetailClient({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24 overflow-x-hidden w-full max-w-full">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-gray-50 pb-24">
       {/* Hero Section */}
       <div className="relative h-96 overflow-hidden">
         {/* City photo with better fallback */}
@@ -179,7 +179,12 @@ export default function TripDetailClient({
             </h1>
             <div className="flex flex-wrap items-center gap-2 text-white sm:gap-3 lg:gap-6">
               <div className="flex items-center gap-2 rounded-full bg-white/20 px-3 py-1.5 text-sm backdrop-blur-sm sm:gap-3 sm:px-4 sm:py-2 sm:text-base">
-                <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="h-4 w-4 sm:h-5 sm:w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -196,7 +201,12 @@ export default function TripDetailClient({
                 <span className="font-semibold sm:text-lg">{trip.destination}</span>
               </div>
               <div className="flex items-center gap-2 rounded-full bg-white/20 px-3 py-1.5 text-sm backdrop-blur-sm sm:gap-3 sm:px-4 sm:py-2 sm:text-base">
-                <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="h-4 w-4 sm:h-5 sm:w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -208,7 +218,12 @@ export default function TripDetailClient({
               </div>
               {activitiesBudget !== null && (
                 <div className="flex items-center gap-2 rounded-full bg-emerald-500/80 px-3 py-1.5 text-sm backdrop-blur-sm sm:gap-3 sm:px-4 sm:py-2 sm:text-base">
-                  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="h-4 w-4 sm:h-5 sm:w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -221,7 +236,12 @@ export default function TripDetailClient({
               )}
               {finalParticipantCount > 0 && (
                 <div className="flex items-center gap-2 rounded-full bg-white/20 px-3 py-1.5 text-sm backdrop-blur-sm sm:gap-3 sm:px-4 sm:py-2 sm:text-base">
-                  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="h-4 w-4 sm:h-5 sm:w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -245,7 +265,12 @@ export default function TripDetailClient({
         <div className="bg-sky-600 text-white">
           <div className="mx-auto max-w-7xl px-3 py-3 sm:px-4 sm:py-4 lg:px-8">
             <div className="flex items-center gap-2 sm:gap-3">
-              <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="h-5 w-5 sm:h-6 sm:w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -253,7 +278,9 @@ export default function TripDetailClient({
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span className="text-sm font-semibold sm:text-base lg:text-lg">Je reis begint over {daysUntil} dagen!</span>
+              <span className="text-sm font-semibold sm:text-base lg:text-lg">
+                Je reis begint over {daysUntil} dagen!
+              </span>
             </div>
           </div>
         </div>
@@ -266,7 +293,7 @@ export default function TripDetailClient({
           <div className="space-y-6 lg:col-span-2">
             {/* Tabs */}
             <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
-              <div className="flex overflow-x-auto border-b border-gray-100 scrollbar-hide">
+              <div className="scrollbar-hide flex overflow-x-auto border-b border-gray-100">
                 {[
                   { id: 'overview', label: 'Overzicht', icon: '📋' },
                   { id: 'itinerary', label: 'Planning', icon: '🗓️' },
@@ -403,7 +430,9 @@ export default function TripDetailClient({
           <div className="space-y-4 sm:space-y-6">
             {/* Quick Stats */}
             <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-lg sm:p-6">
-              <h3 className="mb-4 text-lg font-bold text-gray-900 sm:mb-6 sm:text-xl">Reis Details</h3>
+              <h3 className="mb-4 text-lg font-bold text-gray-900 sm:mb-6 sm:text-xl">
+                Reis Details
+              </h3>
               <div className="space-y-3 sm:space-y-5">
                 <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3 sm:p-4">
                   <div className="flex items-center gap-2 sm:gap-3">
@@ -424,7 +453,9 @@ export default function TripDetailClient({
                     </div>
                     <span className="text-sm font-medium text-gray-700 sm:text-base">Duur</span>
                   </div>
-                  <span className="text-base font-bold text-gray-900 sm:text-lg">{tripDuration} dagen</span>
+                  <span className="text-base font-bold text-gray-900 sm:text-lg">
+                    {tripDuration} dagen
+                  </span>
                 </div>
                 <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3 sm:p-4">
                   <div className="flex items-center gap-2 sm:gap-3">
@@ -443,7 +474,9 @@ export default function TripDetailClient({
                         />
                       </svg>
                     </div>
-                    <span className="text-sm font-medium text-gray-700 sm:text-base">Deelnemers</span>
+                    <span className="text-sm font-medium text-gray-700 sm:text-base">
+                      Deelnemers
+                    </span>
                   </div>
                   <span className="text-base font-bold text-gray-900 sm:text-lg">
                     {finalParticipantCount || 1}
@@ -469,7 +502,9 @@ export default function TripDetailClient({
                       </div>
                       <span className="text-sm font-medium text-gray-700 sm:text-base">Budget</span>
                     </div>
-                    <span className="text-base font-bold text-emerald-600 sm:text-lg">€ {activitiesBudget}</span>
+                    <span className="text-base font-bold text-emerald-600 sm:text-lg">
+                      € {activitiesBudget}
+                    </span>
                   </div>
                 )}
               </div>

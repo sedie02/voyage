@@ -71,15 +71,19 @@ export default async function TripsPage() {
   const activeTrip = tripsWithPhotos?.[0] as any;
 
   return (
-    <div className="min-h-screen bg-bg pb-24 overflow-x-hidden w-full max-w-full">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-bg pb-24">
       {/* Header */}
       <div className="border-b border-border bg-surface px-4 py-6 sm:px-6 sm:py-8 lg:py-12">
         <div className="mx-auto max-w-6xl">
-          <h1 className="mb-2 text-2xl font-bold text-text sm:mb-3 sm:text-3xl lg:text-4xl">Plan</h1>
+          <h1 className="mb-2 text-2xl font-bold text-text sm:mb-3 sm:text-3xl lg:text-4xl">
+            Plan
+          </h1>
           <p className="max-w-2xl text-sm leading-relaxed text-text-muted sm:text-base lg:text-lg">
             Je{' '}
-            <span className="font-semibold text-text">route, transport, verblijf, activiteiten</span> en{' '}
-            <span className="font-semibold text-text">notities</span>, alles op één plek.
+            <span className="font-semibold text-text">
+              route, transport, verblijf, activiteiten
+            </span>{' '}
+            en <span className="font-semibold text-text">notities</span>, alles op één plek.
           </p>
         </div>
       </div>
@@ -257,7 +261,9 @@ export default async function TripsPage() {
 
                     <div className="min-w-[2.5rem] shrink-0 text-center sm:min-w-[3rem] lg:min-w-[4rem]">
                       <p className="text-lg font-bold text-text sm:text-xl lg:text-3xl">{nights}</p>
-                      <p className="text-[9px] font-medium text-text-muted sm:text-[10px] lg:text-xs">nachten</p>
+                      <p className="text-[9px] font-medium text-text-muted sm:text-[10px] lg:text-xs">
+                        nachten
+                      </p>
                     </div>
                   </div>
                 );
@@ -293,7 +299,9 @@ export default async function TripsPage() {
                           <h3 className="mb-1 line-clamp-1 text-base font-bold text-text sm:text-lg">
                             {trip.title}
                           </h3>
-                          <p className="line-clamp-1 text-xs text-text-muted sm:text-sm">{trip.destination}</p>
+                          <p className="line-clamp-1 text-xs text-text-muted sm:text-sm">
+                            {trip.destination}
+                          </p>
                           {typeof trip.activities_budget === 'number' && (
                             <p className="mt-1 text-[10px] font-semibold text-text sm:text-xs">
                               Budget: € {trip.activities_budget}
@@ -358,15 +366,23 @@ export default async function TripsPage() {
                 />
               </svg>
             </div>
-            <h2 className="mb-2 text-xl font-bold text-text sm:mb-3 sm:text-2xl">Start met Plannen</h2>
+            <h2 className="mb-2 text-xl font-bold text-text sm:mb-3 sm:text-2xl">
+              Start met Plannen
+            </h2>
             <p className="mx-auto mb-6 max-w-md text-sm leading-relaxed text-text-muted sm:mb-8 sm:text-base">
-              Maak je eerste reis aan en begin met het organiseren van je avontuur met vrienden en familie.
+              Maak je eerste reis aan en begin met het organiseren van je avontuur met vrienden en
+              familie.
             </p>
             <Link
               href="/trips/new"
               className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover sm:px-8 sm:py-4 sm:text-base"
             >
-              <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="h-4 w-4 sm:h-5 sm:w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

@@ -99,7 +99,12 @@ export default function ShareTripModal({ tripId, isOpen, onClose }: ShareTripMod
           onClick={onClose}
           className="absolute right-3 top-3 rounded-full p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 sm:right-4 sm:top-4 sm:p-2"
         >
-          <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="h-4 w-4 sm:h-5 sm:w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -216,7 +221,9 @@ export default function ShareTripModal({ tripId, isOpen, onClose }: ShareTripMod
             // Authenticated - show invite creation
             <div className="space-y-3 sm:space-y-4">
               <div className="text-center">
-                <h2 className="mb-1.5 text-xl font-bold text-gray-900 sm:mb-2 sm:text-2xl">Deel je Trip</h2>
+                <h2 className="mb-1.5 text-xl font-bold text-gray-900 sm:mb-2 sm:text-2xl">
+                  Deel je Trip
+                </h2>
                 <p className="text-sm text-gray-600 sm:text-base">
                   Maak een uitnodigingslink om anderen uit te nodigen voor deze trip
                 </p>

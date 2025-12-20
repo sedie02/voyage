@@ -43,9 +43,7 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
       return;
     }
 
-    const budgetNum = formData.activitiesBudget
-      ? Number(formData.activitiesBudget)
-      : null;
+    const budgetNum = formData.activitiesBudget ? Number(formData.activitiesBudget) : null;
     if (formData.activitiesBudget && (isNaN(budgetNum!) || budgetNum! <= 0)) {
       setError('Vul een geldig budget in (meer dan 0)');
       return;
@@ -121,7 +119,12 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
               href={`/trips/${trip.id}`}
               className="flex items-center gap-1.5 text-sm text-gray-700 transition-colors hover:text-gray-900 sm:gap-2 sm:text-base"
             >
-              <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="h-4 w-4 sm:h-5 sm:w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -137,7 +140,12 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
               disabled={isPending}
               className="flex items-center gap-1.5 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50 sm:gap-2 sm:px-6 sm:py-2.5 sm:text-base"
             >
-              <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="h-4 w-4 sm:h-5 sm:w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -145,7 +153,9 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
                   d="M5 13l4 4L19 7"
                 />
               </svg>
-              <span className="hidden sm:inline">{isPending ? 'Opslaan...' : 'Wijzigingen Opslaan'}</span>
+              <span className="hidden sm:inline">
+                {isPending ? 'Opslaan...' : 'Wijzigingen Opslaan'}
+              </span>
               <span className="sm:hidden">{isPending ? 'Opslaan...' : 'Opslaan'}</span>
             </button>
           </div>
@@ -155,7 +165,9 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
       {/* Main Content */}
       <main className="mx-auto max-w-4xl px-3 py-6 sm:px-4 sm:py-8 lg:px-8 lg:py-12">
         <div className="mb-6 sm:mb-8">
-          <h1 className="mb-1.5 text-2xl font-bold text-gray-900 sm:mb-2 sm:text-3xl lg:text-4xl">Reis Bewerken</h1>
+          <h1 className="mb-1.5 text-2xl font-bold text-gray-900 sm:mb-2 sm:text-3xl lg:text-4xl">
+            Reis Bewerken
+          </h1>
           <p className="text-base text-gray-600 sm:text-lg">Pas de details van je reis aan</p>
         </div>
 
@@ -335,9 +347,7 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
                   step="1"
                   placeholder="bijv. 300"
                   value={formData.activitiesBudget}
-                  onChange={(e) =>
-                    setFormData({ ...formData, activitiesBudget: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, activitiesBudget: e.target.value })}
                   className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 transition-all focus:border-transparent focus:ring-2 focus:ring-sky-500"
                 />
                 <p className="mt-1 text-xs text-gray-500">

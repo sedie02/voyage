@@ -186,7 +186,9 @@ export default async function PackingPage({ searchParams }: { searchParams: { tr
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-pink-600 sm:text-4xl">{progressPercentage.toFixed(0)}%</p>
+                <p className="text-3xl font-bold text-pink-600 sm:text-4xl">
+                  {progressPercentage.toFixed(0)}%
+                </p>
               </div>
             </div>
             <div className="h-4 overflow-hidden rounded-full bg-gray-200">
