@@ -218,10 +218,17 @@ export default async function TripsPage() {
                 </div>
 
                 <div className="flex w-full items-center gap-2 sm:w-auto sm:gap-3">
-                  <button className="flex-1 rounded-full bg-primary-50 px-4 py-2 text-xs font-semibold text-primary transition-colors hover:bg-primary-100 sm:flex-none sm:px-6 sm:py-2.5 sm:text-sm">
+                  <Link
+                    href={`/trips/${activeTrip.id}`}
+                    className="flex-1 rounded-full bg-primary-50 px-4 py-2 text-center text-xs font-semibold text-primary transition-colors hover:bg-primary-100 sm:flex-none sm:px-6 sm:py-2.5 sm:text-sm"
+                  >
                     Route
-                  </button>
-                  <button className="flex-1 rounded-full border border-border px-4 py-2 text-xs font-semibold text-text-muted transition-colors hover:bg-gray-50 hover:text-text sm:flex-none sm:px-6 sm:py-2.5 sm:text-sm">
+                  </Link>
+                  <button
+                    disabled
+                    className="flex-1 cursor-not-allowed rounded-full border border-border px-4 py-2 text-xs font-semibold text-text-muted opacity-50 sm:flex-none sm:px-6 sm:py-2.5 sm:text-sm"
+                    title="Binnenkort beschikbaar"
+                  >
                     Boekingen
                   </button>
                 </div>
