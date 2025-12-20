@@ -1,7 +1,5 @@
 'use client';
 
-import React from 'react';
-
 interface Activity {
   id: string;
   title: string;
@@ -102,19 +100,6 @@ export default function ActivityCard({ activity, isDragging }: ActivityCardProps
         isDragging ? 'opacity-50 shadow-lg' : ''
       }`}
     >
-      {/* Drag handle indicator */}
-      <div className="flex items-center gap-2 border-b border-gray-100 bg-gray-50 px-4 py-2">
-        <svg
-          className="h-5 w-5 text-gray-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
-        </svg>
-        <span className="text-xs text-gray-500">Sleep om te herordenen</span>
-      </div>
-
       {/* Activity Image/Header */}
       {activityImageUrl || getYourGuideUrl ? (
         <div className="relative h-48 w-full overflow-hidden bg-gradient-to-r from-sky-400 to-blue-500">

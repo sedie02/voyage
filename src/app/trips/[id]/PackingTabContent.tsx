@@ -84,14 +84,25 @@ function PackingTabContent({
       const result = await initializeDefaultCategories(tripId);
 
       if (result.success) {
+        // Force immediate refresh - multiple strategies for reliability
         router.refresh();
+        // Also try to reload after a short delay to ensure data is visible
+        setTimeout(() => {
+          router.refresh();
+        }, 500);
+        // Fallback: full page reload if refresh doesn't work
+        setTimeout(() => {
+          if (typedCategories.length === 0) {
+            window.location.reload();
+          }
+        }, 2000);
       } else {
         setInitError(result.error || 'Onbekende fout');
+        setIsInitializing(false);
       }
     } catch (error: unknown) {
       const err = error as Record<string, unknown>;
       setInitError((err.message as string) || 'Onbekende fout');
-    } finally {
       setIsInitializing(false);
     }
   };

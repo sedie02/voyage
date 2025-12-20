@@ -1,7 +1,7 @@
 'use server';
 
-import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { getGuestSessionId } from '@/lib/session';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 export async function initializeDefaultCategories(tripId: string) {
@@ -42,6 +42,7 @@ export async function initializeDefaultCategories(tripId: string) {
 
         if (existingService && existingService.length > 0) {
           revalidatePath(`/trips/${tripId}`);
+          revalidatePath('/packing');
           return { success: true, message: 'Categorieën bestaan al!' };
         }
       } else {
@@ -54,6 +55,7 @@ export async function initializeDefaultCategories(tripId: string) {
 
     if (existing && existing.length > 0) {
       revalidatePath(`/trips/${tripId}`);
+      revalidatePath('/packing');
       return { success: true, message: 'Categorieën bestaan al!' };
     }
 
@@ -102,7 +104,9 @@ export async function initializeDefaultCategories(tripId: string) {
       };
     }
 
+    // Revalidate both the trip page and packing page
     revalidatePath(`/trips/${tripId}`);
+    revalidatePath('/packing');
 
     return {
       success: true,

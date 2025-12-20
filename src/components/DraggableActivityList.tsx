@@ -7,6 +7,7 @@ import {
   DragEndEvent,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
@@ -49,18 +50,38 @@ function SortableActivityItem({ activity }: { activity: Activity }) {
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: isDragging ? 'none' : transition,
+    opacity: isDragging ? 0.5 : 1,
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
-      className="cursor-grab active:cursor-grabbing"
+      className={`relative transition-all ${
+        isDragging ? 'z-50 scale-105 shadow-2xl' : 'shadow-sm'
+      }`}
     >
-      <ActivityCard activity={activity} isDragging={isDragging} />
+      {/* Drag Handle - alleen dit deel is draggable */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute left-0 top-0 z-10 flex h-full w-12 cursor-grab items-center justify-center bg-gray-50/80 hover:bg-gray-100 active:cursor-grabbing active:bg-gray-200 sm:w-10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <svg
+          className="h-6 w-6 text-gray-400 sm:h-5 sm:w-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+        </svg>
+      </div>
+      {/* Activity Card met padding voor drag handle */}
+      <div className="ml-12 sm:ml-10">
+        <ActivityCard activity={activity} isDragging={isDragging} />
+      </div>
     </div>
   );
 }
@@ -77,7 +98,13 @@ export default function DraggableActivityList({ dayId, activities }: DraggableAc
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // 8px movement before drag starts
+        distance: 10, // 10px movement before drag starts (betere UX)
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200, // 200ms delay voor touch (voorkomt scroll conflicts)
+        tolerance: 8, // 8px tolerance
       },
     }),
     useSensor(KeyboardSensor, {
@@ -125,7 +152,7 @@ export default function DraggableActivityList({ dayId, activities }: DraggableAc
         items={localActivities.map((a) => a.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {localActivities.map((activity) => (
             <SortableActivityItem key={activity.id} activity={activity} />
           ))}
