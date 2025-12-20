@@ -265,7 +265,8 @@ describe('Trip Creation API - Unit Tests', () => {
       expect(result.success).toBe(true);
       expect(result.trip.id).toBe('trip-789');
       // Should have retried without the problematic columns
-      expect(mockSupabase.insert).toHaveBeenCalledTimes(2);
+      // Note: insert is called 3 times: initial trip insert, retry trip insert, and packing categories insert
+      expect(mockSupabase.insert).toHaveBeenCalledTimes(3);
     });
   });
 

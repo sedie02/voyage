@@ -17,15 +17,35 @@ describe('Trip Creation Endpoint - Integration Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
+    let currentTable: string | null = null;
+
     mockSupabase = {
       auth: {
         getUser: jest.fn(),
       },
-      from: jest.fn(() => mockSupabase),
-      insert: jest.fn(() => mockSupabase),
+      from: jest.fn((table: string) => {
+        currentTable = table;
+        return mockSupabase;
+      }),
+      insert: jest.fn((data: any) => {
+        // Store trip inserts for later inspection
+        if (currentTable === 'trips') {
+          mockSupabase._lastTripInsert = data;
+        }
+        // Return mock chain for both trips and packing_categories
+        return {
+          select: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({
+              data: currentTable === 'trips' ? { id: 'trip-default-123' } : [],
+              error: null,
+            }),
+          }),
+        };
+      }),
       select: jest.fn(() => mockSupabase),
       single: jest.fn(() => mockSupabase),
       eq: jest.fn(() => mockSupabase),
+      _lastTripInsert: null as any,
     };
 
     mockCreateClient.mockResolvedValue(mockSupabase);
@@ -213,18 +233,37 @@ describe('Trip Creation Endpoint - Integration Tests', () => {
         error: null,
       });
 
+      // Override insert to track trip data
       let insertedData: any;
+      let currentTable: string | null = null;
+      
+      mockSupabase.from = jest.fn((table: string) => {
+        currentTable = table;
+        return mockSupabase;
+      });
 
-      mockSupabase.insert.mockImplementation((data: any) => {
-        insertedData = data;
-        return {
-          select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: { id: 'trip-desc-123' },
-              error: null,
+      mockSupabase.insert = jest.fn((data: any) => {
+        if (currentTable === 'trips') {
+          insertedData = data;
+          return {
+            select: jest.fn().mockReturnValue({
+              single: jest.fn().mockResolvedValue({
+                data: { id: 'trip-desc-123' },
+                error: null,
+              }),
             }),
-          }),
-        };
+          };
+        } else {
+          // For packing_categories, return successful mock without tracking
+          return {
+            select: jest.fn().mockReturnValue({
+              single: jest.fn().mockResolvedValue({
+                data: [],
+                error: null,
+              }),
+            }),
+          };
+        }
       });
 
       const formData = {
@@ -250,18 +289,37 @@ describe('Trip Creation Endpoint - Integration Tests', () => {
         error: null,
       });
 
+      // Override insert to track trip data
       let insertedData: any;
+      let currentTable: string | null = null;
+      
+      mockSupabase.from = jest.fn((table: string) => {
+        currentTable = table;
+        return mockSupabase;
+      });
 
-      mockSupabase.insert.mockImplementation((data: any) => {
-        insertedData = data;
-        return {
-          select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({
-              data: { id: 'trip-optional-123' },
-              error: null,
+      mockSupabase.insert = jest.fn((data: any) => {
+        if (currentTable === 'trips') {
+          insertedData = data;
+          return {
+            select: jest.fn().mockReturnValue({
+              single: jest.fn().mockResolvedValue({
+                data: { id: 'trip-optional-123' },
+                error: null,
+              }),
             }),
-          }),
-        };
+          };
+        } else {
+          // For packing_categories, return successful mock without tracking
+          return {
+            select: jest.fn().mockReturnValue({
+              single: jest.fn().mockResolvedValue({
+                data: [],
+                error: null,
+              }),
+            }),
+          };
+        }
       });
 
       const formData = {
