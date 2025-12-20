@@ -361,7 +361,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   // If no days found, try a simple query without nested activities
   if (!days || days.length === 0) {
     // No days found, trying simple query
-    const { data: simpleDays, error: simpleError } = await supabase
+    const { data: simpleDays } = await supabase
       .from('days')
       .select('*')
       .eq('trip_id', id)

@@ -25,7 +25,6 @@ export async function createTrip(formData: {
     const guestSessionId = user ? null : await getOrCreateGuestSession();
 
     if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
-      console.log('Creating trip for:', user ? `user ${user.id}` : `guest ${guestSessionId}`);
     }
 
     const composedDescription = [
@@ -85,7 +84,6 @@ export async function createTrip(formData: {
 
     if (error) {
       if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
-        console.error('Error creating trip:', error);
       }
       return {
         success: false,
@@ -103,7 +101,6 @@ export async function createTrip(formData: {
     };
   } catch (error) {
     if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
-      console.error('Error in createTrip:', error);
     }
     return {
       success: false,
@@ -159,7 +156,6 @@ export async function updateTrip(
 
     if (error) {
       if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
-        console.error('Error updating trip:', error);
       }
       throw new Error(`Failed to update trip: ${error.message}`);
     }
@@ -168,7 +164,6 @@ export async function updateTrip(
     redirect(`/trips/${tripId}`);
   } catch (error) {
     if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
-      console.error('Error in updateTrip:', error);
     }
     throw error;
   }
@@ -180,7 +175,6 @@ export async function deleteTrip(tripId: string) {
   const { error } = await supabase.from('trips').delete().eq('id', tripId);
 
   if (error) {
-    console.error('Error deleting trip:', error);
     throw new Error('Failed to delete trip');
   }
 
@@ -194,7 +188,6 @@ export async function archiveTrip(tripId: string) {
   const { error } = await supabase.from('trips').update({ is_archived: true }).eq('id', tripId);
 
   if (error) {
-    console.error('Error archiving trip:', error);
     throw new Error('Failed to archive trip');
   }
 

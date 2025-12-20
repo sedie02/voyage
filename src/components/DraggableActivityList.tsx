@@ -66,7 +66,7 @@ function SortableActivityItem({ activity }: { activity: Activity }) {
 }
 
 export default function DraggableActivityList({ dayId, activities }: DraggableActivityListProps) {
-  const [isPending, startTransition] = useTransition();
+  const [_isPending, startTransition] = useTransition();
   const [localActivities, setLocalActivities] = useState(activities);
 
   // Update local state when activities prop changes

@@ -59,52 +59,39 @@ export default function ItineraryTab({ tripId, days, isOwner }: ItineraryTabProp
   });
 
   const handleGenerate = () => {
-    console.log('📅 Genereer Planning button clicked!', {
-      tripId,
-      daysCount: days.length,
-      hasExistingDays: days.length > 0,
-      isOwner,
-      isPending,
-    });
-
     if (!isOwner) {
-      console.error('📅 Not owner, cannot generate');
       setError('Alleen de planner kan planning genereren');
       return;
     }
 
     if (isPending) {
-      console.log('📅 Already generating, ignoring click');
       return;
     }
 
     startTransition(async () => {
       try {
-        console.log('📅 Starting transition...');
         setError(null);
         setSuccess(null);
-        console.log('📅 Calling generateItinerary with tripId:', tripId);
+
         const result = await generateItinerary(tripId);
-        console.log('📅 generateItinerary result:', result);
+
         if (result.success) {
           const activitiesMsg = result.activitiesAdded
             ? ` en ${result.activitiesAdded} activiteiten`
             : '';
           setSuccess(`Planning gegenereerd! ${result.count} dagen${activitiesMsg} toegevoegd.`);
-          console.log(`📅 Success! ${result.count} dagen${activitiesMsg} toegevoegd.`);
+
           // Refresh page after a short delay
           setTimeout(() => {
             window.location.reload();
           }, 1500);
         } else {
-          console.error('📅 generateItinerary returned success: false');
           setError('Planning genereren mislukt');
         }
       } catch (err) {
-        console.error('📅 Error generating itinerary:', err);
         const errorMessage =
           err instanceof Error ? err.message : 'Er ging iets mis bij het genereren';
-        console.error('📅 Error message:', errorMessage);
+
         setError(errorMessage);
       }
     });
