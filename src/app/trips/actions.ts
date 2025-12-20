@@ -88,43 +88,8 @@ export async function createTrip(formData: {
       };
     }
 
-    // Automatically create default packing categories for the new trip
-    if (trip?.id) {
-      const defaultCategories = [
-        { name: 'Kleding', order_index: 0 },
-        { name: 'Toiletartikelen', order_index: 1 },
-        { name: 'Elektronica', order_index: 2 },
-        { name: 'Documenten', order_index: 3 },
-        { name: 'Medicijnen', order_index: 4 },
-        { name: 'Overig', order_index: 5 },
-      ];
-
-      // Try to insert categories (silently fail if table doesn't exist or RLS blocks it)
-      try {
-        const insertResult = await supabase.from('packing_categories').insert(
-          defaultCategories.map((cat) => ({
-            trip_id: trip.id,
-            name: cat.name,
-            order_index: cat.order_index,
-          }))
-        );
-
-        // If insert fails and user is guest, try with service client
-        if (insertResult.error && !user && guestSessionId) {
-          const service = createServiceClient();
-          await service.from('packing_categories').insert(
-            defaultCategories.map((cat) => ({
-              trip_id: trip.id,
-              name: cat.name,
-              order_index: cat.order_index,
-            }))
-          );
-        }
-      } catch (categoryError) {
-        // Silently fail - categories can be created manually later
-        console.log('Could not auto-create packing categories:', categoryError);
-      }
-    }
+    // Note: Packing categories are automatically created by database trigger
+    // See: supabase/auto-create-packing-categories.sql
 
     revalidatePath('/trips');
     revalidatePath('/packing');
