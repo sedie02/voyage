@@ -177,7 +177,7 @@ export default function NewTripPage() {
                 <p className="text-base text-text-muted sm:text-lg">Kies maximaal 2</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4 w-full max-w-full">
                 {[
                   { type: 'adventure', label: 'Avontuur', icon: '🏔️', desc: 'Actie en spanning' },
                   { type: 'beach', label: 'Strand', icon: '🏖️', desc: 'Zon, zee & relax' },

@@ -137,7 +137,7 @@ export default function TripDetailClient({
             className="group inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-2 text-sm text-gray-700 shadow-lg backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-xl sm:gap-2 sm:px-4 sm:py-2.5 sm:text-base"
           >
             <svg
-              className="h-4 w-4 transition-transform group-hover:-translate-x-0.5 sm:h-5 sm:w-5"
+              className="h-3 w-3 transition-transform group-hover:-translate-x-0.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -153,10 +153,10 @@ export default function TripDetailClient({
           </Link>
           <Link
             href={`/trips/${trip.id}/edit`}
-            className="group inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-2 text-sm text-gray-700 shadow-lg backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-xl sm:gap-2 sm:px-4 sm:py-2.5 sm:text-base"
+            className="group inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-1.5 text-xs text-gray-700 shadow-lg backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-xl sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm lg:gap-2 lg:px-4 lg:py-2.5 lg:text-base"
           >
             <svg
-              className="h-4 w-4 transition-transform group-hover:scale-110 sm:h-5 sm:w-5"
+              className="h-3 w-3 transition-transform group-hover:scale-110 sm:h-4 sm:w-4 lg:h-5 lg:w-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -172,7 +172,7 @@ export default function TripDetailClient({
           </Link>
         </div>
         {/* Trip info overlay */}
-        <div className="absolute inset-x-0 bottom-0 z-30 mx-auto max-w-7xl px-3 pb-4 sm:px-4 sm:pb-6 lg:px-8 lg:pb-8">
+        <div className="absolute inset-x-0 bottom-0 z-30 mx-auto max-w-7xl px-2 pb-2 sm:px-3 sm:pb-3 lg:px-8 lg:pb-8">
           <div className="text-white">
             <h1 className="mb-3 text-3xl font-bold text-white drop-shadow-2xl sm:mb-4 sm:text-4xl md:text-5xl lg:text-6xl">
               {trip.title}
