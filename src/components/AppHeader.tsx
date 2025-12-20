@@ -8,7 +8,7 @@ export default function AppHeader() {
   const isCurrent = (p: string) => pathname === p || pathname?.startsWith(`${p}/`);
 
   // Extract trip ID from pathname if we're on a trip detail page
-  const tripIdMatch = pathname?.match(/^\/trips\/([^\/]+)$/);
+  const tripIdMatch = pathname?.match(new RegExp('^/trips/([^/]+)$'));
   const currentTripId = tripIdMatch ? tripIdMatch[1] : null;
 
   const navItems = [
