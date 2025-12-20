@@ -159,14 +159,14 @@ export default function NewTripPage() {
       </div>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-12">
+      <main className="mx-auto max-w-3xl px-3 py-4 sm:px-4 sm:py-6 lg:px-6 lg:py-12">
         {error && (
           <div className="mb-6 animate-fade-in rounded-2xl border border-red-200 bg-red-50 p-4">
             <p className="text-sm font-semibold text-red-800">{error}</p>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 lg:space-y-8">
           {/* Step 1: Trip Types (max 2) */}
           {step === 1 && (
             <div className="animate-fade-in space-y-6">
@@ -177,7 +177,7 @@ export default function NewTripPage() {
                 <p className="text-base text-text-muted sm:text-lg">Kies maximaal 2</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
                 {[
                   { type: 'adventure', label: 'Avontuur', icon: '🏔️', desc: 'Actie en spanning' },
                   { type: 'beach', label: 'Strand', icon: '🏖️', desc: 'Zon, zee & relax' },
@@ -189,15 +189,15 @@ export default function NewTripPage() {
                     key={option.type}
                     type="button"
                     onClick={() => toggleType(option.type as TripType)}
-                    className={`rounded-2xl border-2 p-4 text-left transition-all duration-200 sm:p-6 ${
+                    className={`rounded-xl border-2 p-3 text-left transition-all duration-200 sm:rounded-2xl sm:p-4 lg:p-6 ${
                       formData.tripTypes.includes(option.type as TripType)
                         ? 'scale-[1.02] border-primary bg-primary-50 shadow-md'
                         : 'border-border hover:border-primary/30 hover:bg-gray-50 active:scale-95'
                     }`}
                   >
-                    <span className="mb-2 block text-3xl sm:text-4xl">{option.icon}</span>
-                    <p className="mb-1 text-sm font-bold text-text sm:text-base">{option.label}</p>
-                    <p className="text-xs text-text-muted sm:text-sm">{option.desc}</p>
+                    <span className="mb-1.5 block text-2xl sm:mb-2 sm:text-3xl lg:text-4xl">{option.icon}</span>
+                    <p className="mb-0.5 text-xs font-bold text-text sm:mb-1 sm:text-sm lg:text-base">{option.label}</p>
+                    <p className="text-[10px] text-text-muted sm:text-xs lg:text-sm">{option.desc}</p>
                   </button>
                 ))}
               </div>

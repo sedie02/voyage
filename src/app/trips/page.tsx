@@ -73,10 +73,10 @@ export default async function TripsPage() {
   return (
     <div className="min-h-screen bg-bg pb-24">
       {/* Header */}
-      <div className="border-b border-border bg-surface px-6 py-12">
+      <div className="border-b border-border bg-surface px-4 py-6 sm:px-6 sm:py-8 lg:py-12">
         <div className="mx-auto max-w-6xl">
-          <h1 className="mb-3 text-4xl font-bold text-text">Plan</h1>
-          <p className="max-w-2xl text-lg leading-relaxed text-text-muted">
+          <h1 className="mb-2 text-2xl font-bold text-text sm:mb-3 sm:text-3xl lg:text-4xl">Plan</h1>
+          <p className="max-w-2xl text-sm leading-relaxed text-text-muted sm:text-base lg:text-lg">
             Je{' '}
             <span className="font-semibold text-text">route, transport, verblijf, activiteiten</span> en{' '}
             <span className="font-semibold text-text">notities</span>, alles op één plek.
@@ -85,7 +85,7 @@ export default async function TripsPage() {
       </div>
 
       {activeTrip ? (
-        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-12">
+        <div className="mx-auto max-w-6xl px-3 py-4 sm:px-4 sm:py-6 lg:px-6 lg:py-12">
           {/* Trip Card */}
           <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-md sm:rounded-3xl">
             {/* Hero Image Section */}
@@ -104,14 +104,14 @@ export default async function TripsPage() {
               {/* Unified clickable pill header */}
               <Link
                 href={`/trips/${activeTrip.id}`}
-                className="absolute left-4 right-4 top-4 z-10 flex items-center justify-between gap-3 rounded-full border border-border bg-white/90 px-4 py-2.5 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 sm:left-6 sm:right-6 sm:top-6 sm:px-5 sm:py-3"
+                className="absolute left-3 right-3 top-3 z-10 flex items-center justify-between gap-2 rounded-full border border-border bg-white/90 px-3 py-2 text-xs shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 sm:left-4 sm:right-4 sm:top-4 sm:gap-3 sm:px-4 sm:py-2.5 sm:text-sm lg:left-6 lg:right-6 lg:top-6 lg:px-5 lg:py-3 lg:text-base"
               >
-                <div className="min-w-0">
-                  <p className="flex items-center gap-2 truncate text-sm font-bold text-text sm:text-base">
+                <div className="min-w-0 flex-1">
+                  <p className="flex items-center gap-1.5 truncate font-bold text-text sm:gap-2">
                     <span className="truncate">{activeTrip.title}</span>
-                    <span className="shrink-0 text-base sm:text-lg">🌍</span>
+                    <span className="shrink-0 text-sm sm:text-base lg:text-lg">🌍</span>
                   </p>
-                  <p className="truncate text-xs text-text-muted sm:text-sm">
+                  <p className="truncate text-[10px] text-text-muted sm:text-xs lg:text-sm">
                     {new Date(activeTrip.start_date).toLocaleDateString('nl-NL', {
                       day: 'numeric',
                       month: 'short',
@@ -124,7 +124,7 @@ export default async function TripsPage() {
                   </p>
                 </div>
                 <svg
-                  className="h-5 w-5 text-text-muted sm:h-6 sm:w-6"
+                  className="h-4 w-4 shrink-0 text-text-muted sm:h-5 sm:w-5 lg:h-6 lg:w-6"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -139,18 +139,18 @@ export default async function TripsPage() {
               </Link>
 
               {/* Destination Label */}
-              <div className="absolute bottom-4 right-4 z-10 sm:bottom-8 sm:right-8">
-                <p className="text-lg font-bold text-white drop-shadow sm:text-2xl">
+              <div className="absolute bottom-3 right-3 z-10 sm:bottom-4 sm:right-4 lg:bottom-8 lg:right-8">
+                <p className="text-sm font-bold text-white drop-shadow sm:text-base lg:text-lg xl:text-2xl">
                   {activeTrip.destination}
                 </p>
               </div>
             </div>
 
             {/* Trip Stats */}
-            <div className="border-b border-border px-4 py-4 sm:px-8 sm:py-6">
-              <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
-                <div className="flex items-center gap-4 sm:gap-6">
-                  <div className="relative h-14 w-14 shrink-0 sm:h-16 sm:w-16">
+            <div className="border-b border-border px-3 py-3 sm:px-4 sm:py-4 lg:px-8 lg:py-6">
+              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0 lg:gap-4">
+                <div className="flex items-center gap-3 sm:gap-4 lg:gap-6">
+                  <div className="relative h-12 w-12 shrink-0 sm:h-14 sm:w-14 lg:h-16 lg:w-16">
                     <svg className="h-14 w-14 -rotate-90 transform sm:h-16 sm:w-16">
                       <circle
                         cx="28"
@@ -225,7 +225,7 @@ export default async function TripsPage() {
             </div>
 
             {/* Destinations List (single logical step) */}
-            <div className="space-y-1 px-4 py-4 sm:px-8 sm:py-6">
+            <div className="space-y-1 px-3 py-3 sm:px-4 sm:py-4 lg:px-8 lg:py-6">
               {(() => {
                 const nights = Math.max(
                   0,
@@ -237,16 +237,16 @@ export default async function TripsPage() {
                 );
                 const cityName = String(activeTrip.destination || '').split(',')[0];
                 return (
-                  <div className="flex items-center justify-between gap-3 border-b border-border py-4 last:border-0 sm:py-5">
-                    <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-5">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold text-primary sm:h-10 sm:w-10 sm:text-base">
+                  <div className="flex items-center justify-between gap-2 border-b border-border py-3 last:border-0 sm:gap-3 sm:py-4 lg:py-5">
+                    <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 lg:gap-5">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-50 text-xs font-bold text-primary sm:h-9 sm:w-9 sm:text-sm lg:h-10 lg:w-10 lg:text-base">
                         1
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="mb-1 truncate text-base font-bold text-text sm:text-lg">
+                        <p className="mb-0.5 truncate text-sm font-bold text-text sm:mb-1 sm:text-base lg:text-lg">
                           {cityName}
                         </p>
-                        <p className="text-xs text-text-muted sm:text-sm">
+                        <p className="text-[10px] text-text-muted sm:text-xs lg:text-sm">
                           {new Date(activeTrip.start_date).toLocaleDateString('nl-NL', {
                             day: 'numeric',
                             month: 'short',
@@ -255,9 +255,9 @@ export default async function TripsPage() {
                       </div>
                     </div>
 
-                    <div className="min-w-[3rem] text-center sm:min-w-[4rem]">
-                      <p className="text-xl font-bold text-text sm:text-3xl">{nights}</p>
-                      <p className="text-[10px] font-medium text-text-muted sm:text-xs">nachten</p>
+                    <div className="min-w-[2.5rem] shrink-0 text-center sm:min-w-[3rem] lg:min-w-[4rem]">
+                      <p className="text-lg font-bold text-text sm:text-xl lg:text-3xl">{nights}</p>
+                      <p className="text-[9px] font-medium text-text-muted sm:text-[10px] lg:text-xs">nachten</p>
                     </div>
                   </div>
                 );
@@ -267,9 +267,9 @@ export default async function TripsPage() {
 
           {/* All Trips */}
           {tripsWithPhotos && tripsWithPhotos.length > 0 && (
-            <div className="mt-16">
-              <h2 className="mb-6 text-2xl font-bold text-text">All Trips</h2>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-8 sm:mt-12 lg:mt-16">
+              <h2 className="mb-4 text-xl font-bold text-text sm:mb-6 sm:text-2xl">Alle Reizen</h2>
+              <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {tripsWithPhotos.map((trip: any) => (
                   <Link
                     key={trip.id}
@@ -287,21 +287,21 @@ export default async function TripsPage() {
                       />
                       <div className="absolute inset-0 bg-black/15" />
                     </div>
-                    <div className="p-6">
-                      <div className="mb-4 flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className="mb-1 line-clamp-1 text-lg font-bold text-text">
+                    <div className="p-4 sm:p-6">
+                      <div className="mb-3 flex items-start justify-between sm:mb-4">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="mb-1 line-clamp-1 text-base font-bold text-text sm:text-lg">
                             {trip.title}
                           </h3>
-                          <p className="line-clamp-1 text-sm text-text-muted">{trip.destination}</p>
+                          <p className="line-clamp-1 text-xs text-text-muted sm:text-sm">{trip.destination}</p>
                           {typeof trip.activities_budget === 'number' && (
-                            <p className="mt-1 text-xs font-semibold text-text">
+                            <p className="mt-1 text-[10px] font-semibold text-text sm:text-xs">
                               Budget: € {trip.activities_budget}
                             </p>
                           )}
                         </div>
                         <svg
-                          className="h-5 w-5 text-text-muted transition-colors group-hover:text-text"
+                          className="h-4 w-4 shrink-0 text-text-muted transition-colors group-hover:text-text sm:h-5 sm:w-5"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -314,7 +314,7 @@ export default async function TripsPage() {
                           />
                         </svg>
                       </div>
-                      <div className="text-sm text-text-muted">
+                      <div className="text-xs text-text-muted sm:text-sm">
                         {new Date(trip.start_date).toLocaleDateString('nl-NL', {
                           day: 'numeric',
                           month: 'short',
@@ -335,11 +335,11 @@ export default async function TripsPage() {
         </div>
       ) : (
         /* Empty State */
-        <div className="mx-auto max-w-2xl px-6 py-24 text-center">
-          <div className="rounded-3xl border border-border bg-surface p-16 shadow-sm">
-            <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-full bg-sky-light/50">
+        <div className="mx-auto max-w-2xl px-4 py-12 text-center sm:px-6 sm:py-16 lg:py-24">
+          <div className="rounded-3xl border border-border bg-surface p-8 shadow-sm sm:p-12 lg:p-16">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-sky-light/50 sm:mb-8 sm:h-20 sm:w-20">
               <svg
-                className="h-10 w-10 text-sky"
+                className="h-8 w-8 text-sky sm:h-10 sm:w-10"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -358,15 +358,15 @@ export default async function TripsPage() {
                 />
               </svg>
             </div>
-            <h2 className="mb-3 text-2xl font-bold text-text">Start Planning</h2>
-            <p className="mx-auto mb-10 max-w-md leading-relaxed text-text-muted">
-              Create your first trip and start organizing your adventure with friends and family.
+            <h2 className="mb-2 text-xl font-bold text-text sm:mb-3 sm:text-2xl">Start met Plannen</h2>
+            <p className="mx-auto mb-6 max-w-md text-sm leading-relaxed text-text-muted sm:mb-8 sm:text-base">
+              Maak je eerste reis aan en begin met het organiseren van je avontuur met vrienden en familie.
             </p>
             <Link
               href="/trips/new"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover sm:px-8 sm:py-4 sm:text-base"
             >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -374,7 +374,7 @@ export default async function TripsPage() {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              Create Trip
+              Reis Aanmaken
             </Link>
           </div>
         </div>

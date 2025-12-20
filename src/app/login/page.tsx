@@ -69,12 +69,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
-      <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-8 sm:py-12">
+      <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-lg sm:p-8">
+        <div className="mb-6 text-center sm:mb-8">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 sm:mb-4 sm:h-16 sm:w-16">
             <svg
-              className="h-8 w-8 text-primary"
+              className="h-7 w-7 text-primary sm:h-8 sm:w-8"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -87,8 +87,8 @@ export default function LoginPage() {
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Inloggen</h1>
-          <p className="mt-2 text-gray-600">Log in op je Voyage account</p>
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Inloggen</h1>
+          <p className="mt-1.5 text-sm text-gray-600 sm:mt-2 sm:text-base">Log in op je Voyage account</p>
         </div>
 
         {error && (
@@ -97,9 +97,9 @@ export default function LoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-3 sm:space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-semibold text-gray-700">E-mailadres</label>
+            <label className="mb-1.5 block text-sm font-semibold text-gray-700 sm:mb-2">E-mailadres</label>
             <input
               type="email"
               value={email}
@@ -107,12 +107,12 @@ export default function LoginPage() {
               required
               maxLength={255}
               placeholder="jouw@email.nl"
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:py-3"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold text-gray-700">Wachtwoord</label>
+            <label className="mb-1.5 block text-sm font-semibold text-gray-700 sm:mb-2">Wachtwoord</label>
             <input
               type="password"
               value={password}
@@ -121,14 +121,14 @@ export default function LoginPage() {
               minLength={6}
               maxLength={128}
               placeholder="••••••••"
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:py-3"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
+            className="w-full rounded-lg bg-primary px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50 sm:py-3.5"
           >
             {loading ? 'Inloggen...' : 'Inloggen'}
           </button>

@@ -92,14 +92,14 @@ export default function ShareTripModal({ tripId, isOpen, onClose }: ShareTripMod
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4">
       <div className="relative w-full max-w-md rounded-2xl bg-white shadow-xl">
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+          className="absolute right-3 top-3 rounded-full p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 sm:right-4 sm:top-4 sm:p-2"
         >
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -109,7 +109,7 @@ export default function ShareTripModal({ tripId, isOpen, onClose }: ShareTripMod
           </svg>
         </button>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {isChecking ? (
             <div className="py-8 text-center">
               <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
@@ -214,10 +214,10 @@ export default function ShareTripModal({ tripId, isOpen, onClose }: ShareTripMod
             </div>
           ) : (
             // Authenticated - show invite creation
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div className="text-center">
-                <h2 className="mb-2 text-2xl font-bold text-gray-900">Deel je Trip</h2>
-                <p className="text-gray-600">
+                <h2 className="mb-1.5 text-xl font-bold text-gray-900 sm:mb-2 sm:text-2xl">Deel je Trip</h2>
+                <p className="text-sm text-gray-600 sm:text-base">
                   Maak een uitnodigingslink om anderen uit te nodigen voor deze trip
                 </p>
               </div>

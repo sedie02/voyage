@@ -115,13 +115,13 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
       <nav className="border-b border-gray-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
+        <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-8">
+          <div className="flex h-14 items-center justify-between sm:h-16">
             <Link
               href={`/trips/${trip.id}`}
-              className="flex items-center gap-2 text-gray-700 transition-colors hover:text-gray-900"
+              className="flex items-center gap-1.5 text-sm text-gray-700 transition-colors hover:text-gray-900 sm:gap-2 sm:text-base"
             >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -135,9 +135,9 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
             <button
               onClick={handleSave}
               disabled={isPending}
-              className="flex items-center gap-2 rounded-lg bg-sky-600 px-6 py-2.5 font-semibold text-white transition-colors hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50 sm:gap-2 sm:px-6 sm:py-2.5 sm:text-base"
             >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -145,17 +145,18 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
                   d="M5 13l4 4L19 7"
                 />
               </svg>
-              {isPending ? 'Opslaan...' : 'Wijzigingen Opslaan'}
+              <span className="hidden sm:inline">{isPending ? 'Opslaan...' : 'Wijzigingen Opslaan'}</span>
+              <span className="sm:hidden">{isPending ? 'Opslaan...' : 'Opslaan'}</span>
             </button>
           </div>
         </div>
       </nav>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="mb-2 text-4xl font-bold text-gray-900">Reis Bewerken</h1>
-          <p className="text-lg text-gray-600">Pas de details van je reis aan</p>
+      <main className="mx-auto max-w-4xl px-3 py-6 sm:px-4 sm:py-8 lg:px-8 lg:py-12">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="mb-1.5 text-2xl font-bold text-gray-900 sm:mb-2 sm:text-3xl lg:text-4xl">Reis Bewerken</h1>
+          <p className="text-base text-gray-600 sm:text-lg">Pas de details van je reis aan</p>
         </div>
 
         <div className="space-y-6">
@@ -200,9 +201,9 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSave} className="space-y-6">
+          <form onSubmit={handleSave} className="space-y-4 sm:space-y-6">
             {/* Basic Info */}
-            <div className="space-y-6 rounded-xl border border-gray-200 bg-white p-6">
+            <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-4 sm:space-y-6 sm:p-6">
               <h2 className="text-xl font-bold text-gray-900">Basis Informatie</h2>
 
               <div>
@@ -269,7 +270,7 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
                 <div>
                   <label
                     htmlFor="startDate"
@@ -347,9 +348,9 @@ export default function EditTripClient({ trip }: EditTripClientProps) {
           </form>
 
           {/* Actions */}
-          <div className="rounded-xl border border-gray-200 bg-white p-6">
-            <h2 className="mb-4 text-xl font-bold text-gray-900">Acties</h2>
-            <div className="space-y-3">
+          <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6">
+            <h2 className="mb-3 text-lg font-bold text-gray-900 sm:mb-4 sm:text-xl">Acties</h2>
+            <div className="space-y-2 sm:space-y-3">
               <button
                 onClick={handleDuplicate}
                 disabled={isPending}

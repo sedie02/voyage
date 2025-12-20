@@ -176,17 +176,17 @@ export default async function PackingPage({ searchParams }: { searchParams: { tr
         )}
 
         {/* Stats Card */}
-        <div className="mb-6 overflow-hidden rounded-2xl border border-white/20 bg-white shadow-xl">
-          <div className="bg-gradient-to-r from-pink-50 to-rose-50 px-6 py-6">
-            <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 overflow-hidden rounded-2xl border border-white/20 bg-white shadow-xl sm:mb-6">
+          <div className="bg-gradient-to-r from-pink-50 to-rose-50 px-4 py-4 sm:px-6 sm:py-6">
+            <div className="mb-3 flex items-center justify-between sm:mb-4">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Voortgang</h2>
-                <p className="text-sm text-gray-600">
+                <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">Voortgang</h2>
+                <p className="text-xs text-gray-600 sm:text-sm">
                   {checkedItems} van {totalItems} items afgevinkt
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-4xl font-bold text-pink-600">{progressPercentage.toFixed(0)}%</p>
+                <p className="text-3xl font-bold text-pink-600 sm:text-4xl">{progressPercentage.toFixed(0)}%</p>
               </div>
             </div>
             <div className="h-4 overflow-hidden rounded-full bg-gray-200">
@@ -198,7 +198,7 @@ export default async function PackingPage({ searchParams }: { searchParams: { tr
           </div>
 
           {/* Download + Add Category */}
-          <div className="flex flex-wrap items-center gap-3 border-t border-gray-100 px-6 py-4">
+          <div className="flex flex-wrap items-center gap-2 border-t border-gray-100 px-4 py-3 sm:gap-3 sm:px-6 sm:py-4">
             {categories.length > 0 && (
               <DownloadButton
                 categories={categories}
