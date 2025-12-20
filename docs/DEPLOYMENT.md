@@ -78,7 +78,7 @@ Vul in:
 NODE_ENV=production
 NEXT_PUBLIC_APP_URL=http://jouw-skylabs-ip:3000
 
-NEXT_PUBLIC_SUPABASE_URL=https://kslkoizgefalcxvtjeqg.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://jouw-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=jouw_supabase_anon_key_hier
 SUPABASE_SERVICE_ROLE_KEY=jouw_supabase_service_role_key_hier
 
