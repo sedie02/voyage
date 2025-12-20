@@ -29,10 +29,11 @@ describe('US47 - updateTrip server action', () => {
           eq: (...eqArgs: unknown[]) => {
             mockSelectEq(...eqArgs);
             return {
-              single: () => Promise.resolve({ 
-                data: { id: 'trip987', destination: 'Paris, France' }, 
-                error: null 
-              }),
+              single: () =>
+                Promise.resolve({
+                  data: { id: 'trip987', destination: 'Paris, France' },
+                  error: null,
+                }),
             };
           },
         }),
@@ -61,10 +62,11 @@ describe('US47 - updateTrip server action', () => {
         }),
         select: () => ({
           eq: () => ({
-            single: () => Promise.resolve({ 
-              data: { id: 'trip987', destination: 'Paris, France' }, 
-              error: null 
-            }),
+            single: () =>
+              Promise.resolve({
+                data: { id: 'trip987', destination: 'Paris, France' },
+                error: null,
+              }),
           }),
         }),
       }),
