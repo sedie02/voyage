@@ -11,7 +11,7 @@ jest.mock('@/lib/supabase/server');
 describe('US47 - updateTrip server action', () => {
   const mockUpdate = jest.fn().mockReturnThis();
   const mockEq = jest.fn().mockReturnThis();
-  const mockSelect = jest.fn().mockResolvedValue({ data: [{ id: 'trip987' }], error: null });
+  const mockSelectEq = jest.fn().mockReturnThis();
 
   beforeEach(() => {
     (createClient as jest.Mock).mockResolvedValue({
@@ -25,7 +25,17 @@ describe('US47 - updateTrip server action', () => {
             },
           };
         },
-        select: () => mockSelect(),
+        select: () => ({
+          eq: (...eqArgs: unknown[]) => {
+            mockSelectEq(...eqArgs);
+            return {
+              single: () => Promise.resolve({ 
+                data: { id: 'trip987', destination: 'Paris, France' }, 
+                error: null 
+              }),
+            };
+          },
+        }),
       }),
     });
     jest.clearAllMocks();
@@ -47,7 +57,15 @@ describe('US47 - updateTrip server action', () => {
     (createClient as jest.Mock).mockResolvedValue({
       from: () => ({
         update: () => ({
-          eq: () => ({ error: mockError }),
+          eq: () => Promise.resolve({ error: mockError }),
+        }),
+        select: () => ({
+          eq: () => ({
+            single: () => Promise.resolve({ 
+              data: { id: 'trip987', destination: 'Paris, France' }, 
+              error: null 
+            }),
+          }),
         }),
       }),
     });
@@ -59,6 +77,6 @@ describe('US47 - updateTrip server action', () => {
         startDate: '2025-01-01',
         endDate: '2025-01-02',
       })
-    ).rejects.toThrow('DB error');
+    ).rejects.toThrow('Failed to update trip: DB error');
   });
 });

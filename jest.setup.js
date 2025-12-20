@@ -134,7 +134,7 @@ jest.mock('react-google-autocomplete', () => {
     // the component calls `onPlaceSelected` with the full typed address.
     default: (props) => {
       const Comp = () => {
-        const [val, setVal] = React.useState(props.value || '');
+        const [val, setVal] = React.useState(props.defaultValue || props.value || '');
         return React.createElement('input', {
           placeholder: props.placeholder || '',
           value: val,
@@ -142,7 +142,10 @@ jest.mock('react-google-autocomplete', () => {
             const v = e.target.value;
             setVal(v);
           },
-          onBlur: () => {
+          onBlur: (e) => {
+            if (props.onBlur) {
+              props.onBlur(e);
+            }
             if (props.onPlaceSelected) {
               props.onPlaceSelected({ formatted_address: val, address_components: [] });
             }
