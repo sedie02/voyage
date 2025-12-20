@@ -77,9 +77,9 @@ export default async function TripsPage() {
         <div className="mx-auto max-w-6xl">
           <h1 className="mb-3 text-4xl font-bold text-text">Plan</h1>
           <p className="max-w-2xl text-lg leading-relaxed text-text-muted">
-            Your{' '}
-            <span className="font-semibold text-text">route, transport, stays, activities</span> and{' '}
-            <span className="font-semibold text-text">notes</span>, all in one place.
+            Je{' '}
+            <span className="font-semibold text-text">route, transport, verblijf, activiteiten</span> en{' '}
+            <span className="font-semibold text-text">notities</span>, alles op één plek.
           </p>
         </div>
       </div>

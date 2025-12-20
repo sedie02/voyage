@@ -29,7 +29,7 @@ export default function AppHeader() {
             { href: '/trips', label: 'Plan' },
             { href: '/budget', label: 'Budget' },
             { href: '/packing', label: 'Pack' },
-            { href: '/discover', label: 'Discover' },
+            { href: '/discover', label: 'Ontdek' },
           ].map((item) => (
             <Link
               key={item.href}

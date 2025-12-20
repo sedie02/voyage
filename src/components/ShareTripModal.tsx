@@ -16,6 +16,7 @@ export default function ShareTripModal({ tripId, isOpen, onClose }: ShareTripMod
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
   const [maxParticipants, setMaxParticipants] = useState(10);
+  const [maxParticipantsInput, setMaxParticipantsInput] = useState('10');
   const [inviteLink, setInviteLink] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -40,6 +41,8 @@ export default function ShareTripModal({ tripId, isOpen, onClose }: ShareTripMod
       setInviteLink(null);
       setError(null);
       setCopied(false);
+      setMaxParticipants(10);
+      setMaxParticipantsInput('10');
     }
   }, [isOpen]);
 
@@ -48,12 +51,25 @@ export default function ShareTripModal({ tripId, isOpen, onClose }: ShareTripMod
       return; // Should not happen, but just in case
     }
 
+    // Validatie
+    const num = Number(maxParticipantsInput);
+    if (isNaN(num) || num < 1) {
+      setError('Vul een geldig aantal deelnemers in (minimaal 1)');
+      return;
+    }
+
+    if (num > 10) {
+      setError('Maximum aantal deelnemers is 10');
+      return;
+    }
+
     startTransition(async () => {
       try {
         setError(null);
-        const result = await createInviteLink(tripId, maxParticipants);
+        const result = await createInviteLink(tripId, num);
         if (result.success && result.url) {
           setInviteLink(result.url);
+          setMaxParticipants(num);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Er ging iets mis bij het maken van de link');
@@ -215,13 +231,28 @@ export default function ShareTripModal({ tripId, isOpen, onClose }: ShareTripMod
                     <input
                       type="number"
                       min="1"
-                      max="20"
-                      value={maxParticipants}
-                      onChange={(e) => setMaxParticipants(parseInt(e.target.value) || 1)}
+                      max="10"
+                      value={maxParticipantsInput}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Alleen nummers toestaan
+                        if (value === '' || /^\d+$/.test(value)) {
+                          setMaxParticipantsInput(value);
+                          setError(null);
+                        }
+                      }}
+                      onBlur={(e) => {
+                        const num = Number(e.target.value);
+                        if (isNaN(num) || num < 1) {
+                          setMaxParticipantsInput('1');
+                        } else if (num > 10) {
+                          setMaxParticipantsInput('10');
+                        }
+                      }}
                       className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                     <p className="text-xs text-gray-500">
-                      Hoeveel mensen kunnen deze link gebruiken om deel te nemen
+                      Hoeveel mensen kunnen deze link gebruiken om deel te nemen (maximaal 10)
                     </p>
                   </div>
 
