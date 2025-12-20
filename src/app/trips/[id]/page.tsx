@@ -335,12 +335,10 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
     const hasActivities = days.some((day: any) => day.activities && day.activities.length > 0);
 
     if (!hasActivities) {
-      console.log(
-        '📅 Days exist but no activities found in nested query, fetching activities separately...'
-      );
+      // Days exist but no activities found in nested query, fetching activities separately
       // Fetch activities separately for each day
       for (const day of days) {
-        console.log(`📅 Fetching activities for day ${day.day_number} (day_id: ${day.id})...`);
+        // Fetching activities for day
         const { data: dayActivities, error: activitiesError } = await supabase
           .from('activities')
           .select('*')
