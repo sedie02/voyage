@@ -82,8 +82,6 @@ export async function createTrip(formData: {
     }
 
     if (error) {
-      if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
-      }
       return {
         success: false,
         error: `Failed to create trip: ${error.message}`,
@@ -118,52 +116,45 @@ export async function updateTrip(
     activitiesBudget?: number;
   }
 ) {
-  try {
-    const supabase = await createClient();
+  const supabase = await createClient();
 
-    // Fetch city photo URL if destination changed
-    const { data: currentTrip } = await supabase
-      .from('trips')
-      .select('destination')
-      .eq('id', tripId)
-      .single();
+  // Fetch city photo URL if destination changed
+  const { data: currentTrip } = await supabase
+    .from('trips')
+    .select('destination')
+    .eq('id', tripId)
+    .single();
 
-    let cityPhotoUrl: string | null = null;
-    if (currentTrip && currentTrip.destination !== formData.destination) {
-      const { getCityPhotoUrl } = await import('@/lib/external/places');
-      cityPhotoUrl = await getCityPhotoUrl(formData.destination);
-    }
-
-    const updateData: any = {
-      title: formData.title,
-      destination: formData.destination,
-      start_date: formData.startDate,
-      end_date: formData.endDate,
-      description: formData.description || null,
-    };
-
-    if (typeof formData.activitiesBudget === 'number') {
-      updateData.activities_budget = formData.activitiesBudget;
-    }
-
-    if (cityPhotoUrl) {
-      updateData.city_photo_url = cityPhotoUrl;
-    }
-
-    const { error } = await supabase.from('trips').update(updateData).eq('id', tripId);
-
-    if (error) {
-      if (process.env.NODE_ENV !== 'test' && !process.env.CI) {
-      }
-      throw new Error(`Failed to update trip: ${error.message}`);
-    }
-
-    revalidatePath(`/trips/${tripId}`);
-    redirect(`/trips/${tripId}`);
-  } catch (error) {
-    // Trip creation in progress
-    throw error;
+  let cityPhotoUrl: string | null = null;
+  if (currentTrip && currentTrip.destination !== formData.destination) {
+    const { getCityPhotoUrl } = await import('@/lib/external/places');
+    cityPhotoUrl = await getCityPhotoUrl(formData.destination);
   }
+
+  const updateData: any = {
+    title: formData.title,
+    destination: formData.destination,
+    start_date: formData.startDate,
+    end_date: formData.endDate,
+    description: formData.description || null,
+  };
+
+  if (typeof formData.activitiesBudget === 'number') {
+    updateData.activities_budget = formData.activitiesBudget;
+  }
+
+  if (cityPhotoUrl) {
+    updateData.city_photo_url = cityPhotoUrl;
+  }
+
+  const { error } = await supabase.from('trips').update(updateData).eq('id', tripId);
+
+  if (error) {
+    throw new Error(`Failed to update trip: ${error.message}`);
+  }
+
+  revalidatePath(`/trips/${tripId}`);
+  redirect(`/trips/${tripId}`);
 }
 
 export async function deleteTrip(tripId: string) {

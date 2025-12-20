@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useEffect, useState, useTransition } from 'react';
+import { updateActivityOrder } from '@/app/trips/[id]/itinerary/actions';
 import {
+  closestCenter,
   DndContext,
+  DragEndEvent,
   KeyboardSensor,
   PointerSensor,
-  closestCenter,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -18,7 +18,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { updateActivityOrder } from '@/app/trips/[id]/itinerary/actions';
+import { useEffect, useState, useTransition } from 'react';
 import ActivityCard from './ActivityCard';
 
 interface Activity {
