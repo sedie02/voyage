@@ -236,7 +236,7 @@ describe('Trip Creation Endpoint - Integration Tests', () => {
       // Override insert to track trip data
       let insertedData: any;
       let currentTable: string | null = null;
-      
+
       mockSupabase.from = jest.fn((table: string) => {
         currentTable = table;
         return mockSupabase;
@@ -292,7 +292,7 @@ describe('Trip Creation Endpoint - Integration Tests', () => {
       // Override insert to track trip data
       let insertedData: any;
       let currentTable: string | null = null;
-      
+
       mockSupabase.from = jest.fn((table: string) => {
         currentTable = table;
         return mockSupabase;
