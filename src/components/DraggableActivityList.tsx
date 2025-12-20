@@ -53,15 +53,8 @@ function SortableActivityItem({ activity }: { activity: Activity }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="relative">
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
       <ActivityCard activity={activity} isDragging={isDragging} />
-      {/* Drag handle overlay */}
-      <div
-        {...attributes}
-        {...listeners}
-        className="absolute top-0 left-0 right-0 h-12 cursor-grab active:cursor-grabbing z-10"
-        style={{ pointerEvents: isDragging ? 'none' : 'auto' }}
-      />
     </div>
   );
 }

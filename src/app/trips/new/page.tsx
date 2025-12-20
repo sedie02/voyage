@@ -126,7 +126,7 @@ export default function NewTripPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg pb-24" ref={containerRef}>
+    <div className="min-h-screen bg-bg pb-24 overflow-x-hidden w-full max-w-full" ref={containerRef}>
       {/* Header */}
       <nav
         className="sticky top-0 z-50 border-b border-border bg-surface"
@@ -148,7 +148,7 @@ export default function NewTripPage() {
 
       {/* Progress Bar */}
       <div className="border-b border-border bg-surface">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+        <div className="mx-auto max-w-3xl px-3 sm:px-4 lg:px-6">
           <div className="h-1 bg-gray-100">
             <div
               className="h-full bg-primary transition-all duration-300"

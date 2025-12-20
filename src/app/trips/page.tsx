@@ -71,7 +71,7 @@ export default async function TripsPage() {
   const activeTrip = tripsWithPhotos?.[0] as any;
 
   return (
-    <div className="min-h-screen bg-bg pb-24">
+    <div className="min-h-screen bg-bg pb-24 overflow-x-hidden w-full max-w-full">
       {/* Header */}
       <div className="border-b border-border bg-surface px-4 py-6 sm:px-6 sm:py-8 lg:py-12">
         <div className="mx-auto max-w-6xl">

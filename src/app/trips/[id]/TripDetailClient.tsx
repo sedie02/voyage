@@ -104,7 +104,7 @@ export default function TripDetailClient({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 pb-24 overflow-x-hidden w-full max-w-full">
       {/* Hero Section */}
       <div className="relative h-96 overflow-hidden">
         {/* City photo with better fallback */}
