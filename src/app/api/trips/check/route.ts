@@ -1,5 +1,5 @@
-import { createClient } from '@/lib/supabase/server';
 import { getGuestSessionId } from '@/lib/session';
+import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -40,9 +40,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Error checking trips:', error);
-    return NextResponse.json(
-      { hasTrips: false, firstTripId: null },
-      { status: 500 }
-    );
+    return NextResponse.json({ hasTrips: false, firstTripId: null }, { status: 500 });
   }
 }
