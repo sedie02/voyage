@@ -349,12 +349,9 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
 
         if (!activitiesError && dayActivities) {
           day.activities = dayActivities;
-          console.log(`✅ Added ${dayActivities.length} activities to day ${day.day_number}`);
+          // Activities added to day
         } else {
-          console.log(
-            `❌ Error fetching activities for day ${day.day_number}:`,
-            activitiesError?.message
-          );
+          // Error fetching activities
           day.activities = [];
         }
       }
@@ -390,12 +387,9 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
 
         if (!activitiesError && dayActivities) {
           day.activities = dayActivities;
-          console.log(`✅ Added ${dayActivities.length} activities to day ${day.day_number}`);
+          // Activities added to day
         } else {
-          console.log(
-            `❌ Error fetching activities for day ${day.day_number}:`,
-            activitiesError?.message
-          );
+          // Error fetching activities
           day.activities = [];
         }
       }
