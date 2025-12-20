@@ -393,6 +393,101 @@ export async function deleteItinerary(tripId: string) {
 }
 
 /**
+ * Update activity order within a day
+ * Allows anyone with access to the trip to reorder activities
+ */
+export async function updateActivityOrder(
+  dayId: string,
+  activityIds: string[]
+): Promise<{ success: boolean }> {
+  try {
+    const supabase = await createClient();
+
+    // Get user or guest session
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const { getGuestSessionId } = await import('@/lib/session');
+    const guestSessionId = user ? null : await getGuestSessionId();
+
+    // Get day and trip info to check access
+    const { data: day, error: dayError } = await supabase
+      .from('days')
+      .select('trip_id, trip:trips(id, owner_id, guest_session_id)')
+      .eq('id', dayId)
+      .single();
+
+    if (dayError || !day) {
+      throw new Error('Dag niet gevonden');
+    }
+
+    const trip = day.trip as any;
+    if (!trip) {
+      throw new Error('Trip niet gevonden');
+    }
+
+    // Check access: user must be owner OR guest must match guest_session_id OR user is participant
+    const isOwner = user && trip.owner_id === user.id;
+    const isGuestOwner = !user && guestSessionId && trip.guest_session_id === guestSessionId;
+
+    // Check if user is a participant (via invite link)
+    let isParticipant = false;
+    if (user) {
+      const { data: participant } = await supabase
+        .from('trip_participants')
+        .select('id')
+        .eq('trip_id', trip.id)
+        .eq('user_id', user.id)
+        .single();
+      isParticipant = !!participant;
+    }
+
+    // For guests, check if they have access via invite link (check cookie/localStorage)
+    // We'll allow guests to reorder if they can see the trip (RLS will handle security)
+
+    if (!isOwner && !isGuestOwner && !isParticipant) {
+      // Try to check if guest has access via invite token
+      // If RLS allows them to see activities, they can reorder
+      const { data: testActivity } = await supabase
+        .from('activities')
+        .select('id')
+        .eq('day_id', dayId)
+        .limit(1)
+        .single();
+
+      if (!testActivity) {
+        throw new Error('Geen toegang tot deze planning');
+      }
+    }
+
+    // Update order_index for each activity
+    const updates = activityIds.map((activityId, index) => ({
+      id: activityId,
+      order_index: index,
+    }));
+
+    for (const update of updates) {
+      const { error: updateError } = await supabase
+        .from('activities')
+        .update({ order_index: update.order_index, updated_at: new Date().toISOString() })
+        .eq('id', update.id)
+        .eq('day_id', dayId);
+
+      if (updateError) {
+        console.error('Error updating activity order:', updateError);
+        throw new Error(`Fout bij bijwerken volgorde: ${updateError.message}`);
+      }
+    }
+
+    revalidatePath(`/trips/${trip.id}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error in updateActivityOrder:', error);
+    throw error;
+  }
+}
+
+/**
  * Add activities to existing days
  */
 async function addActivitiesToExistingDays(
