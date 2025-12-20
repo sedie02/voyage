@@ -2,7 +2,7 @@
 
 import { getCityPhotoUrl } from '@/lib/external/places';
 import { getOrCreateGuestSession } from '@/lib/session';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -88,7 +88,46 @@ export async function createTrip(formData: {
       };
     }
 
+    // Automatically create default packing categories for the new trip
+    if (trip?.id) {
+      const defaultCategories = [
+        { name: 'Kleding', order_index: 0 },
+        { name: 'Toiletartikelen', order_index: 1 },
+        { name: 'Elektronica', order_index: 2 },
+        { name: 'Documenten', order_index: 3 },
+        { name: 'Medicijnen', order_index: 4 },
+        { name: 'Overig', order_index: 5 },
+      ];
+
+      // Try to insert categories (silently fail if table doesn't exist or RLS blocks it)
+      try {
+        const insertResult = await supabase.from('packing_categories').insert(
+          defaultCategories.map((cat) => ({
+            trip_id: trip.id,
+            name: cat.name,
+            order_index: cat.order_index,
+          }))
+        );
+
+        // If insert fails and user is guest, try with service client
+        if (insertResult.error && !user && guestSessionId) {
+          const service = createServiceClient();
+          await service.from('packing_categories').insert(
+            defaultCategories.map((cat) => ({
+              trip_id: trip.id,
+              name: cat.name,
+              order_index: cat.order_index,
+            }))
+          );
+        }
+      } catch (categoryError) {
+        // Silently fail - categories can be created manually later
+        console.log('Could not auto-create packing categories:', categoryError);
+      }
+    }
+
     revalidatePath('/trips');
+    revalidatePath('/packing');
 
     // Return trip data ipv redirect
     return {
