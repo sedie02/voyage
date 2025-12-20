@@ -63,7 +63,7 @@ CREATE TRIGGER trigger_auto_create_packing_categories
 -- TEST: Controleer of de trigger werkt
 -- ================================================
 -- Test de trigger door een test trip aan te maken (verwijder daarna):
--- 
+--
 -- INSERT INTO trips (title, destination, start_date, end_date)
 -- VALUES ('Test Trip', 'Test', '2025-01-01', '2025-01-02')
 -- RETURNING id;

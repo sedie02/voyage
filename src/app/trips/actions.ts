@@ -2,7 +2,7 @@
 
 import { getCityPhotoUrl } from '@/lib/external/places';
 import { getOrCreateGuestSession } from '@/lib/session';
-import { createClient, createServiceClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
