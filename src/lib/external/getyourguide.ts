@@ -81,6 +81,7 @@ export async function scrapeGetYourGuideActivities(
         }
 
         const html = await response.text();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const $: any = load(html);
 
         // Try multiple selectors for GetYourGuide activity cards
@@ -97,9 +98,11 @@ export async function scrapeGetYourGuideActivities(
         ];
 
         for (const selector of selectors) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           $(selector).each((_i: any, element: any) => {
             if (activities.length >= maxResults) return false;
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const $el: any = $(element);
 
             // Extract title - try multiple ways
@@ -176,6 +179,7 @@ export async function scrapeGetYourGuideActivities(
             // Extract URL - prioritize activity links
             let url = null;
             // Try to find activity link
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             $el.find('a[href*="/activity/"]').each((_j: any, link: any) => {
               const href = $(link).attr('href');
               if (href && href.includes('/activity/')) {
@@ -252,12 +256,14 @@ export async function scrapeGetYourGuideActivities(
         }
 
         // Also try JSON-LD structured data
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         $('script[type="application/ld+json"]').each((_i: any, element: any) => {
           try {
             const jsonStr = $(element).html() || '';
             const data = JSON.parse(jsonStr);
 
             if (Array.isArray(data)) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               data.forEach((item: any) => {
                 if (
                   (item['@type'] === 'TouristAttraction' ||
@@ -350,7 +356,7 @@ export async function scrapeGetYourGuideActivities(
     debug(`Found ${activities.length} activities from GetYourGuide`);
     return activities.slice(0, maxResults);
   } catch (error) {
-    console.error('Error scraping GetYourGuide:', error);
+    // Error scraping GetYourGuide - fallback to generated activities
     return [];
   }
 }
@@ -413,9 +419,7 @@ export function generateFallbackActivities(
   const activitiesPerDay = Math.max(2, Math.min(3, Math.ceil(templatesList.length / numDays)));
   const totalActivities = numDays * activitiesPerDay;
 
-  console.log(
-    `Generating ${totalActivities} fallback activities for ${numDays} days (${activitiesPerDay} per day)`
-  );
+  // Generating fallback activities
 
   for (let i = 0; i < totalActivities; i++) {
     const template = templatesList[i % templatesList.length];
@@ -432,6 +436,6 @@ export function generateFallbackActivities(
     });
   }
 
-  console.log(`Generated ${activities.length} fallback activities`);
+  // Generated fallback activities
   return activities;
 }

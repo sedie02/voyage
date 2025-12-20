@@ -42,7 +42,7 @@ export async function generateItinerary(tripId: string, includeActivities: boole
       throw new Error('Alleen de planner kan planning genereren');
     }
 
-    console.log('📅 generateItinerary called:', { tripId, includeActivities });
+    // generateItinerary called
 
     // Check if days already exist
     const { data: existingDays } = await supabase
@@ -57,23 +57,19 @@ export async function generateItinerary(tripId: string, includeActivities: boole
       .eq('trip_id', tripId)
       .limit(1);
 
-    console.log('📅 Existing data check:', {
-      daysCount: existingDays?.length || 0,
-      activitiesCount: existingActivities?.length || 0,
-    });
+    // Existing data check
 
     // If days exist but no activities, add activities to existing days
     if (existingDays && existingDays.length > 0) {
       if (existingActivities && existingActivities.length > 0) {
-        console.log('📅 Planning already exists with activities');
+        // Planning already exists with activities
         throw new Error(
           'Planning bestaat al. Verwijder eerst bestaande dagen om opnieuw te genereren.'
         );
       }
       // Days exist but no activities - add activities to existing days
-      console.log('📅 Days exist but no activities, calling addActivitiesToExistingDays...');
+      // Days exist but no activities, calling addActivitiesToExistingDays
       const result = await addActivitiesToExistingDays(tripId, existingDays, trip);
-      console.log('📅 addActivitiesToExistingDays result:', result);
       return result;
     }
 
@@ -135,7 +131,6 @@ export async function generateItinerary(tripId: string, includeActivities: boole
     }
 
     if (insertError) {
-      console.error('Error generating itinerary:', insertError);
       throw new Error(`Fout bij genereren planning: ${insertError.message}`);
     }
 
@@ -152,13 +147,11 @@ export async function generateItinerary(tripId: string, includeActivities: boole
         );
 
         // If scraping failed, use fallback
-        console.log(`Scraped ${activities.length} activities, generating fallback if needed...`);
+
         const finalActivities =
           activities.length > 0
             ? activities
             : generateFallbackActivities(trip.destination, travelStyle, insertedDays.length);
-
-        console.log(`Using ${finalActivities.length} activities for ${insertedDays.length} days`);
 
         // Distribute activities across days
         const dayParts: ('morning' | 'afternoon' | 'evening')[] = [
@@ -168,17 +161,12 @@ export async function generateItinerary(tripId: string, includeActivities: boole
         ];
         let activityIndex = 0;
 
-        console.log(
-          `Starting to distribute ${finalActivities.length} activities across ${insertedDays.length} days`
-        );
-
         for (const day of insertedDays) {
           // Add 2-3 activities per day
           const activitiesPerDay = Math.min(
             3,
             Math.ceil(finalActivities.length / insertedDays.length)
           );
-          console.log(`Day ${day.day_number}: Adding ${activitiesPerDay} activities`);
 
           for (let i = 0; i < activitiesPerDay && activityIndex < finalActivities.length; i++) {
             const activity = finalActivities[activityIndex];
@@ -221,21 +209,12 @@ export async function generateItinerary(tripId: string, includeActivities: boole
             };
 
             // Try to insert with minimal fields first
-            console.log(
-              `📅 Attempting to insert activity "${activity.title}" for day ${day.day_number}...`
-            );
+
             const { error: activityError, data: insertedActivity } = await supabase
               .from('activities')
               .insert(minimalActivity)
               .select('id')
               .single();
-
-            console.log(`📅 Insert result for "${activity.title}":`, {
-              success: !activityError,
-              error: activityError?.message,
-              errorCode: activityError?.code,
-              insertedId: insertedActivity?.id,
-            });
 
             // If that works, try to add optional fields using the activity ID
             if (!activityError && insertedActivity?.id) {
@@ -298,7 +277,6 @@ export async function generateItinerary(tripId: string, includeActivities: boole
                         !fieldError.message?.includes('column') &&
                         !fieldError.message?.includes('does not exist')
                       ) {
-                        console.warn(`⚠️ Could not update ${key}:`, fieldError.message);
                       }
                     } catch (e) {
                       // Ignore individual field errors
@@ -317,17 +295,12 @@ export async function generateItinerary(tripId: string, includeActivities: boole
               );
             } else {
               // If minimal insert fails, log the error
-              console.error(
-                `❌ Could not insert activity "${activity.title}":`,
-                activityError?.message
-              );
             }
 
             activityIndex++;
           }
         }
       } catch (err) {
-        console.error('❌ Error adding activities:', err);
         // Don't fail if activities fail, days are already created
       }
     }
@@ -340,7 +313,6 @@ export async function generateItinerary(tripId: string, includeActivities: boole
       activitiesAdded,
     };
   } catch (error) {
-    console.error('Error in generateItinerary:', error);
     throw error;
   }
 }
@@ -380,14 +352,12 @@ export async function deleteItinerary(tripId: string) {
     const { error: deleteError } = await supabase.from('days').delete().eq('trip_id', tripId);
 
     if (deleteError) {
-      console.error('Error deleting itinerary:', deleteError);
       throw new Error(`Fout bij verwijderen planning: ${deleteError.message}`);
     }
 
     revalidatePath(`/trips/${tripId}`);
     return { success: true };
   } catch (error) {
-    console.error('Error in deleteItinerary:', error);
     throw error;
   }
 }
@@ -474,7 +444,6 @@ export async function updateActivityOrder(
         .eq('day_id', dayId);
 
       if (updateError) {
-        console.error('Error updating activity order:', updateError);
         throw new Error(`Fout bij bijwerken volgorde: ${updateError.message}`);
       }
     }
@@ -482,7 +451,6 @@ export async function updateActivityOrder(
     revalidatePath(`/trips/${trip.id}`);
     return { success: true };
   } catch (error) {
-    console.error('Error in updateActivityOrder:', error);
     throw error;
   }
 }
@@ -496,21 +464,10 @@ async function addActivitiesToExistingDays(
   trip: any
 ): Promise<{ success: boolean; days: any[]; count: number; activitiesAdded: number }> {
   try {
-    console.log('📅 addActivitiesToExistingDays called:', {
-      tripId,
-      daysCount: days.length,
-      destination: trip.destination,
-      travelStyle: trip.travel_style,
-    });
-
     const supabase = await createClient();
     const travelStyle = trip.travel_style || 'mixed';
 
     // Scrape activities from GetYourGuide
-    console.log('📅 Scraping GetYourGuide activities...');
-    console.log('📅 Destination:', trip.destination);
-    console.log('📅 Travel style:', travelStyle);
-    console.log('📅 Days:', days.length);
 
     const activities = await scrapeGetYourGuideActivities(
       trip.destination,
@@ -518,7 +475,6 @@ async function addActivitiesToExistingDays(
       days.length * 3 // 3 activities per day
     );
 
-    console.log(`📅 Scraped ${activities.length} activities from GetYourGuide`);
     console.log(
       '📅 First 3 activities:',
       activities.slice(0, 3).map((a) => ({
@@ -532,23 +488,18 @@ async function addActivitiesToExistingDays(
     const activitiesWithUrls = activities.filter(
       (a) => a.url && a.url.includes('getyourguide.com')
     );
-    console.log(`📅 Activities with GetYourGuide URLs: ${activitiesWithUrls.length}`);
 
     let finalActivities: GetYourGuideActivity[];
     if (activitiesWithUrls.length > 0) {
       finalActivities = activitiesWithUrls;
-      console.log(`✅ Using ${finalActivities.length} scraped GetYourGuide activities`);
     } else if (activities.length > 0) {
       // Use scraped activities even without URLs (might have other info)
       finalActivities = activities;
       console.log(`⚠️ Using ${finalActivities.length} scraped activities (no URLs)`);
     } else {
-      console.log(`❌ No activities scraped, generating fallback...`);
       finalActivities = generateFallbackActivities(trip.destination, travelStyle, days.length);
-      console.log(`📅 Generated ${finalActivities.length} fallback activities`);
     }
 
-    console.log(`📅 Final: Using ${finalActivities.length} activities for ${days.length} days`);
     console.log(
       `📅 First 3 activities:`,
       finalActivities.slice(0, 3).map((a) => a.title)
@@ -559,10 +510,6 @@ async function addActivitiesToExistingDays(
     let activityIndex = 0;
     let activitiesAdded = 0;
 
-    console.log(
-      `Starting to distribute ${finalActivities.length} activities across ${days.length} days`
-    );
-
     // Fetch days with day_number to ensure we have it
     const { data: daysWithNumbers } = await supabase
       .from('days')
@@ -572,9 +519,7 @@ async function addActivitiesToExistingDays(
 
     const daysToUse = daysWithNumbers || days;
 
-    console.log(`📅 Days to use: ${daysToUse.length}, Final activities: ${finalActivities.length}`);
     if (finalActivities.length === 0) {
-      console.error('❌ NO ACTIVITIES TO INSERT!');
       return {
         success: true,
         days: days,
@@ -633,9 +578,7 @@ async function addActivitiesToExistingDays(
         const activityWithTripId = { ...minimalActivity, trip_id: tripId };
 
         // Try to insert with minimal fields first (with trip_id)
-        console.log(
-          `📅 Attempting to insert activity "${activity.title}" for day ${day.day_number}...`
-        );
+
         let { error: activityError, data: insertedActivity } = await supabase
           .from('activities')
           .insert(activityWithTripId)
@@ -644,7 +587,6 @@ async function addActivitiesToExistingDays(
 
         // If that fails due to trip_id column, retry without it
         if (activityError && activityError.message?.includes('trip_id')) {
-          console.log(`📅 trip_id column not found, retrying without trip_id...`);
           const { error: retryError, data: retryData } = await supabase
             .from('activities')
             .insert(minimalActivity)
@@ -654,14 +596,6 @@ async function addActivitiesToExistingDays(
           activityError = retryError;
           insertedActivity = retryData;
         }
-
-        console.log(`📅 Insert result for "${activity.title}":`, {
-          success: !activityError,
-          error: activityError?.message,
-          errorCode: activityError?.code,
-          insertedId: insertedActivity?.id,
-          hasUrl: !!activity.url,
-        });
 
         // If that works, try to add optional fields using the activity ID
         if (!activityError && insertedActivity?.id) {
@@ -724,7 +658,6 @@ async function addActivitiesToExistingDays(
                     !fieldError.message?.includes('column') &&
                     !fieldError.message?.includes('does not exist')
                   ) {
-                    console.warn(`⚠️ Could not update ${key}:`, fieldError.message);
                   }
                 } catch (e) {
                   // Ignore individual field errors
@@ -743,10 +676,6 @@ async function addActivitiesToExistingDays(
           );
         } else {
           // If minimal insert fails, log the error
-          console.error(
-            `❌ Could not insert activity "${activity.title}":`,
-            activityError?.message
-          );
         }
 
         activityIndex++;
@@ -761,7 +690,6 @@ async function addActivitiesToExistingDays(
       activitiesAdded,
     };
   } catch (error) {
-    console.error('Error in addActivitiesToExistingDays:', error);
     throw error;
   }
 }

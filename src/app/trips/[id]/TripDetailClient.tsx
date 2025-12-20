@@ -95,13 +95,7 @@ export default function TripDetailClient({
 
   // Debug: check if cityPhotoUrl exists
   const cityPhotoUrl = (trip as any).cityPhotoUrl || trip.city_photo_url || null;
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Trip photo URL:', {
-      cityPhotoUrl,
-      city_photo_url: trip.city_photo_url,
-      destination: trip.destination,
-    });
-  }
+  // Trip photo URL prepared
 
   return (
     <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-gray-50 pb-24">
@@ -117,13 +111,7 @@ export default function TripDetailClient({
             alt={trip.destination}
             className="absolute inset-0 h-full w-full object-cover"
             onError={(e) => {
-              console.error('Image failed to load:', cityPhotoUrl);
               (e.currentTarget as HTMLImageElement).style.display = 'none';
-            }}
-            onLoad={() => {
-              if (process.env.NODE_ENV === 'development') {
-                console.log('Image loaded successfully:', cityPhotoUrl);
-              }
             }}
           />
         )}

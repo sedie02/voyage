@@ -151,16 +151,6 @@ export default function ItineraryTab({ tripId, days, isOwner }: ItineraryTabProp
     });
   };
 
-  const getDayPartLabel = (dayPart: string) => {
-    const labels: Record<string, string> = {
-      morning: 'Ochtend',
-      afternoon: 'Middag',
-      evening: 'Avond',
-      full_day: 'Hele dag',
-    };
-    return labels[dayPart] || dayPart;
-  };
-
   if (days.length === 0) {
     return (
       <div className="py-12 text-center">

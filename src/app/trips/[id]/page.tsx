@@ -21,13 +21,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   let trip: any = null;
   let error: any = null;
 
-  console.log('Fetching trip:', {
-    tripId: id,
-    userId: user?.id,
-    guestSessionId,
-    hasUser: !!user,
-    hasGuestSession: !!guestSessionId,
-  });
+  // Fetching trip data
 
   // Try fetching with basic query first
   let result = await supabase.from('trips').select('*').eq('id', id).single();
@@ -35,27 +29,20 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   trip = result.data;
   error = result.error;
 
-  console.log('Basic query result:', {
-    hasTrip: !!trip,
-    error: error?.message,
-    errorCode: error?.code,
-  });
+  // Basic query executed
 
   // If that fails, try with owner filter
   if ((error || !trip) && user) {
-    console.log('Trying with owner_id filter...');
+    // Trying with owner_id filter
     result = await supabase.from('trips').select('*').eq('id', id).eq('owner_id', user.id).single();
     trip = result.data;
     error = result.error;
-    console.log('Owner query result:', {
-      hasTrip: !!trip,
-      error: error?.message,
-    });
+    // Owner query executed
   }
 
   // If that fails, try with guest_session_id
   if ((error || !trip) && guestSessionId) {
-    console.log('Trying with guest_session_id filter...', guestSessionId);
+    // Trying with guest_session_id filter
     result = await supabase
       .from('trips')
       .select('*')
@@ -64,34 +51,17 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
       .single();
     trip = result.data;
     error = result.error;
-    console.log('Guest query result:', {
-      hasTrip: !!trip,
-      error: error?.message,
-      guestSessionId,
-    });
+    // Guest query executed
   }
 
   // If still not found, try without any owner (fallback)
   if (error || !trip) {
-    console.log('Trying without owner filter...');
     result = await supabase.from('trips').select('*').eq('id', id).is('owner_id', null).single();
     trip = result.data;
     error = result.error;
-    console.log('No owner query result:', {
-      hasTrip: !!trip,
-      error: error?.message,
-    });
   }
 
   if (error || !trip) {
-    console.error('All queries failed. Final error:', {
-      error: error?.message,
-      errorCode: error?.code,
-      errorDetails: JSON.stringify(error),
-      tripId: id,
-      userId: user?.id,
-      guestSessionId,
-    });
     notFound();
   }
 
@@ -150,7 +120,6 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
         }
       } catch (err) {
         // Admin function might not be available, continue without it
-        console.warn('Could not fetch owner user info:', err);
       }
     }
 
@@ -174,12 +143,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
       // Always use email - if we don't have it, we need to find it
       const email = ownerEmail || null;
 
-      console.log('Adding owner as participant:', {
-        ownerId: trip.owner_id,
-        ownerName,
-        email,
-        hasOwnerUser: !!ownerUser,
-      });
+      // Adding owner as participant
 
       // Add owner as participant (virtual, not in DB yet)
       participants = [
@@ -279,13 +243,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
 
   const finalTrip = trip;
 
-  console.log('Trip found successfully:', {
-    tripId: finalTrip.id,
-    title: finalTrip.title,
-    ownerId: finalTrip.owner_id,
-    guestSessionId: finalTrip.guest_session_id,
-    participantCount: finalTrip.trip_participants?.length || 0,
-  });
+  // Trip found successfully
 
   // Check if user is owner (authenticated user) OR guest is owner (via guest_session_id)
   const isOwner =
@@ -301,7 +259,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   const cityPhotoUrl = finalTrip.city_photo_url || (await getCityPhotoUrl(finalTrip.destination));
 
   // Fetch days for itinerary with activities
-  console.log('📅 Fetching days for trip:', id);
+  // Fetching days for trip
   let days: any[] = [];
   let daysError: any = null;
 
@@ -338,7 +296,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
       daysError.message?.includes('poi_category') ||
       daysError.message?.includes('estimated_cost'))
   ) {
-    console.log('📅 Query failed due to missing columns, retrying with minimal fields...');
+    // Query failed due to missing columns, retrying with minimal fields
     const { data: daysDataRetry, error: daysErrorRetry } = await supabase
       .from('days')
       .select(
@@ -369,25 +327,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
     daysError = daysErrorRetry;
   }
 
-  console.log('📅 Days query result:', {
-    daysCount: days?.length || 0,
-    error: daysError?.message,
-    errorCode: daysError?.code,
-    errorDetails: daysError ? JSON.stringify(daysError, null, 2) : null,
-    days: days?.map((day: any) => ({
-      id: day.id,
-      day_number: day.day_number,
-      date: day.date,
-      activitiesCount: day.activities?.length || 0,
-      activities: day.activities?.map((a: any) => ({
-        id: a.id,
-        title: a.title,
-        day_part: a.day_part,
-        start_time: a.start_time,
-        location_name: a.location_name,
-      })),
-    })),
-  });
+  // Days query executed
 
   // ALWAYS check if activities are missing and fetch them separately
   if (days && days.length > 0) {
@@ -407,16 +347,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
           .eq('day_id', day.id)
           .order('order_index', { ascending: true });
 
-        console.log(`📅 Activities query result for day ${day.day_number}:`, {
-          activitiesCount: dayActivities?.length || 0,
-          error: activitiesError?.message,
-          errorCode: activitiesError?.code,
-          activities: dayActivities?.map((a: any) => ({
-            id: a.id,
-            title: a.title,
-            day_part: a.day_part,
-          })),
-        });
+        // Activities query executed
 
         if (!activitiesError && dayActivities) {
           day.activities = dayActivities;
@@ -434,39 +365,30 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
 
   // If no days found, try a simple query without nested activities
   if (!days || days.length === 0) {
-    console.log('📅 No days found, trying simple query...');
+    // No days found, trying simple query
     const { data: simpleDays, error: simpleError } = await supabase
       .from('days')
       .select('*')
       .eq('trip_id', id)
       .order('day_number', { ascending: true });
 
-    console.log('📅 Simple days query result:', {
-      daysCount: simpleDays?.length || 0,
-      error: simpleError?.message,
-      days: simpleDays,
-    });
+    // Simple days query executed
 
     if (simpleDays && simpleDays.length > 0) {
       // Days exist but query with activities failed - fetch activities separately
       days = simpleDays;
 
       // Fetch activities separately for each day
-      console.log('📅 Fetching activities separately for days...');
+      // Fetching activities separately for days
       for (const day of days) {
-        console.log(`📅 Fetching activities for day ${day.day_number} (day_id: ${day.id})...`);
+        // Fetching activities for day
         const { data: dayActivities, error: activitiesError } = await supabase
           .from('activities')
           .select('*')
           .eq('day_id', day.id)
           .order('order_index', { ascending: true });
 
-        console.log(`📅 Activities query result for day ${day.day_number}:`, {
-          activitiesCount: dayActivities?.length || 0,
-          error: activitiesError?.message,
-          errorCode: activitiesError?.code,
-          activities: dayActivities,
-        });
+        // Activities query executed
 
         if (!activitiesError && dayActivities) {
           day.activities = dayActivities;
@@ -482,17 +404,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
     }
   }
 
-  console.log('📅 Final days being passed to TripDetailClient:', {
-    daysCount: days?.length || 0,
-    days: days?.map((day: any) => ({
-      id: day.id,
-      day_number: day.day_number,
-      date: day.date,
-      activitiesCount: day.activities?.length || 0,
-      hasActivities: !!day.activities,
-      activities: day.activities?.slice(0, 2), // First 2 activities for debugging
-    })),
-  });
+  // Final days prepared for TripDetailClient
 
   let packingCategories: any[] = [];
   let packingItems: any[] = [];

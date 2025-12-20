@@ -11,6 +11,7 @@ import { cookies } from 'next/headers';
  * Maak Supabase client voor Server Components
  * Gebruikt cookies voor session management
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createClient(): Promise<any> {
   const cookieStore = cookies();
   return createServerClient<Database>(
@@ -45,6 +46,7 @@ export async function createClient(): Promise<any> {
  * Service role client voor admin operations
  * ALLEEN gebruiken in API routes, NOOIT in client!
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createServiceClient(): any {
   // Service client used only on server-side. Cast to `any` to avoid spreading DB-generic types
   // across code while we finish typing the Database definitions.
@@ -57,5 +59,6 @@ export function createServiceClient(): any {
         setAll: () => {},
       },
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) as any;
 }
