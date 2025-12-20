@@ -222,7 +222,7 @@ export default async function TripsPage() {
                     Route
                   </button>
                   <button className="flex-1 rounded-full border border-border px-4 py-2 text-xs font-semibold text-text-muted transition-colors hover:bg-gray-50 hover:text-text sm:flex-none sm:px-6 sm:py-2.5 sm:text-sm">
-                    Bookings
+                    Boekingen
                   </button>
                 </div>
               </div>
