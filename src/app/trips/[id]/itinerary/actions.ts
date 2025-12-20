@@ -263,7 +263,7 @@ export async function generateItinerary(tripId: string, includeActivities: boole
                 // Try updating fields one by one to handle missing columns
                 for (const [key, value] of Object.entries(updates)) {
                   try {
-                    const { error: fieldError } = await supabase
+                    const { error: _fieldError } = await supabase
                       .from('activities')
                       .update({ [key]: value })
                       .eq('id', insertedActivity.id);
@@ -628,7 +628,7 @@ async function addActivitiesToExistingDays(
               // Try updating fields one by one to handle missing columns
               for (const [key, value] of Object.entries(updates)) {
                 try {
-                  const { error: fieldError } = await supabase
+                  const { error: _fieldError } = await supabase
                     .from('activities')
                     .update({ [key]: value })
                     .eq('id', insertedActivity.id);
