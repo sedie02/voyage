@@ -2,20 +2,43 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function AppHeader() {
   const pathname = usePathname();
+  const [firstTripId, setFirstTripId] = useState<string | null>(null);
   const isCurrent = (p: string) => pathname === p || pathname?.startsWith(`${p}/`);
 
   // Extract trip ID from pathname if we're on a trip detail page
   const tripIdMatch = pathname?.match(new RegExp('^/trips/([^/]+)$'));
   const currentTripId = tripIdMatch ? tripIdMatch[1] : null;
 
+  useEffect(() => {
+    // Get first trip ID for Pack button navigation
+    const fetchFirstTripId = async () => {
+      try {
+        const response = await fetch('/api/trips/check');
+        const data = await response.json();
+        setFirstTripId(data.firstTripId || null);
+      } catch (error) {
+        console.error('Error fetching first trip ID:', error);
+      }
+    };
+    fetchFirstTripId();
+  }, [pathname]);
+
+  // Determine Pack button href
+  const packHref = currentTripId
+    ? `/trips/${currentTripId}?tab=packing`
+    : firstTripId
+      ? `/trips/${firstTripId}?tab=packing`
+      : '/packing';
+
   const navItems = [
     { href: '/trips', label: 'Plan' },
     { href: '/budget', label: 'Budget' },
     {
-      href: currentTripId ? `/trips/${currentTripId}?tab=packing` : '/packing',
+      href: packHref,
       label: 'Pack',
     },
     { href: '/discover', label: 'Ontdek' },

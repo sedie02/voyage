@@ -7,14 +7,16 @@ import { useEffect, useState } from 'react';
 export default function BottomNav() {
   const pathname = usePathname();
   const [hasTrips, setHasTrips] = useState(true);
+  const [firstTripId, setFirstTripId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if user has trips
+    // Check if user has trips and get first trip ID
     const checkTrips = async () => {
       try {
         const response = await fetch('/api/trips/check');
         const data = await response.json();
         setHasTrips(data.hasTrips);
+        setFirstTripId(data.firstTripId || null);
       } catch (error) {
         console.error('Error checking trips:', error);
       }
@@ -121,7 +123,13 @@ export default function BottomNav() {
         </Link>
 
         <Link
-          href={currentTripId ? `/trips/${currentTripId}?tab=packing` : getNavLink('/packing')}
+          href={
+            currentTripId
+              ? `/trips/${currentTripId}?tab=packing`
+              : firstTripId
+                ? `/trips/${firstTripId}?tab=packing`
+                : getNavLink('/packing')
+          }
           className={`flex flex-col items-center gap-1 rounded-full px-4 py-2.5 transition-all duration-200 sm:px-6 ${
             isActive('/packing') || pathname?.startsWith('/trips/')
               ? 'bg-primary-50 text-primary'
