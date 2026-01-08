@@ -274,7 +274,7 @@ export async function migrateGuestTripsToUser() {
     }
 
     // Update all guest trips to belong to the new user
-    const tripIds = guestTrips.map((trip) => trip.id);
+    const tripIds = guestTrips.map((trip: { id: string }) => trip.id);
     const { error: updateError } = await supabase
       .from('trips')
       .update({
