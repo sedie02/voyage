@@ -2,7 +2,6 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { APP_URL } from '@/config/constants';
 
 /**
  * Create an invite link for a trip
