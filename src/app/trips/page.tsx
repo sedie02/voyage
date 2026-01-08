@@ -28,7 +28,7 @@ export default async function TripsPage() {
         .is('owner_id', null);
 
       if (guestTrips && guestTrips.length > 0) {
-        const tripIds = guestTrips.map((trip) => trip.id);
+        const tripIds = guestTrips.map((trip: { id: string }) => trip.id);
         await supabase
           .from('trips')
           .update({
