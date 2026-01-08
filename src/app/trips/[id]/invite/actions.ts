@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { APP_URL } from '@/config/constants';
 
 /**
  * Create an invite link for a trip
@@ -84,10 +85,16 @@ export async function createInviteLink(
     }
 
     revalidatePath(`/trips/${tripId}`);
+
+    // Determine base URL - prefer environment variable, fallback to production domain or localhost
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      (process.env.NODE_ENV === 'production' ? 'https://voyagetravel.nl' : 'http://localhost:3000');
+
     return {
       success: true,
       token,
-      url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/invite/${token}`,
+      url: `${baseUrl}/invite/${token}`,
       maxParticipants,
     };
   } catch (error) {

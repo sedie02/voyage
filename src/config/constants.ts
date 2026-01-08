@@ -12,8 +12,11 @@ export const APP_DESCRIPTION = 'Slimme collaboratieve reisplanner';
 
 /**
  * URLs
+ * Prefers environment variable, falls back to production domain or localhost
  */
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+export const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.NODE_ENV === 'production' ? 'https://voyagetravel.nl' : 'http://localhost:3000');
 
 /**
  * Travel Styles
