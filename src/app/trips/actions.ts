@@ -1,7 +1,7 @@
 'use server';
 
 import { getCityPhotoUrl } from '@/lib/external/places';
-import { getOrCreateGuestSession } from '@/lib/session';
+import { getGuestSessionId, getOrCreateGuestSession } from '@/lib/session';
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -231,4 +231,70 @@ export async function duplicateTrip(tripId: string) {
 
   revalidatePath('/trips');
   redirect(`/trips/${newTrip.id}`);
+}
+
+/**
+ * Migrate guest trips to user account
+ * Automatically gets guest_session_id from cookie and migrates trips to the authenticated user
+ * Called after successful login/registration to transfer trips from guest_session_id to owner_id
+ */
+export async function migrateGuestTripsToUser() {
+  try {
+    const supabase = await createClient();
+
+    // Get current user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    // Get guest session ID from cookie
+    const guestSessionId = await getGuestSessionId();
+    if (!guestSessionId) {
+      return { success: true, migrated: 0 };
+    }
+
+    // Find all trips with this guest_session_id that don't have an owner yet
+    const { data: guestTrips, error: fetchError } = await supabase
+      .from('trips')
+      .select('id')
+      .eq('guest_session_id', guestSessionId)
+      .is('owner_id', null);
+
+    if (fetchError) {
+      console.error('Error fetching guest trips:', fetchError);
+      return { success: false, error: fetchError.message };
+    }
+
+    if (!guestTrips || guestTrips.length === 0) {
+      return { success: true, migrated: 0 };
+    }
+
+    // Update all guest trips to belong to the new user
+    const tripIds = guestTrips.map((trip) => trip.id);
+    const { error: updateError } = await supabase
+      .from('trips')
+      .update({
+        owner_id: user.id,
+        guest_session_id: null, // Clear guest_session_id since it's now owned by a user
+      })
+      .in('id', tripIds);
+
+    if (updateError) {
+      console.error('Error migrating guest trips:', updateError);
+      return { success: false, error: updateError.message };
+    }
+
+    revalidatePath('/trips');
+    return { success: true, migrated: tripIds.length };
+  } catch (error) {
+    console.error('Error in migrateGuestTripsToUser:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
 }

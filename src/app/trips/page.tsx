@@ -17,6 +17,28 @@ export default async function TripsPage() {
 
   // If user is logged in, fetch their trips
   if (user && !userError) {
+    // Check if there are guest trips to migrate
+    const guestSessionId = await getGuestSessionId();
+    if (guestSessionId) {
+      // Migrate guest trips to user account
+      const { data: guestTrips } = await supabase
+        .from('trips')
+        .select('id')
+        .eq('guest_session_id', guestSessionId)
+        .is('owner_id', null);
+
+      if (guestTrips && guestTrips.length > 0) {
+        const tripIds = guestTrips.map((trip) => trip.id);
+        await supabase
+          .from('trips')
+          .update({
+            owner_id: user.id,
+            guest_session_id: null,
+          })
+          .in('id', tripIds);
+      }
+    }
+
     const { data, error } = await supabase
       .from('trips')
       .select(
